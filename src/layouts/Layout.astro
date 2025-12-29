@@ -1,13 +1,23 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+import '@fontsource-variable/onest';
+import "../styles/global.css";
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html class="dark" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft</title>
+  </head>
+  <body class="bg-[rgb(var(--background))] text-[rgb(var(--foreground))]">
+    <Header />
+    <slot />
+    <Footer />
+  </body>
 </html>

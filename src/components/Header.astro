@@ -1,0 +1,78 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/dmz-title.png";
+---
+
+<header 
+  id="main-header"
+  class="fixed top-0 z-50 w-full transition-all duration-300 ease-in-out border-b border-transparent"
+>
+  <div class="mx-auto flex h-20 w-full items-center justify-between px-6 md:px-8">
+    
+    <div class="flex items-center h-full z-[60]">
+      <Image
+        src={logo}
+        alt="DragonMineZ - Logo"
+        class="h-12 md:h-14 w-auto object-contain"
+      />
+    </div>
+
+    <button 
+      id="menu-button"
+      class="block md:hidden text-[rgb(var(--foreground))] z-[60] p-2 select-none"
+      aria-label="Toggle Menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+    
+    <nav 
+      id="main-nav"
+      class="fixed md:static inset-0 bg-[rgb(var(--background))] md:bg-transparent flex flex-col md:flex-row items-center justify-center md:justify-end gap-8 md:gap-6 text-2xl md:text-xl font-semibold text-[rgb(var(--foreground))]/80 transition-transform duration-500 translate-x-full md:translate-x-0 z-[55]"
+    >
+      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Download</a>
+      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Discord</a>
+      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">HairSalon</a>
+      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Wiki</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    const header = document.getElementById('main-header');
+    const menuButton = document.getElementById('menu-button');
+    const mainNav = document.getElementById('main-nav');
+    let isMenuOpen = false;
+
+    const updateHeaderStyle = () => {
+      if (isMenuOpen) {
+        header?.classList.add('bg-[rgb(var(--background))]');
+        header?.classList.remove('bg-[rgb(var(--background))]/70', 'backdrop-blur-md', 'border-transparent');
+        return;
+      }
+
+      if (window.scrollY > 10) {
+        // Estado Scroll -> Blur
+        header?.classList.add('bg-[rgb(var(--background))]/70', 'backdrop-blur-md', 'border-white/10');
+        header?.classList.remove('border-transparent', 'bg-[rgb(var(--background))]');
+      } else {
+        // Estado Inicial -> No Blur
+        header?.classList.remove('bg-[rgb(var(--background))]/70', 'bg-[rgb(var(--background))]', 'backdrop-blur-md', 'border-white/10');
+        header?.classList.add('border-transparent');
+      }
+    };
+
+    window.addEventListener('scroll', updateHeaderStyle);
+
+    menuButton?.addEventListener('click', () => {
+      isMenuOpen = !isMenuOpen;
+      mainNav?.classList.toggle('translate-x-full');
+      document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+      updateHeaderStyle();
+    });
+  }
+
+  initHeader();
+</script>

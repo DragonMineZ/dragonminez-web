@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ENTIDAD -> USER
+
+model User {
+  id_user     Int @id @default(autoincrement())
+  clerk_id    String @unique
+  username    String @unique
+  email       String @unique
+  avatar_url  String 
+
+  // RELACION: USER->HAIR 1:N | 1
+  hairs       Hair[]
+
+  // RELACION: USER->LIKES 1:N | 1
+  likes       Like[]
+}
+
+// ENTIDAD -> HAIR
+model Hair {
+  id_hair     Int @id @default(autoincrement())
+  name        String 
+  code        String @unique
+  image_url   String
+  description String?
+  created_at  DateTime @default(now())
+
+  // RELACION: USER->HAIR 1:N | N
+  artistId    Int
+  artist      User @relation(fields: [artistId], references: [id_user])
+
+   // RELACION: USER->HAIR N:M
+  categories  Category[]
+
+  // RELACION: USER->LIKES 1:N | 1
+  likes       Like[]
+}
+
+// ENTIDAD -> CATEGORY
+model Category {
+  id_category Int @id @default(autoincrement())
+  description String?
+
+  // RELACION: USER->HAIR N:M
+  hairs       Hair[]
+}
+
+// ENTIDAD -> LIKE
+model Like {
+  id_user   Int
+  id_hair   Int
+
+  // RELACION: USER->LIKES 1:N | N
+  user      User @relation(fields: [id_user], references: [id_user])
+
+  // RELACION: USER->LIKES 1:N | N 
+  hair      Hair @relation(fields: [id_hair], references: [id_hair])
+
+  // PK: COMPUESTO
+  @@id([id_user, id_hair])
+}
+
+

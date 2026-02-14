@@ -9,6 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.5.3",
+    "@clerk/astro": "^2.17.2",
+    "@clerk/themes": "^2.4.52",
     "@fontsource-variable/onest": "^5.2.11",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.6",

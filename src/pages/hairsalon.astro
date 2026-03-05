@@ -1,22 +1,37 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import {SignedIn, SignedOut, UserButton, SignInButton} from "@clerk/astro/components";
+import HairList from "../components/HairList";
+import {
+  SignedIn,
+  SignedOut,
+  UserButton,
+  SignInButton
+} from "@clerk/astro/components";
 ---
 
 <Layout>
-      <section class="px-8 py-20 space-y-20">
-      <div class="h-[100vh] flex items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
-        <span class="text-[rgb(var(--muted))] italic">HairSalon :v</span>
-      </div>
-    </section>
+  <section class="max-w-7xl mx-auto px-6 py-16">
+    
+      <!-- Auth Section -->
+      <SignedOut>
+        <div class="flex items-center gap-4 text-sm text-gray-500">
+          <p>Para publicar tu cabello, inicia sesión</p>
+          <SignInButton
+            mode="modal"
+            class="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90 transition"
+          >
+            Iniciar Sesión
+          </SignInButton>
+        </div>
+      </SignedOut>
 
-    <SignedOut>
-        <p>Para crear publicar tu cabello, inicia sesión</p>
-        <SignInButton mode="modal"> Iniciar Sesión </SignInButton>
-    </SignedOut>
-
-    <SignedIn>
+      <SignedIn client:load>
         <UserButton />
-        <p>Ya puedes empezar a publicar tus creaciones</p>
-    </SignedIn>
+      </SignedIn>
+    </div>
+
+    <!-- Hair List -->
+    <HairList client:load />
+
+  </section>
 </Layout>

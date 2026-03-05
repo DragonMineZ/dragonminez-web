@@ -1,12 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import {SignedIn, SignedOut, UserButton} from "@clerk/astro/components";
+import CreateHairForm from "../components/CreateHairForm";
+import {SignedIn, SignedOut, UserButton, SignInButton} from "@clerk/astro/components";
 ---
 
 <Layout>
-      <section class="px-8 py-20 space-y-20">
-      <div class="h-[100vh] flex items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
-        <span class="text-[rgb(var(--muted))] italic">Publica tu creación</span>
-      </div>
+    <section class="px-8 py-20 max-w-7xl mx-auto">
+        <div class="flex justify-end mb-6">
+            <SignedOut client:load>
+                <SignInButton mode="modal">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        Iniciar Sesión
+                    </button>
+                </SignInButton>
+            </SignedOut>
+            <SignedIn client:load>
+                <div class="flex items-center gap-4">
+                    <UserButton />
+                </div>
+            </SignedIn>
+        </div>
+
+        <CreateHairForm client:load />
     </section>
 </Layout>

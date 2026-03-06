@@ -1,18 +1,7 @@
 import { useAuth } from "@clerk/astro/react";
 import { useState, useEffect } from "react";
-
-interface Hair {
-  id_hair: number;
-  name: string;
-  code: string;
-  image_url: string;
-  description: string | null;
-  artist: {
-    id_user: number;
-    username: string;
-    avatar_url: string;
-  };
-}
+import type { Hair } from "./types/hair";
+import HairCard from "./HairCard";
 
 export default function HairList() {
   const { isLoaded, isSignedIn, getToken, userId } = useAuth();
@@ -31,7 +20,7 @@ export default function HairList() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("¿Estás seguro de eliminar este cabello?")) return;
-    
+
     const token = await getToken();
     const res = await fetch(`/api/hairs/${id}`, {
       method: "DELETE",
@@ -46,65 +35,56 @@ export default function HairList() {
   };
 
   if (!isLoaded) {
-    return <div className="text-center py-10">Cargando...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+        <div className="h-10 w-48 bg-white/10 rounded-full mb-4"></div>
+        <p className="text-gray-500">Preparando catálogo...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Catálogo de Cabellos</h1>
+    <div className="space-y-10 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            Catálogo de <span className="text-orange-500">Cabellos</span>
+          </h1>
+          <p className="mt-2 text-gray-400">Personaliza tu personaje con los mejores estilos.</p>
+        </div>
+
         {isSignedIn && (
           <a
             href="/createhair"
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="group relative inline-flex items-center gap-2 px-6 py-3 font-bold text-white transition-all bg-orange-600 rounded-xl hover:bg-orange-500 hover:shadow-[0_0_20px_rgba(234,88,12,0.4)] active:scale-95"
           >
-            + Crear Cabello
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Crear Cabello
           </a>
         )}
       </div>
 
       {loading ? (
-        <p className="text-center py-10">Cargando...</p>
+        <div className="flex flex-col gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-64 md:h-52 bg-white/5 rounded-[32px] animate-pulse" />
+          ))}
+        </div>
       ) : hairs.length === 0 ? (
-        <p className="text-center py-10 text-gray-400">No hay cabello todavía</p>
+        <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
+          <p className="text-xl text-gray-500">No hay estilos disponibles todavía.</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6 max-w-4xl mx-auto">
           {hairs.map((hair) => (
-            <div
+            <HairCard
               key={hair.id_hair}
-              className="bg-white/5 rounded-xl overflow-hidden border border-white/10"
-            >
-              <img
-                src={hair.image_url}
-                alt={hair.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 space-y-2">
-                <h3 className="text-xl font-semibold">{hair.name}</h3>
-                <p className="text-sm text-gray-400">Código: {hair.code}</p>
-                {hair.description && (
-                  <p className="text-sm text-gray-300">{hair.description}</p>
-                )}
-                <div className="flex items-center gap-2 pt-2">
-                  <img
-                    src={hair.artist.avatar_url}
-                    alt={hair.artist.username}
-                    className="w-6 h-6 rounded-full"
-                  />
-                  <span className="text-sm text-gray-400">
-                    {hair.artist.username}
-                  </span>
-                </div>
-                {isSignedIn && userId && (
-                  <button
-                    onClick={() => handleDelete(hair.id_hair)}
-                    className="mt-2 text-red-400 hover:text-red-300 text-sm"
-                  >
-                    Eliminar
-                  </button>
-                )}
-              </div>
-            </div>
+              hair={hair}
+              isSignedIn={isSignedIn || false}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}

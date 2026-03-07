@@ -1,23 +1,47 @@
 import { useAuth } from "@clerk/astro/react";
 import { useState, useEffect } from "react";
-import type { Hair } from "./types/hair";
+import type { Hair, Category } from "./types/hair";
 import HairCard from "./HairCard";
 import SearchBar from "./SearchBar";
+import FilterDropdown from "./FilterDropdown";
+import CreateHairTrigger from "./CreateHairTrigger";
+import { SignedIn } from "@clerk/astro/react";
 
 export default function HairList() {
-  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { isLoaded, isSignedIn, getToken, userId } = useAuth();
   const [hairs, setHairs] = useState<Hair[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | string>("all");
+  const [sortBy, setSortBy] = useState<string>("recent");
+  const [showMyCreations, setShowMyCreations] = useState(false);
 
   useEffect(() => {
-    fetch("/api/hairs")
-      .then((res) => res.json())
-      .then((data) => {
-        setHairs(data);
+    // Los datos se cargan en el useEffect de abajo
+  }, [isLoaded, isSignedIn]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [hairsRes, catsRes] = await Promise.all([
+          fetch("/api/hairs"),
+          fetch("/api/categories")
+        ]);
+
+        const hairsData = await hairsRes.json();
+        const catsData = await catsRes.json();
+
+        setHairs(hairsData);
+        setCategories(catsData);
+      } catch (error) {
+        console.error("Error loading data", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -36,10 +60,44 @@ export default function HairList() {
     }
   };
 
-  const filteredHairs = hairs.filter((hair) =>
-    hair.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    hair.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Lógica de filtrado y ordenamiento
+  const processedHairs = hairs
+    .filter((hair) => {
+      // Filtro por búsqueda
+      const matchesSearch =
+        hair.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        hair.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Filtro por categoría
+      const matchesCategory = selectedCategory === "all" ||
+        hair.categories?.some(cat => cat.id_category === Number(selectedCategory));
+
+      // Filtro por "Mis Creaciones"
+      const matchesMyCreations = !showMyCreations || (isSignedIn && hair.artist?.clerk_id === userId);
+
+      return matchesSearch && matchesCategory && matchesMyCreations;
+    })
+    .sort((a, b) => {
+      if (sortBy === "likes") {
+        return (b._count?.likes || 0) - (a._count?.likes || 0);
+      }
+      if (sortBy === "oldest") {
+        return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+      }
+      // Por defecto: Más recientes
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    });
+
+  const categoryOptions = [
+    { id: "all", label: "Todas" },
+    ...categories.map(c => ({ id: c.id_category, label: c.description }))
+  ];
+
+  const popularityOptions = [
+    { id: "recent", label: "Más recientes" },
+    { id: "likes", label: "Más populares" },
+    { id: "oldest", label: "Antiguos" }
+  ];
 
   if (!isLoaded) {
     return (
@@ -53,8 +111,43 @@ export default function HairList() {
   return (
     <div className="space-y-10 px-4 md:px-0">
 
-      <div className="max-w-2xl mx-auto">
-        <SearchBar onSearch={setSearchQuery} />
+      <div className="flex flex-col gap-6 w-full">
+        <div className="w-full max-w-2xl mx-auto">
+          <SearchBar onSearch={setSearchQuery} />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-start gap-4">
+          <FilterDropdown
+            label="Categoría"
+            options={categoryOptions}
+            selectedId={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+          <FilterDropdown
+            label="Popularidad"
+            options={popularityOptions}
+            selectedId={sortBy}
+            onSelect={(id) => setSortBy(String(id))}
+          />
+
+          {isSignedIn && (
+            <button
+              onClick={() => setShowMyCreations(!showMyCreations)}
+              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all border ${showMyCreations
+                ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                : "bg-[#121214] border-white/5 text-gray-400 hover:border-white/10 hover:text-white"
+                }`}
+            >
+              Mis Creaciones
+            </button>
+          )}
+
+          <SignedIn>
+            <div className="ml-auto">
+              <CreateHairTrigger />
+            </div>
+          </SignedIn>
+        </div>
       </div>
 
       {loading ? (
@@ -63,18 +156,18 @@ export default function HairList() {
             <div key={i} className="h-64 md:h-52 bg-white/5 rounded-[32px] animate-pulse" />
           ))}
         </div>
-      ) : filteredHairs.length === 0 ? (
+      ) : processedHairs.length === 0 ? (
         <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10 max-w-4xl mx-auto">
           <span className="material-symbols-outlined text-gray-600 text-6xl mb-4">
             search_off
           </span>
           <p className="text-xl text-gray-500">
-            {searchQuery ? `No se encontraron resultados para "${searchQuery}"` : "No hay estilos disponibles todavía."}
+            {searchQuery ? `No se encontraron resultados para "${searchQuery}"` : "No hay estilos que coincidan con los filtros."}
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-          {filteredHairs.map((hair: Hair) => (
+          {processedHairs.map((hair: Hair) => (
             <HairCard
               key={hair.id_hair}
               hair={hair}

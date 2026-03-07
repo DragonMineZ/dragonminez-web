@@ -8,6 +8,16 @@ import {
   UserButton,
   SignInButton
 } from "@clerk/astro/components";
+import { createClerkClient } from "@clerk/astro/server";
+
+const { userId } = Astro.locals.auth();
+let username = "";
+
+if (userId) {
+  const clerk = createClerkClient({ secretKey: import.meta.env.CLERK_SECRET_KEY });
+  const user = await clerk.users.getUser(userId);
+  username = user.username || user.firstName || "Guerrer@";
+}
 ---
 
 <Layout title="HairSalon | DragonMineZ">
@@ -21,17 +31,22 @@ import {
         <SignedOut>
           <div class="mt-2 flex items-center gap-1.5">
             <p class="text-gray-400">Si quieres publicar un cabello primero deberás</p>
-            <SignInButton mode="modal">
+            <SignInButton mode="modal" class="text-white hover:underline cursor-pointer">
               iniciar sesión.
             </SignInButton>
           </div>
         </SignedOut>
+        <SignedIn>
+          <p class="text-gray-400 mt-2">
+            ¡Bienvenido <span class="text-white font-semibold">{username}</span>!, puedes empezar a publicar tus creaciones
+          </p>
+        </SignedIn>
       </div>
 
       <SignedIn>
-        <div class="flex items-center gap-6">
-          <CreateHairTrigger client:load />
+        <div class="flex items-center gap-3 bg-[#121214] border border-white/5 rounded-full pl-1.5 pr-4 py-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
           <UserButton afterSignOutUrl="/hairsalon" />
+          <span class="text-white font-bold tracking-tight">{username}</span>
         </div>
       </SignedIn>
     </div>

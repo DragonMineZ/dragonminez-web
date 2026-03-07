@@ -1,13 +1,9 @@
 import { useAuth } from "@clerk/astro/react";
 import { useState, useEffect } from "react";
+import type { Category } from "./types/hair";
 
 interface User {
   id_user: number;
-}
-
-interface Category {
-  id_category: number;
-  description: string;
 }
 
 export default function CreateHairForm({ onSuccess }: { onSuccess?: () => void }) {

@@ -4,17 +4,20 @@ export interface Hair {
     code: string;
     image_url: string;
     description: string | null;
+    created_at?: string | Date;
     artist: {
         id_user: number;
         clerk_id: string;
         username: string;
         avatar_url: string;
     };
-    categories?: {
-        id_category: number;
-        description: string | null;
-    }[];
+    categories?: Category[];
     _count?: {
         likes: number;
     };
+}
+
+export interface Category {
+    id_category: number;
+    description: string;
 }

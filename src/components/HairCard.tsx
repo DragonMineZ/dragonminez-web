@@ -50,20 +50,18 @@ export default function HairCard({ hair, isSignedIn, onDelete }: HairCardProps) 
                     </button>
                 </div>
 
-                {/* Tags (Categorías) */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {(hair.categories && hair.categories.length > 0) ? (
-                        hair.categories.map((cat, idx) => (
-                            <span
-                                key={cat.id_category || idx}
-                                className="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs font-bold text-gray-400 tracking-tight"
-                            >
-                                {cat.description}
-                            </span>
-                        ))
-                    ) : (
-                        <span className="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs font-bold text-gray-500 tracking-tight">
-                            Chip
+                    {hair.categories?.map((cat) => (
+                        <span
+                            key={cat.id_category}
+                            className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-white/60 tracking-wider uppercase"
+                        >
+                            {cat.description}
+                        </span>
+                    ))}
+                    {(!hair.categories || hair.categories.length === 0) && (
+                        <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[10px] font-bold text-white/30 tracking-wider uppercase">
+                            Normal
                         </span>
                     )}
                 </div>

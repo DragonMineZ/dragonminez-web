@@ -7,6 +7,9 @@ export const GET: APIRoute = async () => {
             include: {
                 categories: true,
                 artist: true,
+                _count: {
+                    select: { likes: true }
+                }
             },
         });
         return new Response(JSON.stringify(hairs), {
@@ -54,6 +57,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
             },
             include: {
                 categories: true,
+                _count: {
+                    select: { likes: true }
+                }
             },
         });
 

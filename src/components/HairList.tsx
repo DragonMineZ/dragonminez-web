@@ -76,6 +76,22 @@ export default function HairList() {
     setSuccessAlert({ show: true, message: "¡Cabello actualizado correctamente!" });
   };
 
+  const handleLikeToggle = (hairId: number, liked: boolean) => {
+    setHairs(prevHairs => prevHairs.map(h => {
+      if (h.id_hair === hairId) {
+        const currentLikes = h._count?.likes || 0;
+        return {
+          ...h,
+          _count: {
+            ...h._count,
+            likes: liked ? currentLikes + 1 : Math.max(0, currentLikes - 1)
+          }
+        };
+      }
+      return h;
+    }));
+  };
+
   // Lógica de filtrado y ordenamiento
   const processedHairs = hairs
     .filter((hair) => {
@@ -95,7 +111,9 @@ export default function HairList() {
     })
     .sort((a, b) => {
       if (sortBy === "likes") {
-        return (b._count?.likes || 0) - (a._count?.likes || 0);
+        const diff = (b._count?.likes || 0) - (a._count?.likes || 0);
+        if (diff !== 0) return diff;
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
       }
       if (sortBy === "oldest") {
         return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
@@ -196,6 +214,7 @@ export default function HairList() {
                 isSignedIn={isSignedIn || false}
                 onDelete={handleDelete}
                 onUpdateSuccess={handleUpdateSuccess}
+                onLikeToggle={handleLikeToggle}
               />
             ))}
           </div>

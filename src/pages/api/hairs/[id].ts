@@ -11,6 +11,9 @@ export const GET: APIRoute = async ({ params }) => {
             include: {
                 categories: true,
                 artist: true,
+                _count: {
+                    select: { likes: true }
+                }
             },
         });
 
@@ -74,6 +77,9 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
             },
             include: {
                 categories: true,
+                _count: {
+                    select: { likes: true }
+                }
             },
         });
 

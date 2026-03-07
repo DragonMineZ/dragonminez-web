@@ -1,9 +1,10 @@
 import type { Hair } from "./types/hair";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ActionButtons from "./ActionButtons";
 import Modal from "./Modal";
 import CreateHairForm from "./CreateHairForm";
 import ConfirmDialog from "./ConfirmDialog";
+import InfoDialog from "./InfoDialog";
 import { useAuth } from "@clerk/astro/react";
 
 interface HairCardProps {
@@ -11,15 +12,78 @@ interface HairCardProps {
     isSignedIn: boolean;
     onDelete: (id: number) => void;
     onUpdateSuccess?: () => void;
+    onLikeToggle?: (hairId: number, liked: boolean) => void;
 }
 
-export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess }: HairCardProps) {
-    const { userId } = useAuth();
+export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
+    const { getToken, userId: clerkId } = useAuth();
     const [copied, setCopied] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
 
-    const isOwner = userId === hair.artist?.clerk_id;
+    const isOwner = clerkId === hair.artist?.clerk_id;
+
+    useEffect(() => {
+        if (isSignedIn && clerkId) {
+            checkIfLiked();
+        }
+    }, [isSignedIn, clerkId]);
+
+    const checkIfLiked = async () => {
+        try {
+            const token = await getToken();
+            const res = await fetch(`/api/hairs/${hair.id_hair}/like`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            setIsLiked(data.liked);
+        } catch (error) {
+            console.error("Error checking like status", error);
+        }
+    };
+
+    const handleLike = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isSignedIn) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        try {
+            const token = await getToken();
+
+            // Optimistic update
+            const newLikedState = !isLiked;
+            setIsLiked(newLikedState);
+
+            // Notificar al padre para actualizar el estado global inmediatamente
+            if (onLikeToggle) {
+                onLikeToggle(hair.id_hair, newLikedState);
+            }
+
+            const res = await fetch(`/api/hairs/${hair.id_hair}/like`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok) {
+                // Rollback si hay error
+                const rollBackLikedState = !newLikedState;
+                setIsLiked(rollBackLikedState);
+                if (onLikeToggle) {
+                    onLikeToggle(hair.id_hair, rollBackLikedState);
+                }
+            }
+        } catch (error) {
+            console.error("Error toggling like", error);
+        }
+    };
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(hair.code);
@@ -55,8 +119,17 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess }
                     <h3 className="text-2xl md:text-3xl font-bold text-white tracking-[1px] truncate pr-4">
                         {hair.name}
                     </h3>
-                    <button className="group/like flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214] transition-all duration-300">
-                        <span className="material-symbols-outlined text-[24px] text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]">
+                    <button
+                        onClick={handleLike}
+                        className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
+                            ? "bg-[#E2E2DF] border-white/20 text-[#121214]"
+                            : "border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214]"
+                            }`}
+                    >
+                        <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
+                            ? "text-red-500 [font-variation-settings:'FILL'_1]"
+                            : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
+                            }`}>
                             favorite
                         </span>
                         <span className="text-xl font-bold leading-none">
@@ -142,6 +215,13 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess }
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={() => onDelete(hair.id_hair)}
                 description="Si realizas esta acción no podrás recuperar este diseño de cabello."
+            />
+
+            <InfoDialog
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                title="Inicio de Sesión Requerido"
+                description="Debes iniciar sesión con tu cuenta de Discord para poder dar like a los diseños de la comunidad."
             />
         </div>
     );

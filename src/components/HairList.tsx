@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/astro/react";
+import { useAuth, SignedIn } from "@clerk/astro/react";
 import { useState, useEffect } from "react";
 import type { Hair, Category } from "./types/hair";
 import HairCard from "./HairCard";
@@ -6,7 +6,7 @@ import SearchBar from "./SearchBar";
 import FilterDropdown from "./FilterDropdown";
 import CreateHairTrigger from "./CreateHairTrigger";
 import SuccessAlert from "./SuccessAlert";
-import { SignedIn } from "@clerk/astro/react";
+import Pagination from "./Pagination";
 
 export default function HairList() {
   const { isLoaded, isSignedIn, getToken, userId } = useAuth();
@@ -19,9 +19,9 @@ export default function HairList() {
   const [showMyCreations, setShowMyCreations] = useState(false);
   const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
-  useEffect(() => {
-    // Los datos se cargan en el useEffect de abajo
-  }, [isLoaded, isSignedIn]);
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2; // Para pruebas usamos 2, después será 5
 
   const fetchData = async () => {
     try {
@@ -45,6 +45,11 @@ export default function HairList() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Reiniciar página al filtrar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, sortBy, showMyCreations]);
 
   const handleDelete = async (id: number) => {
     const token = await getToken();
@@ -95,9 +100,15 @@ export default function HairList() {
       if (sortBy === "oldest") {
         return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
       }
-      // Por defecto: Más recientes
       return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
     });
+
+  // Cálculo de paginación
+  const totalPages = Math.ceil(processedHairs.length / itemsPerPage);
+  const currentItems = processedHairs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const categoryOptions = [
     { id: "all", label: "Todas" },
@@ -121,7 +132,6 @@ export default function HairList() {
 
   return (
     <div className="space-y-10 px-4 md:px-0">
-
       <div className="flex flex-col gap-6 w-full">
         <div className="w-full max-w-2xl mx-auto">
           <SearchBar onSearch={setSearchQuery} />
@@ -177,17 +187,25 @@ export default function HairList() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-          {processedHairs.map((hair: Hair) => (
-            <HairCard
-              key={hair.id_hair}
-              hair={hair}
-              isSignedIn={isSignedIn || false}
-              onDelete={handleDelete}
-              onUpdateSuccess={handleUpdateSuccess}
-            />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+            {currentItems.map((hair: Hair) => (
+              <HairCard
+                key={hair.id_hair}
+                hair={hair}
+                isSignedIn={isSignedIn || false}
+                onDelete={handleDelete}
+                onUpdateSuccess={handleUpdateSuccess}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <SuccessAlert

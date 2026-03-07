@@ -4,6 +4,7 @@ import ActionButtons from "./ActionButtons";
 import Modal from "./Modal";
 import CreateHairForm from "./CreateHairForm";
 import ConfirmDialog from "./ConfirmDialog";
+import SuccessAlert from "./SuccessAlert";
 import InfoDialog from "./InfoDialog";
 import { useAuth } from "@clerk/astro/react";
 
@@ -22,6 +23,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+    const [alert, setAlert] = useState({ show: false, message: "" });
 
     const isOwner = clerkId === hair.artist?.clerk_id;
 
@@ -39,11 +41,20 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     Authorization: `Bearer ${token}`
                 }
             });
-            const data = await res.json();
-            setIsLiked(data.liked);
+            if (res.ok) {
+                const data = await res.json();
+                setIsLiked(data.liked);
+            }
         } catch (error) {
             console.error("Error checking like status", error);
         }
+    };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(hair.code);
+        setCopied(true);
+        setAlert({ show: true, message: "¡Código copiado al portapapeles!" });
+        setTimeout(() => setCopied(false), 2000);
     };
 
     const handleLike = async (e: React.MouseEvent) => {
@@ -55,12 +66,9 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
         try {
             const token = await getToken();
-
-            // Optimistic update
             const newLikedState = !isLiked;
             setIsLiked(newLikedState);
 
-            // Notificar al padre para actualizar el estado global inmediatamente
             if (onLikeToggle) {
                 onLikeToggle(hair.id_hair, newLikedState);
             }
@@ -72,23 +80,21 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 }
             });
 
-            if (!res.ok) {
-                // Rollback si hay error
-                const rollBackLikedState = !newLikedState;
-                setIsLiked(rollBackLikedState);
+            if (res.ok) {
+                setAlert({
+                    show: true,
+                    message: newLikedState ? "¡Añadido a tus favoritos!" : "Eliminado de tus favoritos"
+                });
+            } else {
+                // Rollback if error
+                setIsLiked(!newLikedState);
                 if (onLikeToggle) {
-                    onLikeToggle(hair.id_hair, rollBackLikedState);
+                    onLikeToggle(hair.id_hair, !newLikedState);
                 }
             }
         } catch (error) {
             console.error("Error toggling like", error);
         }
-    };
-
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(hair.code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 250);
     };
 
     const handleEditSuccess = () => {
@@ -102,7 +108,6 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
     return (
         <div className="group/card relative bg-[#121214] rounded-[32px] overflow-hidden border border-white/5 p-4 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-white/10 hover:bg-[#18181b]">
-
             <div className="relative w-full md:w-48 aspect-square shrink-0">
                 <img
                     src={hair.image_url}
@@ -111,10 +116,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 />
             </div>
 
-            {/* Contenido a la derecha */}
             <div className="flex flex-col flex-1 min-w-0 py-2">
-
-                {/* Header: Title and Likes */}
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-2xl md:text-3xl font-bold text-white tracking-[1px] truncate pr-4">
                         {hair.name}
@@ -122,13 +124,13 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     <button
                         onClick={handleLike}
                         className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
-                            ? "bg-[#E2E2DF] border-white/20 text-[#121214]"
-                            : "border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214]"
+                                ? "bg-[#E2E2DF] border-white/20 text-[#121214]"
+                                : "border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214]"
                             }`}
                     >
                         <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
-                            ? "text-red-500 [font-variation-settings:'FILL'_1]"
-                            : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
+                                ? "text-red-500 [font-variation-settings:'FILL'_1]"
+                                : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
                             }`}>
                             favorite
                         </span>
@@ -154,7 +156,6 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     )}
                 </div>
 
-                {/* Code Area with Copy Button */}
                 <div className="flex items-center bg-[#18181b] border border-white/10 rounded-xl overflow-hidden mb-4 max-w-full">
                     <span className="text-sm font-medium text-gray-400 truncate flex-1 tracking-tight px-4 py-1.5 font-mono">
                         {hair.code}
@@ -170,12 +171,10 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     </button>
                 </div>
 
-                {/* Description */}
                 <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-6 font-normal">
                     {hair.description || "Sin descripción disponible."}
                 </p>
 
-                {/* Footer info */}
                 <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
                     <div className="flex items-center gap-2.5">
                         <div className="relative">
@@ -223,7 +222,13 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 title="Inicio de Sesión Requerido"
                 description="Debes iniciar sesión con tu cuenta de Discord para poder dar like a los diseños de la comunidad."
             />
+
+            <SuccessAlert
+                show={alert.show}
+                message={alert.message}
+                duration={2000}
+                onClose={() => setAlert({ ...alert, show: false })}
+            />
         </div>
     );
 }
-

@@ -2,8 +2,17 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import CreateHairForm from './CreateHairForm';
 
-export default function CreateHairTrigger() {
+export default function CreateHairTrigger({ onSuccess }: { onSuccess?: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleSuccess = () => {
+        setIsModalOpen(false);
+        if (onSuccess) {
+            onSuccess();
+        } else {
+            window.location.reload();
+        }
+    };
 
     return (
         <>
@@ -18,7 +27,7 @@ export default function CreateHairTrigger() {
             </button>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <CreateHairForm onSuccess={() => window.location.reload()} />
+                <CreateHairForm onSuccess={handleSuccess} />
             </Modal>
         </>
     );

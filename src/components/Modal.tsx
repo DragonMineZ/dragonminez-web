@@ -4,9 +4,10 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
+    showCloseButton?: boolean;
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, showCloseButton = true }: ModalProps) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -32,12 +33,14 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
             <div className="relative w-full max-w-xl animate-in fade-in zoom-in duration-200">
                 <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0a0a0b] shadow-2xl shadow-black/50 ring-1 ring-white/5">
                     {/* Header/Close Button (Overlay) */}
-                    <button
-                        onClick={onClose}
-                        className="absolute right-6 top-6 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/50 transition-all hover:bg-white/10 hover:text-white"
-                    >
-                        <span className="material-symbols-outlined">close</span>
-                    </button>
+                    {showCloseButton && (
+                        <button
+                            onClick={onClose}
+                            className="absolute right-6 top-6 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/50 transition-all hover:bg-white/10 hover:text-white"
+                        >
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                    )}
 
                     <div className="p-8 md:p-10">
                         {children}

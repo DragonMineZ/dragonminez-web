@@ -32,9 +32,9 @@ export const GET: APIRoute = async ({ params }) => {
 };
 
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
-    const { isAuthenticated } = locals.auth()
+    const { userId } = locals.auth()
 
-    if (!isAuthenticated) {
+    if (!userId) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
     }
 
@@ -42,11 +42,25 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     if (!id) return new Response(null, { status: 400 });
 
     try {
+        const hairId = parseInt(id);
+        const existingHair = await prisma.hair.findUnique({
+            where: { id_hair: hairId },
+            include: { artist: true }
+        });
+
+        if (!existingHair) {
+            return new Response(JSON.stringify({ error: "Hair no encontrado" }), { status: 404 });
+        }
+
+        if (existingHair.artist.clerk_id !== userId) {
+            return new Response(JSON.stringify({ error: "Forbidden: No eres el dueño de este cabello" }), { status: 403 });
+        }
+
         const body = await request.json();
         const { name, code, image_url, description, categoryIds } = body;
 
         const updatedHair = await prisma.hair.update({
-            where: { id_hair: parseInt(id) },
+            where: { id_hair: hairId },
             data: {
                 name,
                 code,
@@ -76,9 +90,9 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 };
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
-    const { isAuthenticated } = locals.auth()
+    const { userId } = locals.auth()
 
-    if (!isAuthenticated) {
+    if (!userId) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
     }
 
@@ -86,8 +100,22 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     if (!id) return new Response(null, { status: 400 });
 
     try {
+        const hairId = parseInt(id);
+        const existingHair = await prisma.hair.findUnique({
+            where: { id_hair: hairId },
+            include: { artist: true }
+        });
+
+        if (!existingHair) {
+            return new Response(JSON.stringify({ error: "Hair no encontrado" }), { status: 404 });
+        }
+
+        if (existingHair.artist.clerk_id !== userId) {
+            return new Response(JSON.stringify({ error: "Forbidden: No eres el dueño de este cabello" }), { status: 403 });
+        }
+
         await prisma.hair.delete({
-            where: { id_hair: parseInt(id) },
+            where: { id_hair: hairId },
         });
         return new Response(
             JSON.stringify({ message: "Hair eliminado correctamente" }),

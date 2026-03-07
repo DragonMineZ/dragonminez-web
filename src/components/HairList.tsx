@@ -5,6 +5,7 @@ import HairCard from "./HairCard";
 import SearchBar from "./SearchBar";
 import FilterDropdown from "./FilterDropdown";
 import CreateHairTrigger from "./CreateHairTrigger";
+import SuccessAlert from "./SuccessAlert";
 import { SignedIn } from "@clerk/astro/react";
 
 export default function HairList() {
@@ -16,37 +17,36 @@ export default function HairList() {
   const [selectedCategory, setSelectedCategory] = useState<number | string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
   const [showMyCreations, setShowMyCreations] = useState(false);
+  const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
   useEffect(() => {
     // Los datos se cargan en el useEffect de abajo
   }, [isLoaded, isSignedIn]);
 
+  const fetchData = async () => {
+    try {
+      const [hairsRes, catsRes] = await Promise.all([
+        fetch("/api/hairs"),
+        fetch("/api/categories")
+      ]);
+
+      const hairsData = await hairsRes.json();
+      const catsData = await catsRes.json();
+
+      setHairs(hairsData);
+      setCategories(catsData);
+    } catch (error) {
+      console.error("Error loading data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [hairsRes, catsRes] = await Promise.all([
-          fetch("/api/hairs"),
-          fetch("/api/categories")
-        ]);
-
-        const hairsData = await hairsRes.json();
-        const catsData = await catsRes.json();
-
-        setHairs(hairsData);
-        setCategories(catsData);
-      } catch (error) {
-        console.error("Error loading data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("¿Estás seguro de eliminar este cabello?")) return;
-
     const token = await getToken();
     const res = await fetch(`/api/hairs/${id}`, {
       method: "DELETE",
@@ -55,9 +55,20 @@ export default function HairList() {
 
     if (res.ok) {
       setHairs(hairs.filter((h: Hair) => h.id_hair !== id));
+      setSuccessAlert({ show: true, message: "¡Cabello eliminado correctamente!" });
     } else {
-      alert("Error al eliminar");
+      window.alert("Error al eliminar");
     }
+  };
+
+  const handleCreateSuccess = () => {
+    fetchData();
+    setSuccessAlert({ show: true, message: "¡Cabello publicado correctamente!" });
+  };
+
+  const handleUpdateSuccess = () => {
+    fetchData();
+    setSuccessAlert({ show: true, message: "¡Cabello actualizado correctamente!" });
   };
 
   // Lógica de filtrado y ordenamiento
@@ -144,7 +155,7 @@ export default function HairList() {
 
           <SignedIn>
             <div className="ml-auto">
-              <CreateHairTrigger />
+              <CreateHairTrigger onSuccess={handleCreateSuccess} />
             </div>
           </SignedIn>
         </div>
@@ -173,10 +184,17 @@ export default function HairList() {
               hair={hair}
               isSignedIn={isSignedIn || false}
               onDelete={handleDelete}
+              onUpdateSuccess={handleUpdateSuccess}
             />
           ))}
         </div>
       )}
+
+      <SuccessAlert
+        show={successAlert.show}
+        message={successAlert.message}
+        onClose={() => setSuccessAlert({ ...successAlert, show: false })}
+      />
     </div>
   );
 }

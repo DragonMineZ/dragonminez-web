@@ -1,15 +1,25 @@
 import type { Hair } from "./types/hair";
 import { useState } from "react";
 import ActionButtons from "./ActionButtons";
+import Modal from "./Modal";
+import CreateHairForm from "./CreateHairForm";
+import ConfirmDialog from "./ConfirmDialog";
+import { useAuth } from "@clerk/astro/react";
 
 interface HairCardProps {
     hair: Hair;
     isSignedIn: boolean;
     onDelete: (id: number) => void;
+    onUpdateSuccess?: () => void;
 }
 
-export default function HairCard({ hair, isSignedIn, onDelete }: HairCardProps) {
+export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess }: HairCardProps) {
+    const { userId } = useAuth();
     const [copied, setCopied] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const isOwner = userId === hair.artist?.clerk_id;
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(hair.code);
@@ -17,8 +27,13 @@ export default function HairCard({ hair, isSignedIn, onDelete }: HairCardProps) 
         setTimeout(() => setCopied(false), 250);
     };
 
-    const handleEdit = () => {
-        window.location.href = `/edit-hair/${hair.id_hair}`;
+    const handleEditSuccess = () => {
+        setIsEditModalOpen(false);
+        if (onUpdateSuccess) {
+            onUpdateSuccess();
+        } else {
+            window.location.reload();
+        }
     };
 
     return (
@@ -84,7 +99,7 @@ export default function HairCard({ hair, isSignedIn, onDelete }: HairCardProps) 
 
                 {/* Description */}
                 <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-6 font-normal">
-                    {hair.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam molestie, orci varius molestie elementum, mi nunc imperdiet sem, non suscipit orci nisl et ex. Sed non sagittis leo"}
+                    {hair.description || "Sin descripción disponible."}
                 </p>
 
                 {/* Footer info */}
@@ -106,14 +121,29 @@ export default function HairCard({ hair, isSignedIn, onDelete }: HairCardProps) 
                         </div>
                     </div>
 
-                    {isSignedIn && (
+                    {isSignedIn && isOwner && (
                         <ActionButtons
-                            onEdit={handleEdit}
-                            onDelete={() => onDelete(hair.id_hair)}
+                            onEdit={() => setIsEditModalOpen(true)}
+                            onDelete={() => setIsDeleteModalOpen(true)}
                         />
                     )}
                 </div>
             </div>
+
+            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+                <CreateHairForm
+                    initialData={hair}
+                    onSuccess={handleEditSuccess}
+                />
+            </Modal>
+
+            <ConfirmDialog
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={() => onDelete(hair.id_hair)}
+                description="Si realizas esta acción no podrás recuperar este diseño de cabello."
+            />
         </div>
     );
 }
+

@@ -19,7 +19,7 @@ model User {
 model Hair {
   id_hair     Int        @id @default(autoincrement())
   name        String
-  code        String     @unique
+  code        String     @db.Text
   image_url   String
   description String?
   created_at  DateTime   @default(now())

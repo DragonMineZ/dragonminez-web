@@ -1,34 +1,125 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import characters from "../assets/dmz-characters.png";
+import aurora from "../assets/updates/dmz-aurora.png";
 ---
 
 <Layout>
   <main>
-    <section class="relative min-h-screen flex items-center justify-center px-8 pt-20">
+    <!-- Hero Section -->
+    <section class="relative flex items-center justify-center px-8 pt-40 pb-30">
       <div class="max-w-4xl text-center z-10">
         <h1 class="text-6xl font-black text-white italic mb-6">
-          Lorem Ipsum Dolor
+          Avance pe mano
         </h1>
         <p class="text-xl text-[rgb(var(--foreground))]/70 leading-relaxed">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis risus ipsum, molestie a vestibulum et, eleifend non libero. In diam magna, eleifend ut risus eu, viverra tempor nibh. Aenean aliquam dolor nulla, a aliquam lectus hendrerit at.
+          Que requeto papay me lo gosta la KeoSlip
         </p>
       </div>
     </section>
 
-    <section class="px-8 py-20 space-y-20">
-      <div class="max-w-4xl mx-auto">
-        <p class="text-lg text-[rgb(var(--muted))] mb-8">
-          Morbi vehicula dignissim mi in pulvinar. Praesent vitae massa quis velit volutpat viverra at sed nisl. Aenean ultricies mollis elit nec accumsan. Integer id tempor dolor. Donec elementum lacus quis urna ullamcorper porttitor. Nam varius eu nibh a fermentum. Vivamus tristique auctor urna, quis posuere risus viverra et.
-        </p>
+    <!-- Update & Trailer Sections (Default Background) -->
+    <div class="w-full pt-4 pb-16 space-y-20 flex flex-col items-center">
+      
+      <!-- Aurora Update Block -->
+      <div class="w-full max-w-4xl px-8">
+        <div class="relative group cursor-pointer overflow-hidden rounded-[2.5rem] border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-all duration-500 hover:scale-[1.01] hover:border-white/10 active:scale-100">
+          <Image 
+            src={aurora} 
+            alt="Aurora Update" 
+            class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div class="absolute bottom-6 right-8">
+             <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full text-sm font-bold text-white shadow-2xl transition-all group-hover:bg-white group-hover:text-black group-hover:scale-105">
+               View All New Features »
+             </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Trailer Section -->
+      <div class="w-full max-w-4xl px-8 flex flex-col items-center gap-8">
+        <div class="flex flex-col gap-3 text-center">
+          <h3 class="text-3xl md:text-4xl font-black text-white tracking-tight">
+            Mira el trailer pe batedia sedia
+          </h3>
+          <p class="text-[rgb(var(--foreground))]/60 max-w-lg mx-auto leading-relaxed">
+            Pa cuando me presentan a Kyo Sleep :v
+          </p>
+        </div>
         
-        <p class="text-lg text-[rgb(var(--muted))]">
-          Donec sed convallis est. Suspendisse bibendum interdum velit, vitae cursus eros porta vehicula. Fusce efficitur eget orci vitae pretium. Maecenas ullamcorper purus dignissim dolor laoreet condimentum. Vivamus vulputate magna vel leo congue, vitae ullamcorper lacus rhoncus. Fusce condimentum blandit orci. Nullam pellentesque efficitur hendrerit.
-        </p>
+        <div class="relative w-full aspect-video rounded-[2rem] overflow-hidden border border-white/5 shadow-[0_0_80px_rgba(0,0,0,0.6)] bg-black/20 group max-w-3xl">
+          <iframe 
+            class="absolute inset-0 w-full h-full"
+            src="https://www.youtube.com/embed/Y7HnXFOK0w4" 
+            title="DragonMineZ - Aurora Update Trailer" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen
+          ></iframe>
+        </div>
       </div>
+    </div>
 
-      <div class="h-[100vh] flex items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
-        <span class="text-[rgb(var(--muted))] italic">Test scroll :v</span>
+    <!-- Characters Section (Dark Background #1C1B22) -->
+    <div class="w-full bg-[#1C1B22] py-24">
+      <div class="w-full max-w-4xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+        <div class="flex flex-col gap-6 text-left order-2 md:order-1">
+          <h2 class="text-5xl font-black text-white leading-tight italic">
+            Lorem ipsum dolor for
+          </h2>
+          <div class="flex flex-col gap-4">
+            <p class="text-lg text-[rgb(var(--foreground))]/80 leading-relaxed">
+              Lorem ipsum dolor sit amet, consectetur
+            </p>
+            <p class="text-lg text-[rgb(var(--foreground))]/80 leading-relaxed">
+              Quisque ut interdum augue, non efficitur neque.
+            </p>
+            <p class="text-lg text-[rgb(var(--foreground))]/80 leading-relaxed pt-2">
+              Etiam sodales neque non ipsum sagittis lacinia non ut lorem.<br/>
+              Ut efficitur quis tortor sed.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-center md:justify-end order-1 md:order-2">
+          <div class="relative group">
+            <Image 
+              src={characters} 
+              alt="DragonMineZ Characters" 
+              class="w-full max-w-[420px] h-auto object-contain drop-shadow-[0_0_50px_rgba(0,0,0,0.4)] animate-float"
+            />
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- Discord CTA Section (Default Background) -->
+    <div class="w-full py-20 flex flex-col items-center justify-center text-center px-8">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Have Questions or Feedback?
+      </h2>
+      <a 
+        href="https://discord.com" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2.5 px-6 py-3 bg-[#EBEBEB] text-[#1A1A1A] rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+      >
+        <i class="fa-brands fa-discord text-xl"></i>
+        Join our Discord server!
+      </a>
+    </div>
   </main>
 </Layout>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+</style>

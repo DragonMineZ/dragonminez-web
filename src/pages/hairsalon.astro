@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import HairList from "../components/HairList";
+import HairList from "../components/HairList.tsx";
+import CreateHairTrigger from "../components/CreateHairTrigger.tsx";
 import {
   SignedIn,
   SignedOut,
@@ -9,7 +10,7 @@ import {
 } from "@clerk/astro/components";
 ---
 
-<Layout>
+<Layout title="HairSalon | DragonMineZ">
   <section class="max-w-7xl mx-auto px-6 pt-28 pb-16">
     
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -21,7 +22,7 @@ import {
           <div class="mt-2 flex items-center gap-1.5">
             <p class="text-gray-400">Si quieres publicar un cabello primero deberás</p>
             <SignInButton mode="modal">
-                iniciar sesión.
+              iniciar sesión.
             </SignInButton>
           </div>
         </SignedOut>
@@ -29,15 +30,7 @@ import {
 
       <SignedIn>
         <div class="flex items-center gap-6">
-          <a
-            href="/createhair"
-            class="group relative inline-flex items-center gap-2 px-6 py-3 font-bold text-white transition-all bg-orange-600 rounded-xl hover:bg-orange-500 hover:shadow-[0_0_20px_rgba(234,88,12,0.4)] active:scale-95"
-          >
-            <span class="material-symbols-outlined transition-transform group-hover:rotate-90">
-              add
-            </span>
-            Crear Cabello
-          </a>
+          <CreateHairTrigger client:load />
           <UserButton afterSignOutUrl="/hairsalon" />
         </div>
       </SignedIn>

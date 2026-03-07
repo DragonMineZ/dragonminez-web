@@ -6,6 +6,7 @@ export interface Hair {
     description: string | null;
     artist: {
         id_user: number;
+        clerk_id: string;
         username: string;
         avatar_url: string;
     };

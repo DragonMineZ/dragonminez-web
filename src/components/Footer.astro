@@ -1,0 +1,88 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/dmz-title.png";
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="w-full bg-[#1C1B22] text-[rgb(var(--foreground))] py-12 px-6 border-t border-white/5">
+  <div class="max-w-3xl mx-auto flex flex-col items-center text-center gap-4">
+    
+    <!-- Logo -->
+    <div class="mb-2">
+      <a href="/" class="block transform transition-transform hover:scale-105 active:scale-95">
+        <Image 
+          src={logo} 
+          alt="DragonMineZ Logo" 
+          class="h-10 md:h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+        />
+      </a>
+    </div>
+
+    <!-- Info Section -->
+    <div class="flex flex-col gap-2">
+      <p class="text-base font-bold tracking-wide">
+        © {currentYear} DragonMineZ | Fair Use
+      </p>
+      <p class="text-sm text-[rgb(var(--foreground))]/70 max-w-lg leading-relaxed">
+        Lorem ipsum dolor sit amet, consectetur.
+      </p>
+      <p class="text-sm text-[rgb(var(--foreground))]/70 max-w-xl leading-relaxed">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec enim sagittis.
+      </p>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-2/3 max-w-[400px] h-px bg-[rgb(var(--foreground))] my-2"></div>
+
+    <!-- Social Links -->
+    <div class="flex items-center gap-8">
+      <a 
+        href="https://discord.gg/WfMTYMQtSz" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+        aria-label="Discord"
+      >
+        <i class="fa-brands fa-discord"></i>
+      </a>
+      <a 
+        href="https://github.com/DragonMineZ/dragonminez" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+        aria-label="GitHub"
+      >
+        <i class="fa-brands fa-github"></i>
+      </a>
+      <a 
+        href="https://x.com/DragonMineZ" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+        aria-label="X (Twitter)"
+      >
+        <i class="fa-brands fa-x-twitter"></i>
+      </a>
+      <a 
+        href="https://www.youtube.com/@DragonMine-Z" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+        aria-label="YouTube"
+      >
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+      <a 
+        href="https://www.tiktok.com/@dragonminez" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+        aria-label="TikTok"
+      >
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+    </div>
+
+  </div>
+</footer>

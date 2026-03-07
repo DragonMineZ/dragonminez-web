@@ -19,7 +19,10 @@ export default defineConfig({
     react()
   ],
   server: {
-    allowedHosts: true
+    allowedHosts: [
+      'superthorough-stacey-psychiatric.ngrok-free.dev',
+      'localhost'
+    ]
   },
   vite: {
     plugins: [tailwindcss()],

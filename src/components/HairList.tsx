@@ -5,7 +5,7 @@ import HairCard from "./HairCard";
 import SearchBar from "./SearchBar";
 
 export default function HairList() {
-  const { isLoaded, isSignedIn, getToken, userId } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
   const [hairs, setHairs] = useState<Hair[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +30,7 @@ export default function HairList() {
     });
 
     if (res.ok) {
-      setHairs(hairs.filter((h) => h.id_hair !== id));
+      setHairs(hairs.filter((h: Hair) => h.id_hair !== id));
     } else {
       alert("Error al eliminar");
     }
@@ -53,7 +53,9 @@ export default function HairList() {
   return (
     <div className="space-y-10 px-4 md:px-0">
 
-      <SearchBar onSearch={setSearchQuery} />
+      <div className="max-w-2xl mx-auto">
+        <SearchBar onSearch={setSearchQuery} />
+      </div>
 
       {loading ? (
         <div className="flex flex-col gap-6 max-w-4xl mx-auto">
@@ -72,7 +74,7 @@ export default function HairList() {
         </div>
       ) : (
         <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-          {filteredHairs.map((hair) => (
+          {filteredHairs.map((hair: Hair) => (
             <HairCard
               key={hair.id_hair}
               hair={hair}

@@ -19,7 +19,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     };
 
     return (
-        <div className="w-full max-w-2xl mx-auto mb-8">
+        <div className="w-full">
             <div className="group/search relative bg-[#121214] border border-white/5 rounded-full overflow-hidden transition-all duration-300 focus-within:border-white/20 hover:border-white/10 shadow-lg">
                 <input
                     type="text"

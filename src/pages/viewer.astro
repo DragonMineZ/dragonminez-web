@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HairViewerPage from "../components/HairViewerPage";
+
+const code = Astro.url.searchParams.get('code') || '';
+---
+
+<Layout title="Hair Viewer | DragonMineZ">
+  <section class="min-h-screen pt-20 pb-8">
+    <HairViewerPage client:only="react" code={code} />
+  </section>
+</Layout>

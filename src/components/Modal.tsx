@@ -30,7 +30,7 @@ export default function Modal({ isOpen, onClose, children, showCloseButton = tru
             />
 
             {/* Modal Container */}
-            <div className="relative w-full max-w-xl animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full max-w-3xl animate-in fade-in zoom-in duration-200">
                 <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0a0a0b] shadow-2xl shadow-black/50 ring-1 ring-white/5">
                     {/* Header/Close Button (Overlay) */}
                     {showCloseButton && (
@@ -42,7 +42,7 @@ export default function Modal({ isOpen, onClose, children, showCloseButton = tru
                         </button>
                     )}
 
-                    <div className="p-8 md:p-10">
+                    <div className="p-6 md:p-8">
                         {children}
                     </div>
                 </div>

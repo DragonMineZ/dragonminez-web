@@ -121,23 +121,34 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     <h3 className="text-2xl md:text-3xl font-bold text-white tracking-[1px] truncate pr-4">
                         {hair.name}
                     </h3>
-                    <button
-                        onClick={handleLike}
-                        className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
-                                ? "bg-[#E2E2DF] border-white/20 text-[#121214]"
-                                : "border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214]"
-                            }`}
-                    >
-                        <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
-                                ? "text-red-500 [font-variation-settings:'FILL'_1]"
-                                : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
-                            }`}>
-                            favorite
-                        </span>
-                        <span className="text-xl font-bold leading-none">
-                            {hair._count?.likes || 0}
-                        </span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={`/viewer?code=${encodeURIComponent(hair.code)}`}
+                            className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 text-gray-400 hover:bg-white hover:text-black transition-all"
+                            title="Ver en 3D"
+                        >
+                            <span className="material-symbols-outlined text-[24px]">
+                                view_in_ar
+                            </span>
+                        </a>
+                        <button
+                            onClick={handleLike}
+                            className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
+                                    ? "bg-[#E2E2DF] border-white/20 text-[#121214]"
+                                    : "border-white/5 hover:bg-[#E2E2DF] hover:text-[#121214]"
+                                }`}
+                        >
+                            <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
+                                    ? "text-red-500 [font-variation-settings:'FILL'_1]"
+                                    : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
+                                }`}>
+                                favorite
+                            </span>
+                            <span className="text-xl font-bold leading-none">
+                                {hair._count?.likes || 0}
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">

@@ -77,6 +77,62 @@ import aurora from "../assets/updates/dmz-aurora.png";
           ></iframe>
         </div>
       </div>
+
+      <!-- Image Carousel Section -->
+      <div class="w-full max-w-5xl px-8 flex flex-col items-center gap-8 pt-8">
+        <div class="flex flex-col gap-3 text-center">
+          <h3 class="text-3xl md:text-4xl font-black text-white tracking-tight">
+            Galeria
+          </h3>
+          <p class="text-[rgb(var(--foreground))]/60 max-w-lg mx-auto leading-relaxed">
+            Explora el mundo de DragonMineZ
+          </p>
+        </div>
+        
+        <div class="relative w-full max-w-4xl group">
+          <div id="carousel-container" class="relative aspect-[21/9] rounded-[2rem] overflow-hidden border border-white/5 shadow-[0_0_80px_rgba(0,0,0,0.6)] bg-black/20">
+            <div id="carousel-track" class="flex h-full">
+              <div class="carousel-slide w-1/2 h-full flex-shrink-0 flex gap-2 p-2">
+                <img src="/carousel/1.png" alt="DragonMineZ Gallery 1" class="w-full h-full object-cover rounded-xl" />
+                <img src="/carousel/2.png" alt="DragonMineZ Gallery 2" class="w-full h-full object-cover rounded-xl" />
+              </div>
+              <div class="carousel-slide w-1/2 h-full flex-shrink-0 flex gap-2 p-2">
+                <img src="/carousel/2.png" alt="DragonMineZ Gallery 2" class="w-full h-full object-cover rounded-xl" />
+                <img src="/carousel/3.png" alt="DragonMineZ Gallery 3" class="w-full h-full object-cover rounded-xl" />
+              </div>
+              <div class="carousel-slide w-1/2 h-full flex-shrink-0 flex gap-2 p-2">
+                <img src="/carousel/3.png" alt="DragonMineZ Gallery 3" class="w-full h-full object-cover rounded-xl" />
+                <img src="/carousel/4.png" alt="DragonMineZ Gallery 4" class="w-full h-full object-cover rounded-xl" />
+              </div>
+              <div class="carousel-slide w-1/2 h-full flex-shrink-0 flex gap-2 p-2">
+                <img src="/carousel/4.png" alt="DragonMineZ Gallery 4" class="w-full h-full object-cover rounded-xl" />
+                <img src="/carousel/5.png" alt="DragonMineZ Gallery 5" class="w-full h-full object-cover rounded-xl" />
+              </div>
+              <div class="carousel-slide w-1/2 h-full flex-shrink-0 flex gap-2 p-2">
+                <img src="/carousel/5.png" alt="DragonMineZ Gallery 5" class="w-full h-full object-cover rounded-xl" />
+                <img src="/carousel/1.png" alt="DragonMineZ Gallery 1" class="w-full h-full object-cover rounded-xl" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Arrows -->
+          <button id="carousel-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:text-black hover:scale-110 z-10">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button id="carousel-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:text-black hover:scale-110 z-10">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+
+          <!-- Indicators -->
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <button class="carousel-indicator w-3 h-3 rounded-full bg-white transition-all duration-300" data-index="0"></button>
+            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 transition-all duration-300" data-index="1"></button>
+            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 transition-all duration-300" data-index="2"></button>
+            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 transition-all duration-300" data-index="3"></button>
+            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 transition-all duration-300" data-index="4"></button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Characters Section (Dark Background #1C1B22) -->
@@ -128,4 +184,95 @@ import aurora from "../assets/updates/dmz-aurora.png";
       </a>
     </div>
   </main>
+
+  <script>
+    const track = document.getElementById('carousel-track') as HTMLElement | null;
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    let currentIndex = 0;
+    const totalSlides = 5;
+    let autoplayInterval: ReturnType<typeof setInterval> | undefined;
+
+    function updateCarousel(index: number, instant = false) {
+      if (!track) return;
+      
+      if (instant) {
+        track.style.transition = 'none';
+      } else {
+        track.style.transition = 'transform 500ms ease-out';
+      }
+      
+      track.style.transform = `translateX(-${index * 50}%)`;
+      
+      indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('bg-white', i === index);
+        indicator.classList.toggle('bg-white/40', i !== index);
+      });
+      
+      currentIndex = index;
+    }
+
+    function nextSlide() {
+      updateCarousel(currentIndex + 1);
+    }
+
+    function prevSlide() {
+      if (currentIndex === 0) {
+        updateCarousel(totalSlides, true);
+        setTimeout(() => updateCarousel(currentIndex - 1), 50);
+      } else {
+        updateCarousel(currentIndex - 1);
+      }
+    }
+
+    function onTransitionEnd() {
+      if (!track) return;
+      if (currentIndex >= totalSlides) {
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0%)';
+        currentIndex = 0;
+        indicators.forEach((indicator, i) => {
+          indicator.classList.toggle('bg-white', i === 0);
+          indicator.classList.toggle('bg-white/40', i !== 0);
+        });
+      }
+    }
+
+    function startAutoplay() {
+      autoplayInterval = setInterval(nextSlide, 4000);
+    }
+
+    function stopAutoplay() {
+      clearInterval(autoplayInterval);
+    }
+
+    nextBtn?.addEventListener('click', () => {
+      stopAutoplay();
+      nextSlide();
+      startAutoplay();
+    });
+
+    prevBtn?.addEventListener('click', () => {
+      stopAutoplay();
+      prevSlide();
+      startAutoplay();
+    });
+
+    indicators.forEach((indicator) => {
+      indicator.addEventListener('click', () => {
+        stopAutoplay();
+        updateCarousel(parseInt(indicator.getAttribute('data-index') || '0'));
+        startAutoplay();
+      });
+    });
+
+    const container = document.getElementById('carousel-container');
+    container?.addEventListener('mouseenter', stopAutoplay);
+    container?.addEventListener('mouseleave', startAutoplay);
+
+    track?.addEventListener('transitionend', onTransitionEnd);
+
+    startAutoplay();
+  </script>
 </Layout>

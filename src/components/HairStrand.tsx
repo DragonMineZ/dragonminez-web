@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import * as THREE from 'three';
 import type { StrandData } from '../lib/nbt_reader';
 
@@ -13,9 +13,64 @@ const UNIT_SCALE = 0.0625;
 const SIZE_DECAY = 0.85;
 const DEG_TO_RAD = Math.PI / 180;
 
-export default function HairStrand({ strand, basePosition, color, isSSJ = false }: HairStrandProps) {
-    const groupRef = useRef<THREE.Group>(null);
+interface HairSegmentProps {
+    index: number;
+    maxLength: number;
+    bw: number;
+    bh: number;
+    bd: number;
+    ls: number;
+    cx: number;
+    cy: number;
+    cz: number;
+    material: THREE.Material;
+}
 
+function HairSegment({ index, maxLength, bw, bh, bd, ls, cx, cy, cz, material }: HairSegmentProps) {
+    if (index >= maxLength) return null;
+
+    const s = Math.pow(SIZE_DECAY, index);
+    const h = bh * s * ls;
+    const meshY = h / 2;
+
+    if (index === 0) {
+        return (
+            <group>
+                <mesh position={[0, meshY, 0]} material={material}>
+                    <boxGeometry args={[bw * s, h, bd * s]} />
+                </mesh>
+                <group position={[0, h, 0]} rotation={[cx, cy, cz]}>
+                    <HairSegment
+                        index={index + 1}
+                        maxLength={maxLength}
+                        bw={bw} bh={bh} bd={bd} ls={ls}
+                        cx={cx} cy={cy} cz={cz}
+                        material={material}
+                    />
+                </group>
+            </group>
+        );
+    }
+
+    return (
+        <>
+            <mesh position={[0, meshY, 0]} material={material}>
+                <boxGeometry args={[bw * s, h, bd * s]} />
+            </mesh>
+            <group position={[0, h, 0]} rotation={[cx, cy, cz]}>
+                <HairSegment
+                    index={index + 1}
+                    maxLength={maxLength}
+                    bw={bw} bh={bh} bd={bd} ls={ls}
+                    cx={cx} cy={cy} cz={cz}
+                    material={material}
+                />
+            </group>
+        </>
+    );
+}
+
+export default function HairStrand({ strand, basePosition, color, isSSJ = false }: HairStrandProps) {
     const length = strand.l || 0;
     if (length <= 0) return null;
 
@@ -53,26 +108,8 @@ export default function HairStrand({ strand, basePosition, color, isSSJ = false 
     const cy = (strand.cy || 0) * DEG_TO_RAD;
     const cz = (strand.cz || 0) * DEG_TO_RAD;
 
-    const boxes = useMemo(() => {
-        const result: { size: [number, number, number], y: number, scale: number }[] = [];
-        let currentOffset = 0;
-
-        for (let i = 0; i < length; i++) {
-            const s = Math.pow(SIZE_DECAY, i);
-            const h = bh * s * ls;
-            result.push({
-                size: [bw * s, h, bd * s],
-                y: h / 2 + currentOffset,
-                scale: s
-            });
-            currentOffset = h;
-        }
-        return result;
-    }, [length, bw, bh, bd, ls]);
-
     return (
         <group
-            ref={groupRef}
             position={[
                 basePosition[0] * UNIT_SCALE,
                 basePosition[1] * UNIT_SCALE,
@@ -81,26 +118,17 @@ export default function HairStrand({ strand, basePosition, color, isSSJ = false 
             rotation={initialRotation}
             scale={initialScale}
         >
-            {boxes.map((box, i) => (
-                <mesh
-                    key={i}
-                    position={[0, box.y, 0]}
-                    material={material}
-                >
-                    <boxGeometry args={box.size} />
-                </mesh>
-            ))}
-            {length > 1 && (
-                <group rotation={[cx, cy, cz]}>
-                    {boxes.slice(1).map((box, i) => (
-                        <mesh
-                            key={`child-${i}`}
-                            position={[0, box.y - boxes[0].y, 0]}
-                            material={material}
-                        >
-                            <boxGeometry args={box.size} />
-                        </mesh>
-                    ))}
+            <HairSegment
+                index={0}
+                maxLength={length}
+                bw={bw} bh={bh} bd={bd} ls={ls}
+                cx={cx} cy={cy} cz={cz}
+                material={material}
+            />
+        </group>
+    );
+}
+
                 </group>
             )}
         </group>

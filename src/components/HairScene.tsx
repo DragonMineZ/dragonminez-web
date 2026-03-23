@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import HairBase from './HairBase';
 import HairStrand from './HairStrand';
+import { getStrandsForFace } from '../lib/nbt_reader';
 import type { HairFormData, StrandData } from '../lib/nbt_reader';
 
 interface HairSceneProps {
@@ -44,7 +45,7 @@ export default function HairScene({
 }: HairSceneProps) {
     const hairColor = useMemo(() => {
         if (isSSJ) return 0xFFE89E;
-        
+
         const colorKeys = ['Color', 'GlobalColor', 'gc'] as const;
         for (const key of colorKeys) {
             const val = (hairData as Record<string, unknown>)[key];
@@ -59,9 +60,8 @@ export default function HairScene({
     const strandsByFace = useMemo(() => {
         const result: Record<string, StrandData[]> = {};
         for (const face of faces) {
-            const key = face;
-            const strands = hairData[key] as StrandData[] | undefined;
-            result[face] = strands || [];
+            const strands = getStrandsForFace(hairData, face);
+            result[face] = strands;
         }
         return result;
     }, [hairData]);
@@ -70,7 +70,7 @@ export default function HairScene({
         <group scale={5}>
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 10, 7]} intensity={0.8} />
-            
+
             <group>
                 <mesh position={[0, headY, 0]} scale={[headScaleX, headScaleY, headScaleZ]}>
                     <boxGeometry args={[0.5, 0.5, 0.5]} />

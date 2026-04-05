@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import HairList from "../components/HairList.tsx";
-import CreateHairTrigger from "../components/CreateHairTrigger.tsx";
+import HairList from "../components/features/hairs/HairList.tsx";
+import CreateHairTrigger from "../components/features/hairs/CreateHairTrigger.tsx";
 import {
   SignedIn,
   SignedOut,
@@ -30,21 +30,21 @@ if (userId) {
         </h1>
         <SignedOut>
           <div class="mt-2 flex items-center gap-1.5">
-            <p class="text-gray-400">Si quieres publicar un cabello primero deberás</p>
+            <p class="text-muted">Si quieres publicar un cabello primero deberás</p>
             <SignInButton mode="modal" class="text-white hover:underline cursor-pointer">
               iniciar sesión.
             </SignInButton>
           </div>
         </SignedOut>
         <SignedIn>
-          <p class="text-gray-400 mt-2">
+          <p class="text-muted mt-2">
             ¡Bienvenido <span class="text-white font-semibold">{username}</span>!, puedes empezar a publicar tus creaciones
           </p>
         </SignedIn>
       </div>
 
       <SignedIn>
-        <div class="flex items-center gap-3 bg-[#121214] border border-white/5 rounded-full pl-1.5 pr-4 py-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+        <div class="flex items-center gap-3 bg-surface border border-glass rounded-full pl-1.5 pr-4 py-1.5 shadow-glass">
           <UserButton afterSignOutUrl="/hairsalon" />
           <span class="text-white font-bold tracking-tight">{username}</span>
         </div>

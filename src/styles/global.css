@@ -1,34 +1,60 @@
 @import "tailwindcss";
 
-/* LIGHT */
-:root {
-  --background: 245 243 239;
-  --foreground: 15 23 42;
-  --muted: 107 114 128;
-  --surface: 255 255 255;
-  --primary: 250 204 21;
-  --accent: 59 130 246;
+@theme {
+  --color-background: #0a0a0b;
+  --color-surface: #121214;
+  --color-surface-elevated: #18181b;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  /* Equivalent to white/5 */
+  --color-glass-strong: rgba(255, 255, 255, 0.1);
+  /* Equivalent to white/10 */
+  --color-primary: #facc15;
+  --color-accent: #3b82f6;
+  --color-foreground: #ffffff;
+  --color-muted: #9ca3af;
+
+  --shadow-glow: 0 0 15px rgba(255, 255, 255, 0.3);
+  --shadow-glow-strong: 0 0 20px rgba(255, 255, 255, 0.2);
+  --shadow-glass: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-alert: 0 12px 48px rgba(0, 0, 0, 0.6);
+  --shadow-hero: 0 0 80px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 0 50px rgba(0, 0, 0, 0.5);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --shadow-button-hover: 0 0 30px rgba(255, 255, 255, 0.1);
+
+  --drop-shadow-hero: 0 10px 30px rgba(0, 0, 0, 0.8);
+  --drop-shadow-card: 0 4px 10px rgba(0, 0, 0, 0.8);
+  --drop-shadow-portrait: 0 0 100px rgba(0, 0, 0, 0.6);
+  --drop-shadow-logo: 0 0 15px rgba(0, 0, 0, 0.5);
+  --drop-shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.2);
 }
 
-/* DARK */
-.dark {
-  --background: 15 15 20;
-  --foreground: 248 250 252;
-  --muted: 156 163 175;
-  --surface: 27 27 35;
-  --primary: 250 204 21;
-  --accent: 96 165 250;
+:root {
+  color-scheme: dark;
 }
 
 body {
   font-family: 'Onest Variable', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }
 
 @keyframes pulse-subtle {
-    0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1) drop-shadow(0 0 20px rgba(255,100,0,0.2)); }
-    50% { opacity: 0.95; transform: scale(1.02); filter: brightness(1.2) drop-shadow(0 0 30px rgba(255,100,0,0.4)); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 20px rgba(255, 100, 0, 0.2));
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: scale(1.02);
+    filter: brightness(1.2) drop-shadow(0 0 30px rgba(255, 100, 0, 0.4));
+  }
 }
 
 .animate-pulse-subtle {
-    animation: pulse-subtle 4s ease-in-out infinite;
+  animation: pulse-subtle 4s ease-in-out infinite;
 }

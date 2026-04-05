@@ -1,0 +1,262 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+}
+
+header {
+    background-color: #252525;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #333;
+}
+
+.container {
+    background-color: #1e1e1e;
+    max-width: 400px;
+    margin: 25px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.desc {
+    color: #e34425;
+    font-weight: bold;
+    margin: 0;
+}
+
+h1 {
+    color: #e34425;
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 4rem);
+}
+
+/* Table Styles */
+#hair-section {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#hair-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #252525;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+#hair-table th {
+    background-color: #333;
+    color: #e34425;
+    text-align: left;
+    padding: 15px;
+    border-bottom: 2px solid #444;
+}
+
+#hair-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    vertical-align: middle;
+}
+
+#hair-table tr:hover {
+    background-color: #2d2d2d;
+}
+
+.mini-render {
+    width: 80px;
+    height: 80px;
+    background-color: #111;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #444;
+}
+
+.table-code {
+    width: 100%;
+    height: 40px;
+    background: #111;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 11px;
+    resize: none;
+    font-family: monospace;
+}
+
+.row-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.row-buttons button {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-copy,
+.btn-view {
+    background-color: #444;
+    color: #fff;
+    width: 40px;
+    flex: 0 0 auto;
+}
+
+.btn-view {
+    background-color: #e34425;
+    color: #000;
+}
+
+.btn-copy:hover {
+    background-color: #555;
+}
+
+.btn-view:hover {
+    background-color: #ffcc00;
+}
+
+.col-preview {
+    width: 100px;
+}
+
+.col-name {
+    width: 100px;
+    font-weight: bold;
+    color: #e34425;
+}
+.col-author {
+    width: 100px;
+    color: #acacac;
+}
+
+.col-actions {
+    width: 100px;
+}
+
+/* Viewer Styles */
+#viewer-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 300px;
+}
+
+#hair-code {
+    width: 100%;
+    height: 100px;
+    background: #111;
+    color: #0f0;
+    border: 1px solid #444;
+    resize: none;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    background-color: #e34425;
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #ffcc00;
+}
+
+#debug-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 8px;
+    width: 250px;
+    border: 1px solid #444;
+}
+
+#debug-panel h3 {
+    margin-top: 0;
+    color: #e34425;
+    font-size: 16px;
+}
+
+#debug-panel label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+#debug-panel input[type="range"] {
+    width: 100%;
+}
+
+#form-switcher {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 12px 24px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    border: 2px solid #e34425;
+    z-index: 1000;
+    justify-content: center;
+}
+
+#form-switcher button {
+    background: none;
+    border: none;
+    color: #e34425;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0 10px;
+    transition: transform 0.1s, color 0.1s;
+    user-select: none;
+}
+
+#form-switcher button:hover {
+    color: #fff;
+    transform: scale(1.2);
+}
+
+#current-form-label {
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    min-width: 100px;
+    text-align: center;
+    font-size: 18px;
+    user-select: none;
+}

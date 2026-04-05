@@ -31,11 +31,11 @@ export default function ConfirmDialog({
                     className="w-[200px] md:w-[260px] h-auto mb-8 drop-shadow-glow-orange animate-pulse-subtle"
                 />
 
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-tight">
                     {title}
                 </h2>
 
-                <p className="text-white/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
+                <p className="text-foreground/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
                     {description}
                 </p>
 

@@ -5,7 +5,7 @@ import logo from "../../assets/dmz-title.png";
 
 <header 
   id="main-header"
-  class="fixed top-0 z-50 w-full transition-all duration-300 ease-in-out border-b border-transparent"
+  class="dark fixed top-0 z-50 w-full transition-all duration-300 ease-in-out border-b border-transparent"
 >
   <div class="mx-auto flex h-20 w-full items-center justify-between px-6 md:px-8">
     
@@ -21,7 +21,7 @@ import logo from "../../assets/dmz-title.png";
 
     <button 
       id="menu-button"
-      class="flex md:hidden items-center justify-center text-[rgb(var(--foreground))] z-[61] p-2 select-none hover:bg-glass rounded-xl transition-colors active:scale-90"
+      class="flex md:hidden items-center justify-center text-white z-[61] p-2 select-none hover:bg-white/10 rounded-xl transition-colors active:scale-90"
       aria-label="Toggle Menu"
     >
       <span class="material-symbols-rounded text-3xl">menu</span>
@@ -29,12 +29,12 @@ import logo from "../../assets/dmz-title.png";
     
     <nav 
       id="main-nav"
-      class="absolute top-full left-0 w-full h-[auto] bg-surface/95 backdrop-blur-xl md:static md:w-auto md:bg-transparent md:backdrop-blur-none flex flex-col md:flex-row items-center p-8 md:p-0 gap-6 md:gap-8 text-xl font-medium text-foreground/80 transition-all duration-300 -translate-y-4 opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto border-b border-glass-strong md:border-none shadow-dropdown md:shadow-none rounded-b-3xl md:rounded-none z-[60]"
+      class="absolute top-full left-0 w-full h-[auto] bg-[#121214]/95 backdrop-blur-xl md:static md:w-auto md:bg-transparent md:backdrop-blur-none flex flex-col md:flex-row items-center p-8 md:p-0 gap-6 md:gap-8 text-xl font-medium text-white/80 transition-all duration-300 -translate-y-4 opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto border-b border-white/10 md:border-none shadow-dropdown md:shadow-none rounded-b-3xl md:rounded-none z-[60]"
     >
-      <a href="#" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Download</a>
-      <a href="#" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Discord</a>
-      <a href="/hairsalon" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">HairSalon</a>
-      <a href="https://trello.com/b/xewaqYee/dragonmine-z-trello" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Wiki</a>
+      <a href="#" class="hover:text-white transition-colors w-full md:w-auto text-center py-2 md:py-0">Download</a>
+      <a href="#" class="hover:text-white transition-colors w-full md:w-auto text-center py-2 md:py-0">Discord</a>
+      <a href="/hairsalon" class="hover:text-white transition-colors w-full md:w-auto text-center py-2 md:py-0">HairSalon</a>
+      <a href="https://trello.com/b/xewaqYee/dragonmine-z-trello" class="hover:text-white transition-colors w-full md:w-auto text-center py-2 md:py-0">Wiki</a>
     </nav>
   </div>
 </header>
@@ -53,16 +53,16 @@ import logo from "../../assets/dmz-title.png";
       if (!header) return;
 
       if (isMenuOpen) {
-        header.classList.add('bg-surface', 'border-glass-strong');
+        header.classList.add('bg-[#121214]', 'border-white/10');
         header.classList.remove('backdrop-blur-md', 'border-transparent');
         return;
       }
 
       if (window.scrollY > 10) {
-        header.classList.add('bg-background/70', 'backdrop-blur-md', 'border-glass-strong');
-        header.classList.remove('border-transparent', 'bg-surface');
+        header.classList.add('bg-[#0a0a0b]/70', 'backdrop-blur-md', 'border-white/10');
+        header.classList.remove('border-transparent', 'bg-[#121214]');
       } else {
-        header.classList.remove('bg-background/70', 'bg-surface', 'backdrop-blur-md', 'border-glass-strong');
+        header.classList.remove('bg-[#0a0a0b]/70', 'bg-[#121214]', 'backdrop-blur-md', 'border-white/10');
         header.classList.add('border-transparent');
       }
       

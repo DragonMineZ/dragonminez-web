@@ -32,16 +32,16 @@ export default function FilterDropdown({ label, options, selectedId, onSelect }:
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center justify-between gap-3 px-5 py-2.5 bg-surface border transition-all rounded-full min-w-[160px] group
-                    ${isOpen ? 'border-white/60' : 'border-glass hover:border-glass-strong'}
+                className={`flex items-center justify-center gap-3 px-6 py-2.5 bg-surface border transition-all rounded-full min-w-[140px] group
+                    ${isOpen ? 'border-foreground/40 shadow-glow blur-none' : 'border-glass hover:border-glass-strong'}
                 `}
             >
                 <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-200">
+                    <span className="text-sm font-bold text-foreground">
                         {selectedOption ? selectedOption.label : label}
                     </span>
                 </div>
-                <span className={`material-symbols-outlined text-[20px] text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                <span className={`material-symbols-outlined text-[20px] text-muted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                     expand_more
                 </span>
             </button>
@@ -58,8 +58,8 @@ export default function FilterDropdown({ label, options, selectedId, onSelect }:
                                 }}
                                 className={`w-full px-4 py-2 text-left text-sm font-bold rounded-xl transition-all
                                     ${selectedId === option.id
-                                        ? 'bg-white text-black'
-                                        : 'text-muted hover:bg-glass hover:text-white'}
+                                        ? 'bg-foreground text-background'
+                                        : 'text-muted hover:bg-glass hover:text-foreground'}
                                 `}
                             >
                                 {option.label}

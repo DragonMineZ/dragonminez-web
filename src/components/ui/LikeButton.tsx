@@ -12,8 +12,8 @@ export default function LikeButton({ isLiked, likesCount, onClick }: LikeButtonP
             <button
                 onClick={onClick}
                 className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
-                    ? "bg-white border-white/20 text-surface"
-                    : "border-glass text-muted hover:bg-white hover:text-surface"
+                    ? "bg-foreground border-glass text-background"
+                    : "border-glass text-muted hover:bg-foreground hover:text-background"
                     }`}
             >
                 <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked

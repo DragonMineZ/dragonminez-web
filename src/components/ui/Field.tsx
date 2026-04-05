@@ -30,13 +30,13 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
         const currentValue = value !== undefined ? value : internalValue;
         const currentLength = String(currentValue || '').length;
 
-        const baseInputStyles = `w-full px-5 py-3 bg-surface border border-glass rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:border-glass-strong focus:bg-surface-elevated/80 focus:backdrop-blur-md focus:shadow-lg transition-all shadow-inner ${error ? 'border-red-500/50 focus:border-red-500' : ''
+        const baseInputStyles = `w-full px-5 py-3 bg-surface border border-glass rounded-2xl text-foreground placeholder:text-muted/40 focus:outline-none focus:border-glass-strong focus:bg-surface-elevated/80 focus:backdrop-blur-md focus:shadow-lg transition-all shadow-inner ${error ? 'border-red-500/50 focus:border-red-500' : ''
             } ${className}`;
 
         return (
             <div className="space-y-2 w-full">
                 {label && (
-                    <label className="block text-sm font-semibold text-gray-200 ml-1">
+                    <label className="block text-sm font-semibold text-foreground/70 ml-1">
                         {label}
                     </label>
                 )}
@@ -54,7 +54,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
                             />
                             <div className="absolute inset-0 bg-surface rounded-2xl pointer-events-none group-focus-within:bg-surface-elevated/80 group-focus-within:backdrop-blur-md transition-all"></div>
                             {appliedMaxLength && (
-                                <div className="absolute bottom-3 right-3 bg-surface border border-glass text-muted px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider pointer-events-none z-20 shadow-sm transition-all group-focus-within:text-white group-focus-within:border-glass-strong">
+                                <div className="absolute bottom-3 right-3 bg-surface border border-glass text-muted px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider pointer-events-none z-20 shadow-sm transition-all group-focus-within:text-foreground group-focus-within:border-glass-strong">
                                     {currentLength} / {appliedMaxLength}
                                 </div>
                             )}

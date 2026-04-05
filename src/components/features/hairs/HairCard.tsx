@@ -11,6 +11,7 @@ import CreateHairForm from "./CreateHairForm";
 import ConfirmDialog from "../../ui/ConfirmDialog";
 import SuccessAlert from "../../ui/SuccessAlert";
 import InfoDialog from "../../ui/InfoDialog";
+import HairCategories from "./HairCategories";
 
 import { useLike } from "../../../hooks/useLike";
 import { useClipboard } from "../../../hooks/useClipboard";
@@ -85,7 +86,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
             <div className="flex flex-col flex-1 min-w-0 py-2">
                 <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-2xl md:text-3xl font-bold text-white tracking-[1px] truncate pr-4">
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground tracking-[1px] truncate pr-4">
                         {hair.name}
                     </h3>
                     <div className="flex items-center gap-2">
@@ -104,24 +105,12 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 </div>
 
                 {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {(hair.categories?.length ?? 0) > 0 ? (
-                        hair.categories?.map((cat) => (
-                            <Chip key={cat.id_category} variant="glass">
-                                {cat.description}
-                            </Chip>
-                        ))
-                    ) : (
-                        <Chip variant="glass" className="opacity-50">
-                            Normal
-                        </Chip>
-                    )}
-                </div>
+                <HairCategories categories={hair.categories} className="mb-3" />
 
                 {/* Copy Code Button */}
                 <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
 
-                <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-4 font-normal">
+                <p className="text-sm text-foreground/70 line-clamp-3 leading-[1.6] mb-4 font-normal">
                     {hair.description || "Sin descripción disponible."}
                 </p>
 

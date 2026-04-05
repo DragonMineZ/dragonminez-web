@@ -16,8 +16,14 @@ export function FloatingMenu() {
 
     useEffect(() => {
         setIsClient(true);
-        // Initialize theme state from DOM
-        setIsDark(document.documentElement.classList.contains('dark'));
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme ? savedTheme === 'dark' : true; // Default to true (dark) if no saved theme
+        setIsDark(theme);
+        if (theme) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
 
         const savedPos = localStorage.getItem('floating-menu-pos');
         if (savedPos) {
@@ -49,6 +55,7 @@ export function FloatingMenu() {
     const toggleTheme = () => {
         const newDark = !isDark;
         setIsDark(newDark);
+        localStorage.setItem('theme', newDark ? 'dark' : 'light');
         if (newDark) {
             document.documentElement.classList.add('dark');
         } else {

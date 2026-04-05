@@ -26,13 +26,13 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                     value={query}
                     onChange={handleChange}
                     placeholder="Busca tu cabello"
-                    className="w-full h-14 pl-8 pr-16 bg-transparent text-white placeholder-gray-500 font-medium text-lg outline-none"
+                    className="w-full h-14 pl-8 pr-16 bg-transparent text-foreground placeholder:text-muted/50 font-medium text-lg outline-none"
                 />
                 <div className="absolute right-2 top-2 bottom-2 w-12 flex items-center justify-center transition-all duration-300">
                     {query ? (
                         <button
                             onClick={handleClear}
-                            className="group/clear w-full h-full flex items-center justify-center bg-black rounded-full text-muted hover:bg-white hover:text-surface transition-all duration-300"
+                            className="group/clear w-full h-full flex items-center justify-center bg-surface border border-glass rounded-full text-muted hover:bg-foreground hover:text-background transition-all duration-300"
                         >
                             <span className="material-symbols-outlined text-[24px] group-hover/clear:[font-variation-settings:'FILL'_1]">
                                 close

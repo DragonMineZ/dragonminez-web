@@ -15,7 +15,7 @@ export default function CodeClipboard({ code, copied, onCopy }: CodeClipboardPro
             <Tooltip content={copied ? "¡Copiado!" : "Copiar código"} className="shrink-0 h-[34px]">
                 <button
                     onClick={onCopy}
-                    className="group/copy w-full h-full flex items-center justify-center bg-black px-3 text-muted hover:bg-white hover:text-surface transition-all border-l border-glass-strong rounded-r-xl"
+                    className="group/copy w-full h-[34px] flex items-center justify-center bg-foreground px-4 text-background hover:opacity-90 transition-all border-l border-glass-strong rounded-r-xl"
                     aria-label="Copiar código"
                 >
                     <span className="material-symbols-outlined text-[18px] group-hover/copy:[font-variation-settings:'FILL'_1] transition-all">

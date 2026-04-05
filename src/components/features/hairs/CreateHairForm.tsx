@@ -27,7 +27,7 @@ export default function CreateHairForm({
   if (!isLoaded || fetchingUser) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-10 w-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+        <div className="h-10 w-10 border-4 border-foreground/20 border-t-foreground rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function CreateHairForm({
     <div className="flex flex-col w-full h-full max-h-[85vh]">
       {/* Sticky Header */}
       <div className="shrink-0 p-6 md:p-8 pb-4 sticky top-0 bg-background z-20 w-full flex flex-col">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
           {isEditing ? "Editar Cabello" : "Publicar Cabello"}
         </h2>
         <p className="text-muted text-sm md:text-base">
@@ -70,7 +70,7 @@ export default function CreateHairForm({
           />
 
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-200 ml-1">
+            <label className="block text-sm font-semibold text-foreground/70 ml-1">
               Categorías
             </label>
             <div className="flex flex-wrap gap-2">
@@ -80,15 +80,15 @@ export default function CreateHairForm({
                   type="button"
                   onClick={() => toggleCategory(cat.id_category)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${selectedCategories.includes(cat.id_category)
-                    ? "bg-white text-black shadow-glow"
-                    : "bg-glass text-muted hover:bg-glass-strong hover:text-white"
+                    ? "bg-foreground text-background shadow-glow"
+                    : "bg-glass text-muted hover:bg-glass-strong hover:text-foreground"
                     }`}
                 >
                   {cat.description}
                 </button>
               ))}
               {filteredCategories.length === 0 && (
-                <p className="text-xs text-gray-500 italic ml-1">
+                <p className="text-xs text-muted italic ml-1">
                   Ingresa un código válido para ver categorías
                 </p>
               )}
@@ -133,7 +133,7 @@ export default function CreateHairForm({
         >
           {loading ? (
             <>
-              <div className="h-4 w-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+              <div className="h-4 w-4 border-2 border-background/20 border-t-background rounded-full animate-spin"></div>
               {isEditing ? "Actualizando..." : "Publicando..."}
             </>
           ) : isEditing ? (

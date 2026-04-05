@@ -25,9 +25,9 @@ export default function Chip({
 
     // Vary styles based on logic similar to architecture
     const variantStyles = {
-        glass: "px-3 py-1 bg-glass border border-glass-strong text-[10px] font-bold text-white/60 tracking-wider uppercase hover:bg-glass-strong hover:text-white",
-        outline: "px-3 py-1 border border-glass text-muted hover:bg-white hover:text-surface",
-        solid: "px-3 py-1 bg-white border border-white/20 text-surface font-bold"
+        glass: "px-3 py-1 bg-glass border border-glass-strong text-[10px] font-bold text-muted tracking-wider uppercase hover:bg-glass-strong hover:text-foreground",
+        outline: "px-3 py-1 border border-glass text-muted hover:bg-foreground hover:text-background",
+        solid: "px-3 py-1 bg-foreground border border-glass-strong text-background font-bold"
     };
 
     // If there's NO children (meaning purely an icon button chip like the viewer button), override padding optionally via className or just inherit

@@ -51,8 +51,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 disabled={currentPage === 1}
                 className={`w-12 h-12 flex items-center justify-center rounded-2xl border transition-all duration-300
                     ${currentPage === 1
-                        ? 'opacity-20 cursor-not-allowed border-glass text-gray-500'
-                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-white active:scale-95'
+                        ? 'opacity-20 cursor-not-allowed border-glass text-muted'
+                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-foreground active:scale-95'
                     }
                 `}
             >
@@ -66,7 +66,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 {getPageNumbers().map((page, index) => (
                     <React.Fragment key={index}>
                         {page === '...' ? (
-                            <div className="w-12 h-12 flex items-end justify-center text-gray-500 pb-3 font-bold">
+                            <div className="w-12 h-12 flex items-end justify-center text-muted pb-3 font-bold">
                                 ...
                             </div>
                         ) : (
@@ -74,8 +74,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                                 onClick={() => onPageChange(Number(page))}
                                 className={`w-12 h-12 flex items-center justify-center rounded-2xl border text-sm font-bold transition-all duration-300 active:scale-95
                                     ${currentPage === page
-                                        ? 'bg-white text-black border-white shadow-glow-strong'
-                                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-white'
+                                        ? 'bg-foreground text-background border-foreground shadow-glow-strong'
+                                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-foreground'
                                     }
                                 `}
                             >
@@ -92,8 +92,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 disabled={currentPage === totalPages}
                 className={`w-12 h-12 flex items-center justify-center rounded-2xl border transition-all duration-300
                     ${currentPage === totalPages
-                        ? 'opacity-20 cursor-not-allowed border-glass text-gray-500'
-                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-white active:scale-95'
+                        ? 'opacity-20 cursor-not-allowed border-glass text-muted'
+                        : 'bg-surface border-glass text-muted hover:border-glass-strong hover:text-foreground active:scale-95'
                     }
                 `}
             >

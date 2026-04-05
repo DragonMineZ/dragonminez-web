@@ -1,16 +1,39 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: #0a0a0b;
-  --color-surface: #121214;
-  --color-surface-elevated: #18181b;
-  --color-section: #1C1B22;
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-strong: rgba(255, 255, 255, 0.1);
-  --color-primary: #facc15;
-  --color-accent: #3b82f6;
-  --color-foreground: #ffffff;
-  --color-muted: #9ca3af;
+:root {
+  --background: #f9fafb;
+  --surface: #ffffff;
+  --surface-elevated: #f3f4f6;
+  --section: #f3f4f6;
+  --foreground: #111827;
+  --muted: #6b7280;
+  --glass: rgba(0, 0, 0, 0.05);
+  --glass-strong: rgba(0, 0, 0, 0.1);
+
+  --shadow-glow: 0 0 15px rgba(0, 0, 0, 0.1);
+  --shadow-glow-strong: 0 0 20px rgba(0, 0, 0, 0.15);
+  --shadow-glass: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-alert: 0 12px 48px rgba(0, 0, 0, 0.1);
+  --shadow-hero: 0 0 80px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 0 50px rgba(0, 0, 0, 0.1);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.1);
+
+  --drop-shadow-hero: 0 10px 30px rgba(0, 0, 0, 0.2);
+  --drop-shadow-portrait: 0 0 100px rgba(0, 0, 0, 0.1);
+  --drop-shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.1);
+
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0a0a0b;
+  --surface: #121214;
+  --surface-elevated: #18181b;
+  --section: #1c1b22;
+  --foreground: #ffffff;
+  --muted: #9ca3af;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-strong: rgba(255, 255, 255, 0.1);
 
   --shadow-glow: 0 0 15px rgba(255, 255, 255, 0.3);
   --shadow-glow-strong: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -19,34 +42,50 @@
   --shadow-hero: 0 0 80px rgba(0, 0, 0, 0.6);
   --shadow-card-hover: 0 0 50px rgba(0, 0, 0, 0.5);
   --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.5);
-  --shadow-button-hover: 0 0 30px rgba(255, 255, 255, 0.1);
 
   --drop-shadow-hero: 0 10px 30px rgba(0, 0, 0, 0.8);
-  --drop-shadow-card: 0 4px 10px rgba(0, 0, 0, 0.8);
   --drop-shadow-portrait: 0 0 100px rgba(0, 0, 0, 0.6);
-  --drop-shadow-logo: 0 0 15px rgba(0, 0, 0, 0.5);
   --drop-shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.2);
+
+  color-scheme: dark;
 }
 
-:root {
-  color-scheme: dark;
+@theme {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-section: var(--section);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+
+  --shadow-glow: var(--shadow-glow);
+  --shadow-glow-strong: var(--shadow-glow-strong);
+  --shadow-glass: var(--shadow-glass);
+  --shadow-alert: var(--shadow-alert);
+  --shadow-hero: var(--shadow-hero);
+  --shadow-card-hover: var(--shadow-card-hover);
+  --shadow-dropdown: var(--shadow-dropdown);
+
+  --drop-shadow-hero: var(--drop-shadow-hero);
+  --drop-shadow-portrait: var(--drop-shadow-portrait);
+  --drop-shadow-glow-orange: var(--drop-shadow-glow-orange);
 }
 
 body {
   font-family: 'Onest Variable', system-ui, sans-serif;
   background-color: var(--color-background);
   color: var(--color-foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes pulse-subtle {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1) drop-shadow(0 0 20px rgba(255, 100, 0, 0.2));
+    filter: brightness(1) drop-shadow(var(--drop-shadow-glow-orange));
   }
-
   50% {
     opacity: 0.95;
     transform: scale(1.02);
@@ -105,11 +144,13 @@ body {
   .tooltip-arrow-bottom {
     @apply top-[-4.5px] left-1/2 -translate-x-1/2 border-t border-l;
   }
+
   .section-divider {
     @apply w-full max-w-7xl mx-auto px-6 md:px-8;
   }
+
   .section-divider::after {
     content: '';
-    @apply block w-full h-px rounded-full;
+    @apply block w-full h-px rounded-full bg-glass;
   }
-}
+}

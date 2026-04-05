@@ -83,7 +83,7 @@ export default function HairViewer3D({
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <div className="h-10 w-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="h-10 w-10 border-4 border-foreground/20 border-t-foreground rounded-full animate-spin" />
             </div>
         );
     }
@@ -134,7 +134,7 @@ export default function HairViewer3D({
 
                 {hairName && (
                     <div className="absolute top-6 left-0 right-0 flex justify-center pointer-events-none">
-                        <div className="pointer-events-auto bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-white font-bold text-center text-lg px-6 py-2 shadow-lg max-w-[80%] truncate">
+                        <div className="pointer-events-auto bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-foreground font-bold text-center text-lg px-6 py-2 shadow-lg max-w-[80%] truncate">
                             {hairName}
                         </div>
                     </div>
@@ -144,16 +144,16 @@ export default function HairViewer3D({
                     <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 md:gap-6 pointer-events-none">
                         <button
                             onClick={handlePrevForm}
-                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-white hover:bg-glass-strong transition-all shadow-lg"
+                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-foreground hover:bg-glass-strong transition-all shadow-lg"
                         >
                             <span className="material-symbols-outlined text-2xl">chevron_left</span>
                         </button>
-                        <div className="pointer-events-auto flex items-center justify-center h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-white font-bold uppercase tracking-wider min-w-[120px] px-6 shadow-lg">
+                        <div className="pointer-events-auto flex items-center justify-center h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-foreground font-bold uppercase tracking-wider min-w-[120px] px-6 shadow-lg">
                             {currentFormKey}
                         </div>
                         <button
                             onClick={handleNextForm}
-                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-white hover:bg-glass-strong transition-all shadow-lg"
+                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-foreground hover:bg-glass-strong transition-all shadow-lg"
                         >
                             <span className="material-symbols-outlined text-2xl">chevron_right</span>
                         </button>

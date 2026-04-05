@@ -10,6 +10,8 @@ interface ViewerControlsProps {
     setCustomColor: (val: string) => void;
 }
 
+import Field from '../../ui/Field';
+
 export default function ViewerControls({
     code,
     setCode,
@@ -33,11 +35,13 @@ export default function ViewerControls({
 
             <div className="bg-surface-elevated border border-glass-strong rounded-xl p-4">
                 <h3 className="text-white font-bold mb-3">Hair Code</h3>
-                <textarea
+                <Field
+                    as="textarea"
                     value={code}
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={(e: any) => setCode(e.target.value)}
                     placeholder="Paste DMZ1/DMZ4/DMZ5, DMZF1/DMZF4/DMZF5 code..."
-                    className="w-full h-24 bg-surface border border-glass rounded-xl text-white font-mono text-sm p-3 resize-none focus:outline-none focus:border-white/20"
+                    maxLength={5000} // Much higher limit for hair codes
+                    className="font-mono text-sm"
                 />
                 <div className="flex gap-2 mt-3">
                     <button
@@ -92,12 +96,11 @@ export default function ViewerControls({
 
             <div className="bg-surface-elevated border border-glass-strong rounded-xl p-4">
                 <h3 className="text-white font-bold mb-3">Hair Name</h3>
-                <input
+                <Field
                     type="text"
                     value={hairName}
-                    onChange={(e) => setHairName(e.target.value)}
+                    onChange={(e: any) => setHairName(e.target.value)}
                     placeholder="Enter hair name..."
-                    className="w-full bg-surface border border-glass rounded-xl text-white px-4 py-2 focus:outline-none focus:border-white/20"
                 />
             </div>
         </div>

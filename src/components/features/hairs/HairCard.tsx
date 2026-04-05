@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import type { Hair } from "../../types/hair";
 import { useAuth } from "@clerk/astro/react";
 import ActionButtons from "../../ui/ActionButtons";
+import Chip from "../../ui/Chip";
+import AuthorTag from "../../ui/AuthorTag";
+import CodeClipboard from "../../ui/CodeClipboard";
+import LikeButton from "../../ui/LikeButton";
 import Modal from "../../ui/Modal";
 import CreateHairForm from "./CreateHairForm";
 import ConfirmDialog from "../../ui/ConfirmDialog";
@@ -85,66 +89,37 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                         {hair.name}
                     </h3>
                     <div className="flex items-center gap-2">
-                        <a
+                        <Chip
                             href={`/viewer?code=${encodeURIComponent(hair.code)}`}
-                            className="flex items-center gap-2 px-3 py-1 rounded-full border border-glass text-muted hover:bg-white hover:text-black transition-all"
+                            icon="visibility"
+                            variant="outline"
                             title="Ver en 3D"
-                        >
-                            <span className="material-symbols-outlined text-[24px]">view_in_ar</span>
-                        </a>
-                        <button
+                        />
+                        <LikeButton
+                            isLiked={isLiked}
+                            likesCount={hair._count?.likes || 0}
                             onClick={handleToggleLikeClick}
-                            className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked
-                                ? "bg-white border-white/20 text-surface"
-                                : "border-glass hover:bg-white hover:text-surface"
-                                }`}
-                        >
-                            <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
-                                ? "text-red-500 [font-variation-settings:'FILL'_1]"
-                                : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
-                                }`}>
-                                favorite
-                            </span>
-                            <span className="text-xl font-bold leading-none">
-                                {hair._count?.likes || 0}
-                            </span>
-                        </button>
+                        />
                     </div>
                 </div>
 
                 {/* Categories */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {hair.categories?.length > 0 ? (
-                        hair.categories.map((cat) => (
-                            <span
-                                key={cat.id_category}
-                                className="px-3 py-1 bg-glass border border-glass-strong rounded-full text-[10px] font-bold text-white/60 tracking-wider uppercase"
-                            >
+                    {(hair.categories?.length ?? 0) > 0 ? (
+                        hair.categories?.map((cat) => (
+                            <Chip key={cat.id_category} variant="glass">
                                 {cat.description}
-                            </span>
+                            </Chip>
                         ))
                     ) : (
-                        <span className="px-3 py-1 bg-glass border border-glass rounded-full text-[10px] font-bold text-white/30 tracking-wider uppercase">
+                        <Chip variant="glass" className="opacity-50">
                             Normal
-                        </span>
+                        </Chip>
                     )}
                 </div>
 
                 {/* Copy Code Button */}
-                <div className="flex items-center bg-surface-elevated border border-glass-strong rounded-xl overflow-hidden mb-4 max-w-full">
-                    <span className="text-sm font-medium text-muted truncate flex-1 tracking-tight px-4 py-1.5 font-mono">
-                        {hair.code}
-                    </span>
-                    <button
-                        onClick={handleCopyCode}
-                        className="group/copy shrink-0 flex items-center justify-center bg-black w-10 py-1.5 text-muted hover:bg-white hover:text-surface transition-all border-l border-glass-strong"
-                        title="Copiar código"
-                    >
-                        <span className="material-symbols-outlined text-[18px] group-hover/copy:[font-variation-settings:'FILL'_1]">
-                            {copied ? 'check' : 'content_copy'}
-                        </span>
-                    </button>
-                </div>
+                <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
 
                 <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-6 font-normal">
                     {hair.description || "Sin descripción disponible."}
@@ -152,22 +127,11 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
                 {/* Author Info & Actions */}
                 <div className="flex items-center justify-between pt-4 border-t border-glass mt-auto">
-                    <div className="flex items-center gap-2.5">
-                        <div className="relative">
-                            <img
-                                src={hair.artist.avatar_url}
-                                alt={hair.artist.username}
-                                className="w-8 h-8 rounded-full border border-white/20 object-cover"
-                            />
-                            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-surface rounded-full" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-xs text-gray-500 font-medium">Author</span>
-                            <span className="text-sm text-gray-200 font-semibold leading-tight">
-                                {hair.artist.username}
-                            </span>
-                        </div>
-                    </div>
+                    <AuthorTag
+                        avatarUrl={hair.artist.avatar_url}
+                        username={hair.artist.username}
+                        isOnline={true}
+                    />
 
                     {isSignedIn && isOwner && (
                         <ActionButtons
@@ -179,7 +143,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
             </div>
 
             {/* Modals are still here but logic is clean and readable */}
-            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} noPadding={true}>
                 <CreateHairForm initialData={hair} onSuccess={handleEditSuccess} />
             </Modal>
 

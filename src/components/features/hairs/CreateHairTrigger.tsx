@@ -24,7 +24,7 @@ export default function CreateHairTrigger({ onSuccess }: { onSuccess?: () => voi
                 Publicar Cabello
             </Button>
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} noPadding={true}>
                 <CreateHairForm onSuccess={handleSuccess} />
             </Modal>
         </>

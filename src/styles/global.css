@@ -58,3 +58,13 @@ body {
 .animate-pulse-subtle {
   animation: pulse-subtle 4s ease-in-out infinite;
 }
+
+/* Hide scrollbar for clean Modal UI */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

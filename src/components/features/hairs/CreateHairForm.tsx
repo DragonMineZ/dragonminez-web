@@ -1,5 +1,6 @@
 import type { Hair } from "../../types/hair";
 import Button from "../../ui/Button";
+import Field from "../../ui/Field";
 import { useHairForm } from "../../../hooks/useHairForm";
 
 export default function CreateHairForm({
@@ -32,8 +33,9 @@ export default function CreateHairForm({
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-8">
+    <div className="flex flex-col w-full h-full max-h-[85vh]">
+      {/* Sticky Header */}
+      <div className="shrink-0 p-6 md:p-8 pb-4 sticky top-0 bg-background z-20 w-full flex flex-col">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
           {isEditing ? "Editar Cabello" : "Publicar Cabello"}
         </h2>
@@ -44,115 +46,103 @@ export default function CreateHairForm({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-200 ml-1">
-            Nombre
-          </label>
-          <input
+      {/* Scrollable Form Body */}
+      <div className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-hide">
+        <form id="hair-form" onSubmit={handleSubmit} className="space-y-6">
+          <Field
+            label="Nombre"
             type="text"
             required
             placeholder="Escribe el nombre del cabello"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-5 py-3 bg-black/40 border border-glass rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:border-white/60 transition-all shadow-inner"
+            onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
           />
-        </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-200 ml-1">
-            Código
-          </label>
-          <input
-            type="text"
+          <Field
+            label="Código"
+            as="textarea"
             required
             placeholder="Escribe el código del cabello"
             value={formData.code}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            className="w-full px-5 py-3 bg-black/40 border border-glass rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:border-white/60 transition-all shadow-inner"
+            onChange={(e: any) => setFormData({ ...formData, code: e.target.value })}
+            maxLength={5000}
+            className="font-mono text-sm"
           />
-        </div>
 
-        <div className="space-y-3">
-          <label className="block text-sm font-semibold text-gray-200 ml-1">
-            Categorías
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {filteredCategories.map((cat) => (
-              <button
-                key={cat.id_category}
-                type="button"
-                onClick={() => toggleCategory(cat.id_category)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${selectedCategories.includes(cat.id_category)
-                  ? "bg-white text-black shadow-glow"
-                  : "bg-glass text-muted hover:bg-glass-strong hover:text-white"
-                  }`}
-              >
-                {cat.description}
-              </button>
-            ))}
-            {filteredCategories.length === 0 && (
-              <p className="text-xs text-gray-500 italic ml-1">
-                Ingresa un código válido para ver categorías
-              </p>
-            )}
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-200 ml-1">
+              Categorías
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {filteredCategories.map((cat) => (
+                <button
+                  key={cat.id_category}
+                  type="button"
+                  onClick={() => toggleCategory(cat.id_category)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${selectedCategories.includes(cat.id_category)
+                    ? "bg-white text-black shadow-glow"
+                    : "bg-glass text-muted hover:bg-glass-strong hover:text-white"
+                    }`}
+                >
+                  {cat.description}
+                </button>
+              ))}
+              {filteredCategories.length === 0 && (
+                <p className="text-xs text-gray-500 italic ml-1">
+                  Ingresa un código válido para ver categorías
+                </p>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-200 ml-1">
-            Imagen
-          </label>
-          <input
+          <Field
+            label="Imagen"
             type="url"
             required
             placeholder="Escribe la URL de la imagen del cabello"
             value={formData.image_url}
-            onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            className="w-full px-5 py-3 bg-black/40 border border-glass rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:border-white/60 transition-all shadow-inner"
+            onChange={(e: any) => setFormData({ ...formData, image_url: e.target.value })}
           />
-        </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-200 ml-1">
-            Descripción
-          </label>
-          <textarea
+          <Field
+            label="Descripción"
+            as="textarea"
             placeholder="Escribe la descripción del cabello"
             rows={2}
             value={formData.description}
-            onChange={(e) =>
+            onChange={(e: any) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            className="w-full px-5 py-3 bg-black/40 border border-glass rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:border-white/60 transition-all shadow-inner resize-none"
           />
-        </div>
 
-        {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm animate-shake">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm animate-shake">
+              {error}
+            </div>
+          )}
+        </form>
+      </div>
 
-        <div className="flex justify-end pt-2">
-          <Button
-            type="submit"
-            disabled={loading}
-            className="flex items-center gap-2"
-          >
-            {loading ? (
-              <>
-                <div className="h-4 w-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                {isEditing ? "Actualizando..." : "Publicando..."}
-              </>
-            ) : isEditing ? (
-              "Guardar Cambios"
-            ) : (
-              "Publicar Cabello"
-            )}
-          </Button>
-        </div>
-      </form>
+      {/* Sticky Footer */}
+      <div className="shrink-0 p-6 md:p-8 pt-4 sticky bottom-0 bg-background z-20 w-full flex justify-end">
+        <Button
+          type="submit"
+          form="hair-form"
+          disabled={loading}
+          className="flex items-center gap-2"
+        >
+          {loading ? (
+            <>
+              <div className="h-4 w-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+              {isEditing ? "Actualizando..." : "Publicando..."}
+            </>
+          ) : isEditing ? (
+            "Guardar Cambios"
+          ) : (
+            "Publicar Cabello"
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

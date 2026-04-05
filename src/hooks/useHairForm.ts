@@ -53,20 +53,24 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
     }, [isLoaded, isSignedIn, getToken]);
 
     useEffect(() => {
-        if (!isEditing) {
-            if (formData.code.startsWith("DMZF")) {
-                const fullCategory = categories.find((c) => c.description === "Full");
-                if (fullCategory) {
-                    setSelectedCategories([fullCategory.id_category]);
-                }
-            } else if (formData.code.startsWith("DMZ")) {
-                const fullCategory = categories.find((c) => c.description === "Full");
-                if (fullCategory && selectedCategories.includes(fullCategory.id_category)) {
-                    setSelectedCategories((prev) => prev.filter((id) => id !== fullCategory.id_category));
-                }
+        if (formData.code.startsWith("DMZF")) {
+            const fullCategory = categories.find((c) => c.description === "Full");
+            if (fullCategory) {
+                setSelectedCategories((prev) => {
+                    if (prev.length === 1 && prev[0] === fullCategory.id_category) return prev;
+                    return [fullCategory.id_category];
+                });
+            }
+        } else if (formData.code.startsWith("DMZ")) {
+            const fullCategory = categories.find((c) => c.description === "Full");
+            if (fullCategory) {
+                setSelectedCategories((prev) => {
+                    if (!prev.includes(fullCategory.id_category)) return prev;
+                    return prev.filter((id) => id !== fullCategory.id_category);
+                });
             }
         }
-    }, [formData.code, categories, isEditing]);
+    }, [formData.code, categories]);
 
     const filteredCategories = categories.filter((cat) => {
         if (formData.code.startsWith("DMZF")) return cat.description === "Full";

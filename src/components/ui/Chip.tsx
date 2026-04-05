@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Tooltip from "./Tooltip";
 
 type ChipProps = {
     children?: ReactNode;
@@ -20,7 +21,7 @@ export default function Chip({
     title
 }: ChipProps) {
     // Base styles for round borders and text consistency
-    const baseStyles = "inline-flex items-center justify-center gap-1.5 rounded-full transition-all duration-300";
+    const baseStyles = "group/chip inline-flex items-center justify-center gap-1.5 rounded-full transition-all duration-300";
 
     // Vary styles based on logic similar to architecture
     const variantStyles = {
@@ -35,7 +36,7 @@ export default function Chip({
     const content = (
         <>
             {icon && (
-                <span className={`material-symbols-outlined text-[18px] leading-none ${!children ? 'text-[24px]' : ''}`}>
+                <span className={`material-symbols-outlined text-[18px] leading-none transition-all duration-300 ${!children ? 'text-[24px]' : ''} group-hover/chip:[font-variation-settings:'FILL'_1]`}>
                     {icon}
                 </span>
             )}
@@ -43,25 +44,29 @@ export default function Chip({
         </>
     );
 
+    let element = (
+        <span className={combinedClassName}>
+            {content}
+        </span>
+    );
+
     if (href) {
-        return (
-            <a href={href} className={combinedClassName} title={title}>
+        element = (
+            <a href={href} className={combinedClassName}>
                 {content}
             </a>
         );
-    }
-
-    if (onClick) {
-        return (
-            <button onClick={onClick} className={combinedClassName} title={title}>
+    } else if (onClick) {
+        element = (
+            <button onClick={onClick} className={combinedClassName}>
                 {content}
             </button>
         );
     }
 
-    return (
-        <span className={combinedClassName} title={title}>
-            {content}
-        </span>
-    );
+    if (title) {
+        return <Tooltip content={title}>{element}</Tooltip>;
+    }
+
+    return element;
 }

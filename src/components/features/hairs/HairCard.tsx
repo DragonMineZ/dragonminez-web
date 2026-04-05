@@ -74,7 +74,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     };
 
     return (
-        <div className="group/card relative bg-surface rounded-[32px] overflow-hidden border border-glass p-4 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
+        <div className="group/card relative bg-surface rounded-[32px] border border-glass p-4 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
             <div className="relative w-full md:w-48 aspect-square shrink-0">
                 <img
                     src={hair.image_url}

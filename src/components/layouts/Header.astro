@@ -9,7 +9,7 @@ import logo from "../../assets/dmz-title.png";
 >
   <div class="mx-auto flex h-20 w-full items-center justify-between px-6 md:px-8">
     
-    <div class="flex items-center h-full z-[60]">
+    <div class="flex items-center h-full z-[61]">
       <a href="/" class="flex items-center h-full">
         <Image
           src={logo}
@@ -21,22 +21,20 @@ import logo from "../../assets/dmz-title.png";
 
     <button 
       id="menu-button"
-      class="block md:hidden text-[rgb(var(--foreground))] z-[60] p-2 select-none"
+      class="flex md:hidden items-center justify-center text-[rgb(var(--foreground))] z-[61] p-2 select-none hover:bg-glass rounded-xl transition-colors active:scale-90"
       aria-label="Toggle Menu"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-      </svg>
+      <span class="material-symbols-rounded text-3xl">menu</span>
     </button>
     
     <nav 
       id="main-nav"
-      class="fixed md:static inset-0 bg-[rgb(var(--background))] md:bg-transparent flex flex-col md:flex-row items-center justify-center md:justify-end gap-8 md:gap-6 text-2xl md:text-xl font-semibold text-[rgb(var(--foreground))]/80 transition-transform duration-500 translate-x-full md:translate-x-0 z-[55]"
+      class="absolute top-full left-0 w-full h-[auto] bg-surface/95 backdrop-blur-xl md:static md:w-auto md:bg-transparent md:backdrop-blur-none flex flex-col md:flex-row items-center p-8 md:p-0 gap-6 md:gap-8 text-xl font-medium text-foreground/80 transition-all duration-300 -translate-y-4 opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto border-b border-glass-strong md:border-none shadow-dropdown md:shadow-none rounded-b-3xl md:rounded-none z-[60]"
     >
-      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Download</a>
-      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Discord</a>
-      <a href="/hairsalon" class="hover:text-[rgb(var(--foreground))] transition">HairSalon</a>
-      <a href="#" class="hover:text-[rgb(var(--foreground))] transition">Wiki</a>
+      <a href="#" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Download</a>
+      <a href="#" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Discord</a>
+      <a href="/hairsalon" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">HairSalon</a>
+      <a href="#" class="hover:text-foreground transition-colors w-full md:w-auto text-center py-2 md:py-0">Wiki</a>
     </nav>
   </div>
 </header>
@@ -45,36 +43,68 @@ import logo from "../../assets/dmz-title.png";
   function initHeader() {
     const header = document.getElementById('main-header');
     const menuButton = document.getElementById('menu-button');
+    const menuIcon = menuButton?.querySelector('.material-symbols-rounded');
     const mainNav = document.getElementById('main-nav');
+    
     let isMenuOpen = false;
+    let isScrolling = false;
 
     const updateHeaderStyle = () => {
+      if (!header) return;
+
       if (isMenuOpen) {
-        header?.classList.add('bg-[rgb(var(--background))]');
-        header?.classList.remove('bg-[rgb(var(--background))]/70', 'backdrop-blur-md', 'border-transparent');
+        header.classList.add('bg-surface', 'border-glass-strong');
+        header.classList.remove('backdrop-blur-md', 'border-transparent');
         return;
       }
 
       if (window.scrollY > 10) {
-        // Estado Scroll -> Blur
-        header?.classList.add('bg-[rgb(var(--background))]/70', 'backdrop-blur-md', 'border-glass-strong');
-        header?.classList.remove('border-transparent', 'bg-[rgb(var(--background))]');
+        header.classList.add('bg-background/70', 'backdrop-blur-md', 'border-glass-strong');
+        header.classList.remove('border-transparent', 'bg-surface');
       } else {
-        // Estado Inicial -> No Blur
-        header?.classList.remove('bg-[rgb(var(--background))]/70', 'bg-[rgb(var(--background))]', 'backdrop-blur-md', 'border-glass-strong');
-        header?.classList.add('border-transparent');
+        header.classList.remove('bg-background/70', 'bg-surface', 'backdrop-blur-md', 'border-glass-strong');
+        header.classList.add('border-transparent');
+      }
+      
+      isScrolling = false;
+    };
+
+    const onScroll = () => {
+      if (!isScrolling) {
+        window.requestAnimationFrame(updateHeaderStyle);
+        isScrolling = true;
       }
     };
 
-    window.addEventListener('scroll', updateHeaderStyle);
-
-    menuButton?.addEventListener('click', () => {
+    const toggleMenu = () => {
       isMenuOpen = !isMenuOpen;
-      mainNav?.classList.toggle('translate-x-full');
-      document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+      
+      if (mainNav && menuIcon) {
+        if (isMenuOpen) {
+          mainNav.classList.remove('-translate-y-4', 'opacity-0', 'pointer-events-none');
+          mainNav.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          menuIcon.textContent = 'close';
+          document.body.style.overflow = 'hidden';
+        } else {
+          mainNav.classList.add('-translate-y-4', 'opacity-0', 'pointer-events-none');
+          mainNav.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          menuIcon.textContent = 'menu';
+          document.body.style.overflow = '';
+        }
+      }
+      
       updateHeaderStyle();
-    });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    menuButton?.addEventListener('click', toggleMenu);
+
+    // Initial check
+    updateHeaderStyle();
   }
 
+  // Handle Astro page transitions if any
+  document.addEventListener('astro:page-load', initHeader);
+  // Fallback for initial load
   initHeader();
 </script>

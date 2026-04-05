@@ -36,16 +36,16 @@ const currentYear = new Date().getFullYear();
     </div>
 
     <!-- Divider -->
-    <div class="w-2/3 max-w-[400px] h-0.5 bg-foreground/30 rounded-full my-4"></div>
+    <div class="w-2/3 max-w-[400px] h-px bg-foreground rounded-full mt-2 mb-1"></div>
 
     <!-- Social Links -->
-    <div class="flex items-center gap-8">
+    <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 mt-1">
       <Tooltip content="Discord">
         <a 
           href="https://discord.gg/WfMTYMQtSz" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="Discord"
         >
           <i class="fa-brands fa-discord"></i>
@@ -56,7 +56,7 @@ const currentYear = new Date().getFullYear();
           href="https://github.com/DragonMineZ/dragonminez" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="GitHub"
         >
           <i class="fa-brands fa-github"></i>
@@ -67,7 +67,7 @@ const currentYear = new Date().getFullYear();
           href="https://x.com/DragonMineZ" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="X (Twitter)"
         >
           <i class="fa-brands fa-x-twitter"></i>
@@ -78,7 +78,7 @@ const currentYear = new Date().getFullYear();
           href="https://www.youtube.com/@DragonMine-Z" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="YouTube"
         >
           <i class="fa-brands fa-youtube"></i>
@@ -89,7 +89,7 @@ const currentYear = new Date().getFullYear();
           href="https://www.tiktok.com/@dragonminez" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="TikTok"
         >
           <i class="fa-brands fa-tiktok"></i>
@@ -100,7 +100,7 @@ const currentYear = new Date().getFullYear();
           href="#" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="CurseForge"
         >
           <span class="flex items-center justify-center" set:html={curseforgeIcon} />
@@ -111,7 +111,7 @@ const currentYear = new Date().getFullYear();
           href="#" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
+          class="text-xl sm:text-2xl flex items-center justify-center text-[rgb(var(--foreground))] hover:text-[rgb(var(--foreground))]/80 hover:-translate-y-1 transition-all duration-300"
           aria-label="Modrinth"
         >
           <span class="flex items-center justify-center" set:html={modrinthIcon} />

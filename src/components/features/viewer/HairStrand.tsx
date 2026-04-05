@@ -7,11 +7,57 @@ interface HairStrandProps {
     basePosition: [number, number, number];
     color: number;
     isSSJ?: boolean;
+    forceColor?: number;
 }
 
 const UNIT_SCALE = 0.0625;
 const SIZE_DECAY = 0.85;
 const DEG_TO_RAD = Math.PI / 180;
+
+interface HairSegmentProps {
+    index: number;
+    length: number;
+    strand: StrandData;
+    material: THREE.Material;
+    bh: number;
+    bw: number;
+    bd: number;
+    ls: number;
+    prevOffset: number;
+    baseCx: number;
+    baseCy: number;
+    baseCz: number;
+}
+
+function HairSegment({ index, length, strand, material, bh, bw, bd, ls, prevOffset, baseCx, baseCy, baseCz }: HairSegmentProps) {
+    if (index >= length) return null;
+
+    const s = Math.pow(SIZE_DECAY, index);
+    const h = bh * s * ls;
+    const size = [bw * s, h, bd * s] as [number, number, number];
+
+    return (
+        <group position={[0, prevOffset, 0]} rotation={index > 0 ? [baseCx, baseCy, baseCz] : [0, 0, 0]}>
+            <mesh position={[0, h / 2, 0]} material={material}>
+                <boxGeometry args={size} />
+            </mesh>
+            <HairSegment
+                index={index + 1}
+                length={length}
+                strand={strand}
+                material={material}
+                bh={bh}
+                bw={bw}
+                bd={bd}
+                ls={ls}
+                prevOffset={h}
+                baseCx={baseCx}
+                baseCy={baseCy}
+                baseCz={baseCz}
+            />
+        </group>
+    );
+}
 
 export default function HairStrand({ strand, basePosition, color, isSSJ = false }: HairStrandProps) {
     const groupRef = useRef<THREE.Group>(null);
@@ -28,7 +74,7 @@ export default function HairStrand({ strand, basePosition, color, isSSJ = false 
     if (isSSJ && isBlack) strandColor = 0xFFE89E;
     if (isNaN(strandColor) || strandColor === -1) strandColor = isSSJ ? 0xFFE89E : 0x000000;
 
-    const material = useMemo(() => 
+    const material = useMemo(() =>
         new THREE.MeshLambertMaterial({ color: strandColor }),
         [strandColor]
     );
@@ -53,23 +99,6 @@ export default function HairStrand({ strand, basePosition, color, isSSJ = false 
     const cy = (strand.cy || 0) * DEG_TO_RAD;
     const cz = (strand.cz || 0) * DEG_TO_RAD;
 
-    const boxes = useMemo(() => {
-        const result: { size: [number, number, number], y: number, scale: number }[] = [];
-        let currentOffset = 0;
-
-        for (let i = 0; i < length; i++) {
-            const s = Math.pow(SIZE_DECAY, i);
-            const h = bh * s * ls;
-            result.push({
-                size: [bw * s, h, bd * s],
-                y: h / 2 + currentOffset,
-                scale: s
-            });
-            currentOffset = h;
-        }
-        return result;
-    }, [length, bw, bh, bd, ls]);
-
     return (
         <group
             ref={groupRef}
@@ -81,28 +110,20 @@ export default function HairStrand({ strand, basePosition, color, isSSJ = false 
             rotation={initialRotation}
             scale={initialScale}
         >
-            {boxes.map((box, i) => (
-                <mesh
-                    key={i}
-                    position={[0, box.y, 0]}
-                    material={material}
-                >
-                    <boxGeometry args={box.size} />
-                </mesh>
-            ))}
-            {length > 1 && (
-                <group rotation={[cx, cy, cz]}>
-                    {boxes.slice(1).map((box, i) => (
-                        <mesh
-                            key={`child-${i}`}
-                            position={[0, box.y - boxes[0].y, 0]}
-                            material={material}
-                        >
-                            <boxGeometry args={box.size} />
-                        </mesh>
-                    ))}
-                </group>
-            )}
+            <HairSegment
+                index={0}
+                length={length}
+                strand={strand}
+                material={material}
+                bh={bh}
+                bw={bw}
+                bd={bd}
+                ls={ls}
+                prevOffset={0}
+                baseCx={cx}
+                baseCy={cy}
+                baseCz={cz}
+            />
         </group>
     );
 }

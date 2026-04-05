@@ -16,6 +16,7 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
     const [headScaleY, setHeadScaleY] = useState(1);
     const [headScaleZ, setHeadScaleZ] = useState(1);
     const [currentForm, setCurrentForm] = useState('Base');
+    const [customColor, setCustomColor] = useState<string>('');
 
     const { copied, copy } = useClipboard();
 
@@ -34,7 +35,7 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
 
     return (
         <div className="flex flex-col h-[calc(100vh-6rem)]">
-            <div className="flex-1 flex gap-6 p-6">
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
                 <ViewerControls
                     code={code}
                     setCode={setCode}
@@ -43,6 +44,8 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
                     onRender={handleRender}
                     onCopy={handleCopy}
                     copied={copied}
+                    customColor={customColor}
+                    setCustomColor={setCustomColor}
                 />
 
                 {/* 3D Viewer - Center */}
@@ -56,6 +59,7 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
                             headScaleY={headScaleY}
                             headScaleZ={headScaleZ}
                             onFormChange={setCurrentForm}
+                            customColor={customColor}
                         />
                     </div>
                 </div>

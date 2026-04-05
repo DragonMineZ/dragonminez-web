@@ -18,7 +18,7 @@ export default function ViewerDebug({
     currentForm
 }: ViewerDebugProps) {
     return (
-        <div className="w-72 shrink-0 bg-black/70 border border-glass-strong rounded-2xl p-6 flex flex-col gap-4">
+        <div className="w-full lg:w-72 shrink-0 bg-surface border border-glass rounded-2xl p-6 flex flex-col gap-4">
             <h3 className="text-white font-bold text-lg">Debug</h3>
 
             <div className="space-y-4">

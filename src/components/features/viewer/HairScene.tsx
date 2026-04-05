@@ -11,6 +11,7 @@ interface HairSceneProps {
     headScaleX?: number;
     headScaleY?: number;
     headScaleZ?: number;
+    customColor?: string;
 }
 
 const FACE_COLS = 4;
@@ -35,18 +36,20 @@ function getStrandBasePosition(face: string, index: number): [number, number, nu
     }
 }
 
-export default function HairScene({ 
-    hairData, 
+export default function HairScene({
+    hairData,
     isSSJ = false,
     isSSJ3 = false,
     headY = 0.25,
     headScaleX = 1,
     headScaleY = 1,
-    headScaleZ = 1
+    headScaleZ = 1,
+    customColor
 }: HairSceneProps) {
     const hairColor = useMemo(() => {
+        if (customColor) return parseInt(customColor.replace('#', ''), 16);
         if (isSSJ) return 0xFFE89E;
-        
+
         const colorKeys = ['Color', 'GlobalColor', 'gc'] as const;
         for (const key of colorKeys) {
             const val = (hairData as Record<string, unknown>)[key];
@@ -54,7 +57,11 @@ export default function HairScene({
             if (typeof val === 'string') return parseInt(val.replace('#', ''), 16);
         }
         return 0x000000;
-    }, [hairData, isSSJ]);
+    }, [hairData, isSSJ, customColor]);
+
+    const finalOverrideColor = useMemo(() => (
+        customColor ? parseInt(customColor.replace('#', ''), 16) : undefined
+    ), [customColor]);
 
     const faces = ['F', 'B', 'L', 'R', 'T'] as const;
 
@@ -69,29 +76,24 @@ export default function HairScene({
     }, [hairData]);
 
     return (
-        <group scale={5}>
+        <group scale={5} rotation={[0, Math.PI, 0]}>
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 10, 7]} intensity={0.8} />
-            
+
             <group>
                 <mesh position={[0, headY, 0]} scale={[headScaleX, headScaleY, headScaleZ]}>
                     <boxGeometry args={[0.5, 0.5, 0.5]} />
                     <meshLambertMaterial color={0xe0aa94} />
                 </mesh>
 
-                {isSSJ3 && (
-                    <mesh position={[0, -1.5, 0]}>
-                        <cylinderGeometry args={[0.25, 0.3, 3, 8]} />
-                        <meshLambertMaterial color={0xe0aa94} />
-                    </mesh>
-                )}
+
 
                 <group position={[0, headY, 0]}>
                     <HairBase color={hairColor} />
                 </group>
             </group>
 
-            <group position={[0, headY, 0]}>
+            <group>
                 {faces.map((face) =>
                     strandsByFace[face].map((strand, index) => (
                         <HairStrand
@@ -99,6 +101,7 @@ export default function HairScene({
                             strand={strand}
                             basePosition={getStrandBasePosition(face, index)}
                             color={hairColor}
+                            forceColor={finalOverrideColor}
                             isSSJ={isSSJ}
                         />
                     ))

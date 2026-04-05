@@ -35,7 +35,7 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
 
     return (
         <div className="flex flex-col h-[calc(100vh-6rem)]">
-            <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 md:p-6 overflow-y-auto overflow-x-hidden">
                 <ViewerControls
                     code={code}
                     setCode={setCode}

@@ -4,10 +4,9 @@
   --color-background: #0a0a0b;
   --color-surface: #121214;
   --color-surface-elevated: #18181b;
+  --color-section: #1C1B22;
   --color-glass: rgba(255, 255, 255, 0.05);
-  /* Equivalent to white/5 */
   --color-glass-strong: rgba(255, 255, 255, 0.1);
-  /* Equivalent to white/10 */
   --color-primary: #facc15;
   --color-accent: #3b82f6;
   --color-foreground: #ffffff;
@@ -71,11 +70,14 @@ body {
 
 /* Tooltip Micro-animation */
 @layer components {
+  .container-base {
+    @apply w-full max-w-7xl mx-auto px-6 md:px-8;
+  }
+
   .tooltip-wrapper {
     @apply relative inline-flex;
   }
 
-  /* Must use group/tooltip on the wrapper to trigger hover state */
   .tooltip-content {
     @apply absolute flex items-center justify-center z-50 opacity-0 scale-95 pointer-events-none group-hover/tooltip:opacity-100 group-hover/tooltip:scale-100 transition-all duration-200 ease-out origin-center;
   }
@@ -102,5 +104,12 @@ body {
 
   .tooltip-arrow-bottom {
     @apply top-[-4.5px] left-1/2 -translate-x-1/2 border-t border-l;
+  }
+  .section-divider {
+    @apply w-full max-w-7xl mx-auto px-6 md:px-8;
+  }
+  .section-divider::after {
+    content: '';
+    @apply block w-full h-px rounded-full;
   }
 }

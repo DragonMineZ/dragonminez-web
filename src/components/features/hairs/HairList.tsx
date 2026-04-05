@@ -30,7 +30,7 @@ export default function HairList() {
   const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Para pruebas usamos 2, después será 5
+  const itemsPerPage = 2;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -47,7 +47,7 @@ export default function HairList() {
       handleDeleteLocally(id);
       setSuccessAlert({ show: true, message: "¡Cabello eliminado correctamente!" });
     } else {
-      window.alert("Error al eliminar"); // Consider switching to a modern toast
+      window.alert("Error al eliminar");
     }
   };
 
@@ -83,92 +83,91 @@ export default function HairList() {
 
   if (!isLoaded || loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-        <div className="h-10 w-48 bg-glass-strong rounded-full mb-4"></div>
-        <p className="text-gray-500">Preparando catálogo...</p>
+      <div className="flex flex-col items-center justify-center py-24 gap-4 animate-pulse">
+        <div className="h-10 w-48 bg-glass-strong rounded-2xl"></div>
+        <p className="text-muted">Preparando catálogo...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-red-500">
-        <p>{error}</p>
+      <div className="flex flex-col items-center justify-center py-24">
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-10 px-4 md:px-0">
-      {/* ... Filters Header ... */}
-      <div className="flex flex-col gap-6 w-full">
-        <div className="w-full max-w-2xl mx-auto">
-          <SearchBar onSearch={setSearchQuery} />
-        </div>
+    <div className="flex flex-col gap-8">
 
-        <div className="flex flex-wrap items-center justify-start gap-4">
-          <FilterDropdown
-            label="Categoría"
-            options={categoryOptions}
-            selectedId={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-          <FilterDropdown
-            label="Popularidad"
-            options={popularityOptions}
-            selectedId={sortBy}
-            onSelect={(id) => setSortBy(String(id))}
-          />
+      {/* Búsqueda */}
+      <SearchBar onSearch={setSearchQuery} />
 
-          {isSignedIn && (
-            <Button
-              variant={showMyCreations ? "primary" : "secondary"}
-              onClick={() => setShowMyCreations(!showMyCreations)}
-              className="px-6 py-2.5"
-            >
-              Mis Creaciones
-            </Button>
-          )}
-
-          <SignedIn>
-            <div className="ml-auto">
-              <CreateHairTrigger onSuccess={handleCreateSuccess} />
-            </div>
-          </SignedIn>
-        </div>
+      {/* Filtros y acciones */}
+      <div className="flex flex-wrap items-center gap-3">
+        <FilterDropdown
+          label="Categoría"
+          options={categoryOptions}
+          selectedId={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
+        <FilterDropdown
+          label="Popularidad"
+          options={popularityOptions}
+          selectedId={sortBy}
+          onSelect={(id) => setSortBy(String(id))}
+        />
+        {isSignedIn && (
+          <Button
+            variant={showMyCreations ? "primary" : "secondary"}
+            size="md"
+            onClick={() => setShowMyCreations(!showMyCreations)}
+          >
+            Mis Creaciones
+          </Button>
+        )}
+        <SignedIn>
+          <div className="ml-auto">
+            <CreateHairTrigger onSuccess={handleCreateSuccess} />
+          </div>
+        </SignedIn>
       </div>
 
-      {/* ... Empty or List ... */}
+      {/* Lista o estado vacío */}
       {processedHairs.length === 0 ? (
-        <div className="text-center py-20 bg-glass rounded-3xl border border-dashed border-glass-strong max-w-4xl mx-auto">
-          <span className="material-symbols-outlined text-gray-600 text-6xl mb-4">
+        <div className="flex flex-col items-center justify-center py-24 gap-4 bg-glass rounded-3xl border border-dashed border-glass-strong">
+          <span className="material-symbols-outlined text-muted text-6xl">
             search_off
           </span>
-          <p className="text-xl text-gray-500">
-            {searchQuery ? `No se encontraron resultados para "${searchQuery}"` : "No hay estilos que coincidan con los filtros."}
+          <p className="text-lg text-muted">
+            {searchQuery
+              ? `No se encontraron resultados para "${searchQuery}"`
+              : "No hay estilos que coincidan con los filtros."}
           </p>
         </div>
       ) : (
-        <>
-          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-            {currentItems.map((hair) => (
-              <HairCard
-                key={hair.id_hair}
-                hair={hair}
-                isSignedIn={isSignedIn || false}
-                onDelete={handleDelete}
-                onUpdateSuccess={handleUpdateSuccess}
-                onLikeToggle={handleLikeToggleLocally}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col gap-6">
+          {currentItems.map((hair) => (
+            <HairCard
+              key={hair.id_hair}
+              hair={hair}
+              isSignedIn={isSignedIn || false}
+              onDelete={handleDelete}
+              onUpdateSuccess={handleUpdateSuccess}
+              onLikeToggle={handleLikeToggleLocally}
+            />
+          ))}
+        </div>
+      )}
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </>
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       )}
 
       <SuccessAlert

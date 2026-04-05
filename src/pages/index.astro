@@ -5,12 +5,14 @@ import heroImage from "../assets/dmz-hero.png";
 import characters from "../assets/dmz-characters.png";
 import aurora from "../assets/updates/dmz-aurora.png";
 import ImageCarousel from "../components/ui/ImageCarousel.astro";
+import { Button } from "../components/ui/Button";
 ---
 
 <Layout>
   <main>
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center px-8 pt-32 pb-40 overflow-hidden bg-black">
+
+    <!-- 1. Hero Section -->
+    <section class="relative min-h-screen flex items-end overflow-hidden bg-black">
       <div class="absolute inset-0 z-0">
         <Image 
           src={heroImage} 
@@ -18,128 +20,189 @@ import ImageCarousel from "../components/ui/ImageCarousel.astro";
           class="w-full h-full object-cover"
           loading="eager"
         />
-        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent h-1/3"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[rgb(var(--background))] via-[rgb(var(--background))]/50 to-transparent h-1/3 mt-auto"></div>
+        <div class="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-black/80 via-black/40 to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-section via-section/60 to-transparent"></div>
       </div>
 
-      <div class="container mx-auto max-w-7xl z-10">
-        <div class="flex flex-col gap-8 text-left max-w-3xl">
-          <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-black text-white italic leading-[0.9] tracking-tighter drop-shadow-hero">
+      <div class="container-base relative z-10 pb-24 md:pb-32 pt-48">
+        <div class="flex flex-col gap-6 max-w-3xl">
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-[7rem] font-black text-white italic leading-[0.9] tracking-tighter drop-shadow-hero">
             ¡Tu aventura <br/>empieza aquí!
           </h1>
-          <p class="text-xl md:text-3xl text-white/90 font-medium leading-relaxed max-w-2xl drop-shadow-card">
+          <p class="text-lg sm:text-xl md:text-2xl text-white/80 font-medium leading-relaxed max-w-2xl">
             Vive la experiencia de Dragon Ball y recorre la historia junto a Goku.
           </p>
+          <div class="flex flex-wrap items-center gap-4 pt-4">
+            <a href="/hairsalon">
+              <Button variant="primary" size="lg" className="gap-3">
+                <span class="material-symbols-rounded text-xl">download</span>
+                Descargar Mod
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce opacity-60">
+        <span class="material-symbols-rounded text-white text-2xl">keyboard_arrow_down</span>
+      </div>
+    </section>
+
+    <!-- 2. Latest Update Showcase (Aurora) -->
+    <section class="py-24 md:py-32 bg-section">
+      <div class="container-base">
+        <div class="flex flex-col lg:flex-row items-center gap-12 md:gap-20">
+          <div class="flex-1 space-y-8">
+            <div class="space-y-4">
+              <span class="text-foreground font-bold tracking-widest uppercase text-sm">Última Versión</span>
+              <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tighter italic uppercase">
+                AURORA <br/>UPDATE
+              </h2>
+            </div>
+            <p class="text-xl text-foreground/70 leading-relaxed max-w-xl">
+              Nuestra mayor actualización hasta la fecha. Hemos rediseñado por completo el sistema de renderizado para ofrecer efectos visuales impresionantes, nuevas transformaciones y una estabilidad sin precedentes.
+            </p>
+            <div class="flex items-center gap-6">
+              <Button variant="primary" size="lg" className="gap-3">
+                <span class="material-symbols-rounded text-xl">article</span>
+                Ver Notas del Parche
+              </Button>
+            </div>
+          </div>
+          
+          <div class="flex-1 w-full">
+            <div class="relative group cursor-pointer overflow-hidden rounded-[2.5rem] border border-glass shadow-card-hover transition-all duration-500 hover:scale-[1.01] hover:border-glass-strong active:scale-100">
+              <Image 
+                src={aurora} 
+                alt="Aurora Update Preview" 
+                class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Update & Trailer Sections (Default Background) -->
-    <div class="w-full pt-24 pb-16 space-y-20 flex flex-col items-center">
-      
-      <!-- Aurora Update Block -->
-      <div class="w-full max-w-4xl px-8">
-        <div class="relative group cursor-pointer overflow-hidden rounded-[2.5rem] border border-glass shadow-card-hover transition-all duration-500 hover:scale-[1.01] hover:border-glass-strong active:scale-100">
+    <div class="section-divider"></div>
+
+    <!-- 3. HairSalon Spotlight -->
+    <section class="py-24 md:py-32 overflow-hidden bg-section">
+      <div class="container-base grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+        
+        <div class="relative flex justify-center md:justify-start">
           <Image 
-            src={aurora} 
-            alt="Aurora Update" 
-            class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+            src={characters} 
+            alt="DragonMineZ Characters Showcase" 
+            class="w-full max-w-[520px] md:max-w-none md:w-[110%] md:-ml-8 h-auto object-contain drop-shadow-portrait transition-all duration-700 ease-out hover:scale-105"
           />
-          <div class="absolute bottom-6 right-8">
-             <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-black/40 backdrop-blur-xl border border-glass-strong rounded-full text-sm font-bold text-white shadow-2xl transition-all group-hover:bg-white group-hover:text-black group-hover:scale-105">
-               View All New Features »
-             </span>
+        </div>
+
+        <div class="flex flex-col gap-8 text-left">
+          <div class="space-y-4">
+            <span class="text-foreground font-bold tracking-widest uppercase text-sm">Tu Guerrero, Tu Estilo</span>
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] italic tracking-tighter uppercase">
+              DISEÑA TU <br/>PROPIA IDENTIDAD
+            </h2>
+          </div>
+          <div class="flex flex-col gap-5">
+            <p class="text-lg text-foreground/80 leading-relaxed">
+              En DragonMineZ, no eres solo un jugador más. Te ofrecemos las herramientas para que tu guerrero sea verdaderamente único.
+            </p>
+            <p class="text-lg text-foreground/80 leading-relaxed">
+              A través de nuestro HairSalon, puedes explorar miles de modelos creados por la comunidad o subir los tuyos propios usando nuestro visor 3D en tiempo real.
+            </p>
+          </div>
+          <div class="pt-2 flex flex-wrap gap-4">
+            <a href="/hairsalon">
+              <Button variant="primary" size="lg" className="gap-3">
+                <span class="material-symbols-rounded text-xl">styler</span>
+                Explorar el Salón
+              </Button>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- 4. Video Trailer Section -->
+    <section class="py-24 md:py-32 bg-section">
+      <div class="container-base flex flex-col items-center gap-16">
+        <div class="flex flex-col gap-4 text-center">
+          <h3 class="text-3xl md:text-5xl font-black text-white italic tracking-tight uppercase">
+            Acción en Estado Puro
+          </h3>
+          <p class="text-foreground/60 max-w-xl mx-auto leading-relaxed text-lg">
+            Echa un vistazo a la fluidez del combate y los efectos visuales que hacen de DragonMineZ una experiencia inigualable.
+          </p>
+        </div>
+        
+        <div class="relative w-full aspect-video rounded-[3rem] overflow-hidden border border-glass shadow-hero bg-black/20 group">
+          <div class="absolute inset-0 transition-transform duration-700 group-hover:scale-105">
+            <iframe 
+              class="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/Y7HnXFOK0w4" 
+              title="DragonMineZ - Aurora Update Trailer" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerpolicy="strict-origin-when-cross-origin" 
+              allowfullscreen
+            ></iframe>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Video Trailer Section -->
-      <div class="w-full max-w-4xl px-8 flex flex-col items-center gap-8">
-        <div class="flex flex-col gap-3 text-center">
-          <h3 class="text-3xl md:text-4xl font-black text-white tracking-tight">
-            Mira el trailer pe batedia sedia
+    <div class="section-divider"></div>
+
+    <!-- 5. Gallery Section -->
+    <section class="py-24 md:py-32 bg-section">
+      <div class="container-base flex flex-col items-center gap-16">
+        <div class="flex flex-col gap-4 text-center">
+          <h3 class="text-3xl md:text-5xl font-black text-white italic tracking-tight uppercase">
+            Galería del Mundo
           </h3>
-          <p class="text-[rgb(var(--foreground))]/60 max-w-lg mx-auto leading-relaxed">
-            Causa yapeame, esta pagina no se mantiene sola +51974666807
+          <p class="text-foreground/60 max-w-lg mx-auto leading-relaxed text-lg">
+            Capturas directas desde el corazón de la aventura.
           </p>
         </div>
-        
-        <div class="relative w-full aspect-video rounded-[2rem] overflow-hidden border border-glass shadow-hero bg-black/20 group max-w-3xl">
-          <iframe 
-            class="absolute inset-0 w-full h-full"
-            src="https://www.youtube.com/embed/Y7HnXFOK0w4" 
-            title="DragonMineZ - Aurora Update Trailer" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin" 
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-
-      <!-- Image Carousel Section -->
-      <div class="w-full max-w-5xl px-8 flex flex-col items-center gap-8 pt-8">
-        <div class="flex flex-col gap-3 text-center">
-          <h3 class="text-3xl md:text-4xl font-black text-white tracking-tight">
-            Galeria
-          </h3>
-          <p class="text-[rgb(var(--foreground))]/60 max-w-lg mx-auto leading-relaxed">
-            Explora el mundo de DragonMineZ
-          </p>
-        </div>
-        
-        <!-- Extracted component -->
         <ImageCarousel />
-
       </div>
-    </div>
+    </section>
 
-    <!-- Characters Section (Dark Background #1C1B22) -->
-    <div class="w-full bg-[#1C1B22] py-32">
-      <div class="w-full max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 items-center gap-16">
-        <div class="flex flex-col gap-8 text-left order-2 md:order-1">
-          <h2 class="text-6xl md:text-7xl font-black text-white leading-tight italic tracking-tighter">
-            Lorem ipsum <br/>dolor for
-          </h2>
-          <div class="flex flex-col gap-6">
-            <p class="text-xl text-[rgb(var(--foreground))]/80 leading-relaxed max-w-xl">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at porttitor sem. 
-            </p>
-            <p class="text-xl text-[rgb(var(--foreground))]/80 leading-relaxed max-w-xl">
-              Quisque ut interdum augue, non efficitur neque. Mauris tristique varius eros ut convallis.
-            </p>
-            <p class="text-xl text-[rgb(var(--foreground))]/80 leading-relaxed pt-2 max-w-xl">
-              Etiam sodales neque non ipsum sagittis lacinia non ut lorem.<br/>
-              Ut efficitur quis tortor sed.
-            </p>
+    <!-- 6. Community Discord Section -->
+    <section class="py-24 md:py-32">
+      <div class="container-base">
+        <div class="relative overflow-hidden rounded-[4rem] bg-[#5865F2] p-12 md:p-24 text-center flex flex-col items-center justify-center gap-10 shadow-alert">
+          <div class="absolute inset-0 z-0 opacity-10 flex items-center justify-center">
+            <i class="fa-brands fa-discord text-[45rem] rotate-12"></i>
           </div>
-        </div>
-
-        <div class="flex justify-center md:justify-end order-1 md:order-2">
-          <div class="relative group">
-            <Image 
-              src={characters} 
-              alt="DragonMineZ Characters" 
-              class="w-full max-w-[720px] h-auto object-contain drop-shadow-portrait transition-all duration-700 ease-out group-hover:scale-105 cursor-pointer md:translate-x-8"
-            />
+          <div class="relative z-10 space-y-8">
+            <div class="space-y-4">
+              <h2 class="text-4xl md:text-7xl font-black text-white italic tracking-tighter uppercase leading-[0.9]">
+                ÚNETE A LA PATRULLA <br/>DEL TIEMPO
+              </h2>
+              <p class="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
+                Conéctate con miles de jugadores, encuentra grupos para incursiones y obtén soporte directo de los desarrolladores.
+              </p>
+            </div>
+            <div class="flex justify-center pt-4">
+              <a 
+                href="https://discord.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-4 px-12 py-6 bg-white text-[#5865F2] rounded-full font-black text-xl transition-all hover:scale-110 active:scale-95 shadow-hero hover:shadow-glow-strong"
+              >
+                <i class="fa-brands fa-discord text-3xl"></i>
+                ENTRAR AL DISCORD
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Discord CTA Section (Default Background) -->
-    <div class="w-full py-20 flex flex-col items-center justify-center text-center px-8">
-      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
-        Have Questions or Feedback?
-      </h2>
-      <a 
-        href="https://discord.com" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2.5 px-6 py-3 bg-[#EBEBEB] text-[#1A1A1A] rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl hover:shadow-button-hover"
-      >
-        <i class="fa-brands fa-discord text-xl"></i>
-        Join our Discord server!
-      </a>
-    </div>
   </main>
 </Layout>

@@ -44,7 +44,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     };
 
     return (
-        <div className="flex items-center justify-center gap-2 mt-12 pb-8">
+        <div className="flex items-center justify-center gap-2 mt-8 pb-4">
             {/* Botón Anterior */}
             <button
                 onClick={() => onPageChange(currentPage - 1)}

@@ -30,7 +30,7 @@ export default function InfoDialog({
                     {title}
                 </h2>
 
-                <p className="text-white/60 text-base md:text-lg mb-10 max-w-[90%] font-medium leading-relaxed">
+                <p className="text-white/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
                     {description}
                 </p>
 

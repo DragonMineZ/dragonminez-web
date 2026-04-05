@@ -74,7 +74,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     };
 
     return (
-        <div className="group/card relative bg-surface rounded-[32px] border border-glass p-4 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
+        <div className="group/card relative bg-surface rounded-[32px] border border-glass p-4 md:p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
             <div className="relative w-full md:w-48 aspect-square shrink-0">
                 <img
                     src={hair.image_url}
@@ -104,7 +104,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 </div>
 
                 {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-3">
                     {(hair.categories?.length ?? 0) > 0 ? (
                         hair.categories?.map((cat) => (
                             <Chip key={cat.id_category} variant="glass">
@@ -121,7 +121,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 {/* Copy Code Button */}
                 <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
 
-                <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-6 font-normal">
+                <p className="text-sm text-gray-200 line-clamp-3 leading-[1.6] mb-4 font-normal">
                     {hair.description || "Sin descripción disponible."}
                 </p>
 

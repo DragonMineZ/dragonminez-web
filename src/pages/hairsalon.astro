@@ -25,20 +25,20 @@ if (userId) {
     
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
       <div>
-        <h1 class="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+        <h1 class="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl" data-i18n="hairSalon.title">
           HairSalon
         </h1>
         <SignedOut>
           <div class="mt-2 flex items-center gap-1.5">
-            <p class="text-muted">Si quieres publicar un cabello primero deberás</p>
+            <p class="text-muted" data-i18n="hairSalon.authRequired">Si quieres publicar un cabello primero deberás</p>
             <SignInButton mode="modal" class="text-foreground hover:underline cursor-pointer">
-              iniciar sesión.
+              <span data-i18n="hairSalon.loginToPublish">iniciar sesión.</span>
             </SignInButton>
           </div>
         </SignedOut>
         <SignedIn>
           <p class="text-muted mt-2">
-            ¡Bienvenido <span class="text-foreground font-semibold">{username}</span>!, puedes empezar a publicar tus creaciones
+            <span data-i18n="common.welcome">¡Bienvenido</span> <span class="text-foreground font-semibold">{username}</span>!, <span data-i18n="hairSalon.publishCreations">puedes empezar a publicar tus creaciones</span>
           </p>
         </SignedIn>
       </div>

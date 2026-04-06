@@ -26,17 +26,17 @@ import { Button } from "../components/ui/Button";
 
       <div class="container-base relative z-10 pb-24 md:pb-32 pt-48">
         <div class="flex flex-col gap-6 max-w-3xl">
-          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-[7rem] font-black text-white italic leading-[0.9] tracking-tighter drop-shadow-hero">
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-[7rem] font-black text-white italic leading-[0.9] tracking-tighter drop-shadow-hero" data-i18n="home.hero.title">
             ¡Tu aventura <br/>empieza aquí!
           </h1>
-          <p class="text-lg sm:text-xl md:text-2xl text-white/80 font-medium leading-relaxed max-w-2xl">
+          <p class="text-lg sm:text-xl md:text-2xl text-white/80 font-medium leading-relaxed max-w-2xl" data-i18n="home.hero.subtitle">
             Vive la experiencia de Dragon Ball y recorre la historia junto a Goku.
           </p>
           <div class="flex flex-wrap items-center gap-4 pt-4">
             <a href="/hairsalon">
               <Button variant="primary" size="lg" className="gap-3">
                 <span class="material-symbols-rounded text-xl">download</span>
-                Descargar Mod
+                <span data-i18n="home.hero.cta">Descargar Mod</span>
               </Button>
             </a>
           </div>
@@ -54,18 +54,18 @@ import { Button } from "../components/ui/Button";
         <div class="flex flex-col lg:flex-row items-center gap-12 md:gap-20">
           <div class="flex-1 space-y-8">
             <div class="space-y-4">
-              <span class="text-foreground font-bold tracking-widest uppercase text-sm">Última Versión</span>
+              <span class="text-foreground font-bold tracking-widest uppercase text-sm" data-i18n="home.aurora.tag">Última Versión</span>
               <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight tracking-tighter italic uppercase">
                 AURORA <br/>UPDATE
               </h2>
             </div>
-            <p class="text-xl text-foreground/70 leading-relaxed max-w-xl">
+            <p class="text-xl text-foreground/70 leading-relaxed max-w-xl" data-i18n="home.aurora.description">
               Nuestra mayor actualización hasta la fecha. Hemos rediseñado por completo el sistema de renderizado para ofrecer efectos visuales impresionantes, nuevas transformaciones y una estabilidad sin precedentes.
             </p>
             <div class="flex items-center gap-6">
               <Button variant="primary" size="lg" className="gap-3">
                 <span class="material-symbols-rounded text-xl">article</span>
-                Ver Notas del Parche
+                <span data-i18n="home.aurora.cta">Ver Notas del Parche</span>
               </Button>
             </div>
           </div>
@@ -100,16 +100,16 @@ import { Button } from "../components/ui/Button";
 
         <div class="flex flex-col gap-8 text-left">
           <div class="space-y-4">
-            <span class="text-foreground font-bold tracking-widest uppercase text-sm">Tu Guerrero, Tu Estilo</span>
-            <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-[1.1] italic tracking-tighter uppercase">
+            <span class="text-foreground font-bold tracking-widest uppercase text-sm" data-i18n="home.salon.tag">Tu Guerrero, Tu Estilo</span>
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-[1.1] italic tracking-tighter uppercase" data-i18n="home.salon.title">
               DISEÑA TU <br/>PROPIA IDENTIDAD
             </h2>
           </div>
           <div class="flex flex-col gap-5">
-            <p class="text-lg text-foreground/80 leading-relaxed">
+            <p class="text-lg text-foreground/80 leading-relaxed" data-i18n="home.salon.description1">
               En DragonMineZ, no eres solo un jugador más. Te ofrecemos las herramientas para que tu guerrero sea verdaderamente único.
             </p>
-            <p class="text-lg text-foreground/80 leading-relaxed">
+            <p class="text-lg text-foreground/80 leading-relaxed" data-i18n="home.salon.description2">
               A través de nuestro HairSalon, puedes explorar miles de modelos creados por la comunidad o subir los tuyos propios usando nuestro visor 3D en tiempo real.
             </p>
           </div>
@@ -117,7 +117,7 @@ import { Button } from "../components/ui/Button";
             <a href="/hairsalon">
               <Button variant="primary" size="lg" className="gap-3">
                 <span class="material-symbols-rounded text-xl">styler</span>
-                Explorar el Salón
+                <span data-i18n="home.salon.cta">Explorar el Salón</span>
               </Button>
             </a>
           </div>
@@ -132,10 +132,10 @@ import { Button } from "../components/ui/Button";
     <section class="py-24 md:py-32 bg-section">
       <div class="container-base flex flex-col items-center gap-16">
         <div class="flex flex-col gap-4 text-center">
-          <h3 class="text-3xl md:text-5xl font-black text-foreground italic tracking-tight uppercase">
+          <h3 class="text-3xl md:text-5xl font-black text-foreground italic tracking-tight uppercase" data-i18n="home.video.title">
             Acción en Estado Puro
           </h3>
-          <p class="text-foreground/60 max-w-xl mx-auto leading-relaxed text-lg">
+          <p class="text-foreground/60 max-w-xl mx-auto leading-relaxed text-lg" data-i18n="home.video.description">
             Echa un vistazo a la fluidez del combate y los efectos visuales que hacen de DragonMineZ una experiencia inigualable.
           </p>
         </div>
@@ -161,10 +161,10 @@ import { Button } from "../components/ui/Button";
     <section class="py-24 md:py-32 bg-section">
       <div class="container-base flex flex-col items-center gap-16">
         <div class="flex flex-col gap-4 text-center">
-          <h3 class="text-3xl md:text-5xl font-black text-foreground italic tracking-tight uppercase">
+          <h3 class="text-3xl md:text-5xl font-black text-foreground italic tracking-tight uppercase" data-i18n="home.gallery.title">
             Galería del Mundo
           </h3>
-          <p class="text-foreground/60 max-w-lg mx-auto leading-relaxed text-lg">
+          <p class="text-foreground/60 max-w-lg mx-auto leading-relaxed text-lg" data-i18n="home.gallery.description">
             Capturas directas desde el corazón de la aventura.
           </p>
         </div>
@@ -181,10 +181,10 @@ import { Button } from "../components/ui/Button";
           </div>
           <div class="relative z-10 space-y-8">
             <div class="space-y-4">
-              <h2 class="text-4xl md:text-7xl font-black text-white italic tracking-tighter uppercase leading-[0.9]">
+              <h2 class="text-4xl md:text-7xl font-black text-white italic tracking-tighter uppercase leading-[0.9]" data-i18n="home.community.title">
                 ÚNETE A LA PATRULLA <br/>DEL TIEMPO
               </h2>
-              <p class="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
+              <p class="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed" data-i18n="home.community.description">
                 Conéctate con miles de jugadores, encuentra grupos para incursiones y obtén soporte directo de los desarrolladores.
               </p>
             </div>
@@ -196,7 +196,7 @@ import { Button } from "../components/ui/Button";
                 class="inline-flex items-center gap-4 px-12 py-6 bg-foreground text-background rounded-full font-black text-xl transition-all hover:scale-110 active:scale-95 shadow-hero hover:shadow-glow-strong"
               >
                 <i class="fa-brands fa-discord text-3xl"></i>
-                ENTRAR AL DISCORD
+                <span data-i18n="home.community.cta">ENTRAR AL DISCORD</span>
               </a>
             </div>
           </div>

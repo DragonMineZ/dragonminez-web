@@ -1,5 +1,5 @@
 import { useAuth, SignedIn } from "@clerk/astro/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import HairCard from "./HairCard";
 import SearchBar from "../../ui/SearchBar";
 import FilterDropdown from "../../ui/FilterDropdown";
@@ -9,9 +9,11 @@ import Pagination from "../../ui/Pagination";
 import Button from "../../ui/Button";
 import { useHairs } from "../../../hooks/useHairs";
 import { filterHairs, sortHairs } from "../../../lib/hairFilters";
+import { useLanguage } from "../../../i18n";
 
 export default function HairList() {
-  const { isLoaded, isSignedIn, getToken, userId } = useAuth();
+  const { isLoaded: isAuthLoaded, isSignedIn, getToken, userId } = useAuth();
+  const { t } = useLanguage();
 
   const {
     hairs,
@@ -23,6 +25,7 @@ export default function HairList() {
     handleLikeToggleLocally
   } = useHairs();
 
+  // ... rest of state ...
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
@@ -70,22 +73,22 @@ export default function HairList() {
     currentPage * itemsPerPage
   );
 
-  const categoryOptions = [
-    { id: "all", label: "Todas" },
+  const categoryOptions = useMemo(() => [
+    { id: "all", label: t('hairSalon.filterAll') },
     ...categories.map(c => ({ id: c.id_category, label: c.description }))
-  ];
+  ], [categories, t]);
 
-  const popularityOptions = [
-    { id: "recent", label: "Más recientes" },
-    { id: "likes", label: "Más populares" },
-    { id: "oldest", label: "Antiguos" }
-  ];
+  const popularityOptions = useMemo(() => [
+    { id: "recent", label: t('hairSalon.sortRecent') },
+    { id: "likes", label: t('hairSalon.sortPopular') },
+    { id: "oldest", label: t('hairSalon.sortOldest') }
+  ], [t]);
 
-  if (!isLoaded || loading) {
+  if (!isAuthLoaded || loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 animate-pulse">
         <div className="h-10 w-48 bg-glass-strong rounded-2xl"></div>
-        <p className="text-muted">Preparando catálogo...</p>
+        <p className="text-muted" data-i18n="hairSalon.preparingCatalog">{t('hairSalon.preparingCatalog')}</p>
       </div>
     );
   }
@@ -107,13 +110,13 @@ export default function HairList() {
       {/* Filtros y acciones */}
       <div className="flex flex-wrap items-center gap-3">
         <FilterDropdown
-          label="Categoría"
+          label={t('hairSalon.categoriesLabel')}
           options={categoryOptions}
           selectedId={selectedCategory}
           onSelect={setSelectedCategory}
         />
         <FilterDropdown
-          label="Popularidad"
+          label={t('hairSalon.sortLabel')}
           options={popularityOptions}
           selectedId={sortBy}
           onSelect={(id) => setSortBy(String(id))}
@@ -124,7 +127,7 @@ export default function HairList() {
             size="md"
             onClick={() => setShowMyCreations(!showMyCreations)}
           >
-            Mis Creaciones
+            {t('hairSalon.myCreations')}
           </Button>
         )}
         <SignedIn>
@@ -142,8 +145,8 @@ export default function HairList() {
           </span>
           <p className="text-lg text-muted">
             {searchQuery
-              ? `No se encontraron resultados para "${searchQuery}"`
-              : "No hay estilos que coincidan con los filtros."}
+              ? `${t('hairSalon.noResults')} ("${searchQuery}")`
+              : t('hairSalon.noResults')}
           </p>
         </div>
       ) : (

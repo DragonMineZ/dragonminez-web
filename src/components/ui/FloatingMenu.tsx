@@ -2,11 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import FloatingMenuButton from './FloatingMenuButton';
 import FloatingLanguageSelector from './FloatingLanguageSelector';
 import Tooltip from './Tooltip';
+import { useLanguage } from '../../i18n';
 
 export function FloatingMenu() {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
+    // ... rest of state stays the same
 
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const [isClient, setIsClient] = useState(false);
@@ -160,7 +163,7 @@ export function FloatingMenu() {
                     }`}
             >
                 {/* Theme Toggle Button */}
-                <Tooltip content={isDark ? "Modo Claro" : "Modo Oscuro"} position="top">
+                <Tooltip content={isDark ? t('floatingMenu.themeLight') : t('floatingMenu.themeDark')} position="top">
                     <FloatingMenuButton
                         onClick={toggleTheme}
                         icon={isDark ? 'light_mode' : 'dark_mode'}
@@ -171,7 +174,7 @@ export function FloatingMenu() {
                 {/* Language Button with expanding options list */}
                 <div className="relative flex items-center justify-end">
                     <FloatingLanguageSelector isOpen={isLangOpen} />
-                    <Tooltip content="Idioma" position="top">
+                    <Tooltip content={t('floatingMenu.language')} position="top">
                         <FloatingMenuButton
                             onClick={() => setIsLangOpen(!isLangOpen)}
                             icon="translate"
@@ -183,7 +186,7 @@ export function FloatingMenu() {
 
             {/* Main Draggable FAB */}
             <div className="touch-none" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-                <Tooltip content={isOpen ? "Cerrar Opciones" : "Menú de Opciones"} position="top">
+                <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')} position="top">
                     <FloatingMenuButton
                         ref={menuRef}
                         iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}

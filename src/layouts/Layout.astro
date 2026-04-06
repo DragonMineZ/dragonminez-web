@@ -2,6 +2,7 @@
 import Header from "../components/layouts/Header.astro";
 import Footer from "../components/layouts/Footer.astro";
 import FloatingMenu from "../components/ui/FloatingMenu";
+import { AppProviders } from "../providers/AppProviders";
 
 import '@fontsource-variable/onest';
 import "../styles/global.css";
@@ -35,9 +36,59 @@ import "../styles/global.css";
     <title>DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft</title>
   </head>
   <body class="bg-background text-foreground selection:bg-foreground/10">
-    <Header />
-    <slot />
-    <Footer />
-    <FloatingMenu client:load />
+    <AppProviders client:load>
+      <Header />
+      <slot />
+      <Footer />
+      <FloatingMenu client:load />
+    </AppProviders>
+
+    <script>
+      import { i18nStore } from "../i18n/store";
+
+      function updateI18nElements() {
+        const { translations, isLoaded } = i18nStore.getState();
+        if (!isLoaded || !translations) return;
+
+        const elements = document.querySelectorAll('[data-i18n]');
+        elements.forEach((el) => {
+          const path = el.getAttribute('data-i18n');
+          if (!path) return;
+
+          const keys = path.split('.');
+          let value: any = translations;
+          
+          for (const key of keys) {
+            if (value && typeof value === 'object' && key in value) {
+              value = value[key];
+            } else {
+              value = path;
+              break;
+            }
+          }
+
+          if (typeof value === 'string') {
+            // Support for placeholder attribute if requested
+            if (el.hasAttribute('data-i18n-placeholder')) {
+              el.setAttribute('placeholder', value);
+            } else {
+              el.textContent = value;
+            }
+          }
+        });
+      }
+
+      // Initial update
+      updateI18nElements();
+
+      // Subscribe to store changes
+      i18nStore.subscribe(updateI18nElements);
+
+      // Handle Astro page transitions (View Transitions)
+      document.addEventListener('astro:page-load', () => {
+        updateI18nElements();
+        i18nStore.subscribe(updateI18nElements);
+      });
+    </script>
   </body>
 </html>

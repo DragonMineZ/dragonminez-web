@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useLanguage } from "../../i18n";
 
 interface SearchBarProps {
     onSearch: (query: string) => void;
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
+    const { t } = useLanguage();
     const [query, setQuery] = useState("");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +27,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                     type="text"
                     value={query}
                     onChange={handleChange}
-                    placeholder="Busca tu cabello"
+                    placeholder={t('hairSalon.searchPlaceholder')}
                     className="w-full h-14 pl-8 pr-16 bg-transparent text-foreground placeholder:text-muted/50 font-medium text-lg outline-none"
                 />
                 <div className="absolute right-2 top-2 bottom-2 w-12 flex items-center justify-center transition-all duration-300">

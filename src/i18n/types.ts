@@ -10,6 +10,8 @@ export interface Translations {
     save: string;
     cancel: string;
     welcome: string;
+    confirm: string;
+    back: string;
   };
   nav: {
     download: string;
@@ -68,6 +70,45 @@ export interface Translations {
     sortOldest: string;
     myCreations: string;
     preparingCatalog: string;
+    createSuccess: string;
+    updateSuccess: string;
+    deleteSuccess: string;
+    deleteError: string;
+    copySuccess: string;
+    addedToFavorites: string;
+    removedFromFavorites: string;
+    view3D: string;
+    noDescription: string;
+    deleteConfirmTitle: string;
+    deleteConfirmDesc: string;
+    authRequiredTitle: string;
+    authRequiredDesc: string;
+    editTitle: string;
+    publishTitle: string;
+    editDesc: string;
+    publishDesc: string;
+    formName: string;
+    formNamePlaceholder: string;
+    formCode: string;
+    formCodePlaceholder: string;
+    formCategories: string;
+    formCategoriesEmpty: string;
+    formImage: string;
+    formImagePlaceholder: string;
+    formDescription: string;
+    formDescriptionPlaceholder: string;
+    updating: string;
+    publishing: string;
+    saveChanges: string;
+    usernameFallback: string;
+    editDesign: string;
+    deleteDesign: string;
+    copyCode: string;
+    copied: string;
+    like: string;
+    unlike: string;
+    author: string;
+    categoryNormal: string;
   };
   footer: {
     rights: string;
@@ -77,6 +118,7 @@ export interface Translations {
     es: string;
     en: string;
     pt: string;
+    languageSuccess: string;
   };
   floatingMenu: {
     options: string;

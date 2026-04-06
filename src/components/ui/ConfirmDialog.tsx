@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from './Modal';
 import Button from './Button';
 import titleImage from '../../assets/dmz-title.png';
+import { useLanguage } from '../../i18n';
 
 interface ConfirmDialogProps {
     isOpen: boolean;
@@ -17,11 +18,18 @@ export default function ConfirmDialog({
     isOpen,
     onClose,
     onConfirm,
-    title = "¿Estás seguro de esta acción?",
-    description = "Si realizas esta acción no podrás deshacerla.",
-    confirmLabel = "Confirmar",
-    cancelLabel = "Cancelar"
+    title,
+    description,
+    confirmLabel,
+    cancelLabel
 }: ConfirmDialogProps) {
+    const { t } = useLanguage();
+    
+    const displayTitle = title || t('hairSalon.deleteConfirmTitle');
+    const displayDescription = description || t('common.error'); // Fallback to common error if not provided
+    const displayConfirmLabel = confirmLabel || t('common.confirm');
+    const displayCancelLabel = cancelLabel || t('common.cancel');
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} showCloseButton={false}>
             <div className="flex flex-col items-center text-center py-4">
@@ -32,11 +40,11 @@ export default function ConfirmDialog({
                 />
 
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-tight">
-                    {title}
+                    {displayTitle}
                 </h2>
 
                 <p className="text-foreground/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
-                    {description}
+                    {displayDescription}
                 </p>
 
                 <div className="flex flex-col-reverse sm:flex-row gap-4 w-full px-4 sm:px-0 sm:justify-center">
@@ -45,7 +53,7 @@ export default function ConfirmDialog({
                         onClick={onClose}
                         className="w-full sm:w-[160px]"
                     >
-                        {cancelLabel}
+                        {displayCancelLabel}
                     </Button>
 
                     <Button
@@ -56,7 +64,7 @@ export default function ConfirmDialog({
                         }}
                         className="w-full sm:w-[160px]"
                     >
-                        {confirmLabel}
+                        {displayConfirmLabel}
                     </Button>
                 </div>
             </div>

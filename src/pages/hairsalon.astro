@@ -16,7 +16,7 @@ let username = "";
 if (userId) {
   const clerk = createClerkClient({ secretKey: import.meta.env.CLERK_SECRET_KEY });
   const user = await clerk.users.getUser(userId);
-  username = user.username || user.firstName || "Guerrer@";
+  username = user.username || user.firstName || ""; // Let i18n handle fallback if empty
 }
 ---
 
@@ -38,7 +38,7 @@ if (userId) {
         </SignedOut>
         <SignedIn>
           <p class="text-muted mt-2">
-            <span data-i18n="common.welcome">¡Bienvenido</span> <span class="text-foreground font-semibold">{username}</span>!, <span data-i18n="hairSalon.publishCreations">puedes empezar a publicar tus creaciones</span>
+            <span data-i18n="common.welcome">¡Bienvenido</span> <span class="text-foreground font-semibold">{username || <span data-i18n="hairSalon.usernameFallback">Guerrer@</span>}</span>!, <span data-i18n="hairSalon.publishCreations">puedes empezar a publicar tus creaciones</span>
           </p>
         </SignedIn>
       </div>

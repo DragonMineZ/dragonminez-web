@@ -1,37 +1,28 @@
-import { useState, useCallback } from 'react';
 import HairViewer3D from './HairViewer3D';
 import ViewerControls from './ViewerControls';
 import ViewerDebug from './ViewerDebug';
-import { useClipboard } from '../../../hooks/useClipboard';
+import { useHairViewer } from '../../../hooks/useHairViewer';
 
 interface HairViewerPageProps {
     code: string;
+    name?: string;
 }
 
-export default function HairViewerPage({ code: initialCode }: HairViewerPageProps) {
-    const [code, setCode] = useState(initialCode);
-    const [hairName, setHairName] = useState('');
-    const [headY, setHeadY] = useState(0.25);
-    const [headScaleX, setHeadScaleX] = useState(1);
-    const [headScaleY, setHeadScaleY] = useState(1);
-    const [headScaleZ, setHeadScaleZ] = useState(1);
-    const [currentForm, setCurrentForm] = useState('Base');
-    const [customColor, setCustomColor] = useState<string>('');
-
-    const { copied, copy } = useClipboard();
-
-    const handleRender = useCallback(() => {
-        setHeadY(0.25);
-        setHeadScaleX(1);
-        setHeadScaleY(1);
-        setHeadScaleZ(1);
-    }, []);
-
-    const handleCopy = useCallback(() => {
-        if (code) {
-            copy(code);
-        }
-    }, [code, copy]);
+export default function HairViewerPage({ code: initialCode, name: initialName = '' }: HairViewerPageProps) {
+    const {
+        code, setCode,
+        hairName, setHairName,
+        headY, setHeadY,
+        headScaleX, setHeadScaleX,
+        headScaleY, setHeadScaleY,
+        headScaleZ, setHeadScaleZ,
+        currentForm, setCurrentForm,
+        customColor, setCustomColor,
+        copied,
+        handleRenderReset,
+        handleCopy,
+        handleResetColor
+    } = useHairViewer(initialCode, initialName);
 
     return (
         <div className="flex flex-col h-[calc(100vh-6rem)]">
@@ -41,16 +32,17 @@ export default function HairViewerPage({ code: initialCode }: HairViewerPageProp
                     setCode={setCode}
                     hairName={hairName}
                     setHairName={setHairName}
-                    onRender={handleRender}
+                    onRender={handleRenderReset}
                     onCopy={handleCopy}
                     copied={copied}
                     customColor={customColor}
                     setCustomColor={setCustomColor}
+                    onResetColor={handleResetColor}
                 />
 
                 {/* 3D Viewer - Center */}
                 <div className="flex-1 min-w-0">
-                    <div className="h-full bg-background rounded-2xl overflow-hidden">
+                    <div className="h-full bg-background rounded-3xl overflow-hidden border border-glass shadow-glass relative group/viewer">
                         <HairViewer3D
                             code={code}
                             hairName={hairName}

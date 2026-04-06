@@ -1,3 +1,5 @@
+import { useLanguage } from "../../i18n";
+
 interface AuthorTagProps {
     avatarUrl: string;
     username: string;
@@ -5,6 +7,7 @@ interface AuthorTagProps {
 }
 
 export default function AuthorTag({ avatarUrl, username, isOnline = true }: AuthorTagProps) {
+    const { t } = useLanguage();
     return (
         <div className="flex items-center gap-2.5">
             <div className="relative">
@@ -18,7 +21,7 @@ export default function AuthorTag({ avatarUrl, username, isOnline = true }: Auth
                 )}
             </div>
             <div className="flex flex-col">
-                <span className="text-xs text-muted font-medium">Author</span>
+                <span className="text-xs text-muted font-medium">{t('hairSalon.author')}</span>
                 <span className="text-sm text-foreground font-semibold leading-tight">
                     {username}
                 </span>

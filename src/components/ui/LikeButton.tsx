@@ -1,4 +1,5 @@
 import Tooltip from "./Tooltip";
+import { useLanguage } from "../../i18n";
 
 interface LikeButtonProps {
     isLiked: boolean;
@@ -7,8 +8,9 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({ isLiked, likesCount, onClick }: LikeButtonProps) {
+    const { t } = useLanguage();
     return (
-        <Tooltip content={isLiked ? "Eliminar de favoritos" : "Dar me gusta"}>
+        <Tooltip content={isLiked ? t('hairSalon.unlike') : t('hairSalon.like')}>
             <button
                 onClick={onClick}
                 className={`group/like flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-300 ${isLiked

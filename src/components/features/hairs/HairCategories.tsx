@@ -1,5 +1,6 @@
 import Chip from "../../ui/Chip";
 import type { Category } from "../../types/hair";
+import { useLanguage } from "../../../i18n";
 
 interface HairCategoriesProps {
     categories?: Category[];
@@ -7,6 +8,7 @@ interface HairCategoriesProps {
 }
 
 export default function HairCategories({ categories, className = "" }: HairCategoriesProps) {
+    const { t } = useLanguage();
     const hasCategories = (categories?.length ?? 0) > 0;
 
     return (
@@ -19,7 +21,7 @@ export default function HairCategories({ categories, className = "" }: HairCateg
                 ))
             ) : (
                 <Chip variant="glass" className="opacity-50">
-                    Normal
+                    {t('hairSalon.categoryNormal')}
                 </Chip>
             )}
         </div>

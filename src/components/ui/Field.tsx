@@ -14,7 +14,7 @@ export type FieldProps = InputProps | TextareaProps;
 export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldProps>(
     ({ label, error, as = 'input', className = '', onChange, value, defaultValue, maxLength, ...props }, ref) => {
         const isTextarea = as === 'textarea';
-        const appliedMaxLength = isTextarea && maxLength === undefined ? 500 : maxLength;
+        const appliedMaxLength = isTextarea && maxLength === undefined ? 1000 : maxLength;
 
         const [internalValue, setInternalValue] = useState(value !== undefined ? value : (defaultValue || ''));
 

@@ -48,20 +48,20 @@ export default function HairList() {
 
     if (res.ok) {
       handleDeleteLocally(id);
-      setSuccessAlert({ show: true, message: "¡Cabello eliminado correctamente!" });
+      setSuccessAlert({ show: true, message: t('hairSalon.deleteSuccess') });
     } else {
-      window.alert("Error al eliminar");
+      window.alert(t('hairSalon.deleteError'));
     }
   };
 
   const handleCreateSuccess = () => {
     fetchData();
-    setSuccessAlert({ show: true, message: "¡Cabello publicado correctamente!" });
+    setSuccessAlert({ show: true, message: t('hairSalon.createSuccess') });
   };
 
   const handleUpdateSuccess = () => {
     fetchData();
-    setSuccessAlert({ show: true, message: "¡Cabello actualizado correctamente!" });
+    setSuccessAlert({ show: true, message: t('hairSalon.updateSuccess') });
   };
 
   const filteredHairs = filterHairs(hairs, searchQuery, selectedCategory, showMyCreations, !!isSignedIn, userId);

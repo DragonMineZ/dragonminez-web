@@ -2,13 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import FloatingMenuButton from './FloatingMenuButton';
 import FloatingLanguageSelector from './FloatingLanguageSelector';
 import Tooltip from './Tooltip';
+import SuccessAlert from './SuccessAlert';
 import { useLanguage } from '../../i18n';
 
 export function FloatingMenu() {
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
+    const [showAlert, setShowAlert] = useState(false);
+    const isFirstRender = useRef(true);
     // ... rest of state stays the same
 
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
@@ -54,6 +57,14 @@ export function FloatingMenu() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        setShowAlert(true);
+    }, [language]);
 
     const toggleTheme = () => {
         const newDark = !isDark;
@@ -196,6 +207,13 @@ export function FloatingMenu() {
                     />
                 </Tooltip>
             </div>
+
+            <SuccessAlert
+                show={showAlert}
+                message={t('languages.languageSuccess')}
+                duration={2000}
+                onClose={() => setShowAlert(false)}
+            />
         </div>
     );
 }

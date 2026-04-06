@@ -13,11 +13,13 @@ export function decodeHairCode(code: string): DecodedHair | null {
     if (!code) return null;
 
     let isFullSet = false;
-    let cleanCode = code.replace(/\s+/g, '');
+    // Remove all whitespace including non-breaking spaces and hidden characters
+    let cleanCode = code.trim().replace(/[\s\u200B\uFEFF]+/g, '');
     const upperCode = cleanCode.toUpperCase();
 
     let alphabet = BASE64_URL_ALPHABET;
 
+    // Check for prefixes (case-insensitive due to upperCode)
     if (upperCode.startsWith("DMZF1:")) {
         cleanCode = cleanCode.substring(6);
         isFullSet = true;
@@ -39,6 +41,9 @@ export function decodeHairCode(code: string): DecodedHair | null {
     } else if (upperCode.startsWith("DMZ5:")) {
         cleanCode = cleanCode.substring(5);
         alphabet = BASE64_URL_ALPHABET;
+    } else {
+        // If no DMZ prefix is found, it might be a raw code or an unsupported version
+        console.warn(`[HairDecoder] Unknown code format: ${upperCode.substring(0, 10)}...`);
     }
 
     try {
@@ -51,7 +56,7 @@ export function decodeHairCode(code: string): DecodedHair | null {
             isFullSet: isFullSet
         };
     } catch (e) {
-        console.error("Decoding failed", e);
+        console.error(`[HairDecoder] Decoding failed for input: ${code.substring(0, 20)}...`, e);
         return null;
     }
 }

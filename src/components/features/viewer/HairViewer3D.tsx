@@ -35,11 +35,14 @@ export default function HairViewer3D({
     const [isFullSet, setIsFullSet] = useState(false);
 
     useEffect(() => {
+        setError(null);
         if (!code) {
             setError('No code provided');
             setIsLoading(false);
             return;
         }
+
+        setIsLoading(true);
 
         try {
             const decoded = decodeHairCode(code);
@@ -134,28 +137,31 @@ export default function HairViewer3D({
 
                 {hairName && (
                     <div className="absolute top-6 left-0 right-0 flex justify-center pointer-events-none">
-                        <div className="pointer-events-auto bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-foreground font-bold text-center text-lg px-6 py-2 shadow-lg max-w-[80%] truncate">
+                        <div className="pointer-events-auto bg-surface/80 backdrop-blur-xl border border-glass shadow-dropdown rounded-2xl text-foreground font-bold text-center text-base px-6 py-2.5 max-w-[80%] truncate">
                             {hairName}
                         </div>
                     </div>
                 )}
 
                 {isFullSet && availableForms.length > 1 && (
-                    <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 md:gap-6 pointer-events-none">
+                    <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-4 md:gap-6 pointer-events-none px-4">
                         <button
                             onClick={handlePrevForm}
-                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-foreground hover:bg-glass-strong transition-all shadow-lg"
+                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground hover:bg-foreground hover:text-background transition-all shadow-dropdown group/btn active:scale-95"
+                            title="Previous Form"
                         >
-                            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                            <span className="material-symbols-outlined text-2xl group-hover/btn:-translate-x-0.5 transition-transform">chevron_left</span>
                         </button>
-                        <div className="pointer-events-auto flex items-center justify-center h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-xl text-foreground font-bold uppercase tracking-wider min-w-[120px] px-6 shadow-lg">
-                            {currentFormKey}
+                        <div className="pointer-events-auto flex flex-col items-center justify-center h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground min-w-[140px] px-6 shadow-dropdown">
+                            <span className="text-[10px] text-muted font-black uppercase tracking-[0.2em] leading-none mb-1">Current Form</span>
+                            <span className="font-black uppercase tracking-tight text-sm leading-none">{currentFormKey}</span>
                         </div>
                         <button
                             onClick={handleNextForm}
-                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface-elevated/80 backdrop-blur-md border border-glass-strong rounded-full text-foreground hover:bg-glass-strong transition-all shadow-lg"
+                            className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground hover:bg-foreground hover:text-background transition-all shadow-dropdown group/btn active:scale-95"
+                            title="Next Form"
                         >
-                            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                            <span className="material-symbols-outlined text-2xl group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
                         </button>
                     </div>
                 )}

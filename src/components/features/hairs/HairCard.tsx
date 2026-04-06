@@ -15,6 +15,7 @@ import HairCategories from "./HairCategories";
 
 import { useLike } from "../../../hooks/useLike";
 import { useClipboard } from "../../../hooks/useClipboard";
+import { useLanguage } from "../../../i18n";
 
 interface HairCardProps {
     hair: Hair;
@@ -26,6 +27,7 @@ interface HairCardProps {
 
 export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
     const { userId: clerkId } = useAuth();
+    const { t } = useLanguage();
 
     // Abstracted logic into hooks
     const { isLiked, toggleLike, checkInitialLikeStatus } = useLike(hair.id_hair, onLikeToggle);
@@ -48,7 +50,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
     const handleCopyCode = () => {
         copy(hair.code, () => {
-            setAlert({ show: true, message: "¡Código copiado al portapapeles!" });
+            setAlert({ show: true, message: t('hairSalon.copySuccess') });
         });
     };
 
@@ -60,7 +62,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
         } else if (result.success) {
             setAlert({
                 show: true,
-                message: result.isLiked ? "¡Añadido a tus favoritos!" : "Eliminado de tus favoritos"
+                message: result.isLiked ? t('hairSalon.addedToFavorites') : t('hairSalon.removedFromFavorites')
             });
         }
     };
@@ -91,10 +93,10 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     </h3>
                     <div className="flex items-center gap-2">
                         <Chip
-                            href={`/viewer?code=${encodeURIComponent(hair.code)}`}
+                            href={`/viewer?code=${encodeURIComponent(hair.code)}&name=${encodeURIComponent(hair.name)}`}
                             icon="visibility"
                             variant="outline"
-                            title="Ver en 3D"
+                            title={t('hairSalon.view3D')}
                         />
                         <LikeButton
                             isLiked={isLiked}
@@ -111,7 +113,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
 
                 <p className="text-sm text-foreground/70 line-clamp-3 leading-[1.6] mb-4 font-normal">
-                    {hair.description || "Sin descripción disponible."}
+                    {hair.description || t('hairSalon.noDescription')}
                 </p>
 
                 {/* Author Info & Actions */}
@@ -140,14 +142,14 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={() => onDelete(hair.id_hair)}
-                description="Si realizas esta acción no podrás recuperar este diseño de cabello."
+                description={t('hairSalon.deleteConfirmDesc')}
             />
 
             <InfoDialog
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
-                title="Inicio de Sesión Requerido"
-                description="Debes iniciar sesión con tu cuenta de Discord para poder dar like a los diseños de la comunidad."
+                title={t('hairSalon.authRequiredTitle')}
+                description={t('hairSalon.authRequiredDesc')}
             />
 
             <SuccessAlert

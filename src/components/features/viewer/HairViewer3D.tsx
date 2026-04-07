@@ -93,7 +93,7 @@ export default function HairViewer3D({
 
     if (error) {
         return (
-            <div className="flex items-center justify-center h-full text-red-500">
+            <div className="flex items-center justify-center h-full text-error font-medium animate-shake">
                 {error}
             </div>
         );

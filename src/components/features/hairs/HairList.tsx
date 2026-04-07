@@ -95,8 +95,8 @@ export default function HairList() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <p className="text-red-500">{error}</p>
+      <div className="flex flex-col items-center justify-center py-24 animate-shake">
+        <p className="text-error font-medium">{error}</p>
       </div>
     );
   }

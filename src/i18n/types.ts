@@ -97,6 +97,11 @@ export interface Translations {
     formImagePlaceholder: string;
     formDescription: string;
     formDescriptionPlaceholder: string;
+    formFieldRequired: string;
+    formNameRequired: string;
+    formCodeRequired: string;
+    formImageRequired: string;
+    formInvalidFields: string;
     updating: string;
     publishing: string;
     saveChanges: string;

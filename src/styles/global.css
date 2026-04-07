@@ -22,6 +22,9 @@
   --drop-shadow-portrait: 0 0 100px rgba(0, 0, 0, 0.1);
   --drop-shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.1);
 
+  --error: #ef4444;
+  --error-glass: rgba(239, 68, 68, 0.1);
+
   color-scheme: light;
 }
 
@@ -47,6 +50,9 @@
   --drop-shadow-portrait: 0 0 100px rgba(0, 0, 0, 0.6);
   --drop-shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.2);
 
+  --error: #ff4d4d;
+  --error-glass: rgba(255, 77, 77, 0.1);
+
   color-scheme: dark;
 }
 
@@ -71,6 +77,9 @@
   --drop-shadow-hero: var(--drop-shadow-hero);
   --drop-shadow-portrait: var(--drop-shadow-portrait);
   --drop-shadow-glow-orange: var(--drop-shadow-glow-orange);
+
+  --color-error: var(--error);
+  --color-error-glass: var(--error-glass);
 }
 
 body {
@@ -95,6 +104,21 @@ body {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 4s ease-in-out infinite;
+}
+
+@keyframes slide-in-soft {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-soft {
+  animation: slide-in-soft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Hide scrollbar for clean Modal UI */

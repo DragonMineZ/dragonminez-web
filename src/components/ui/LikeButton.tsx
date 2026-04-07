@@ -19,8 +19,8 @@ export default function LikeButton({ isLiked, likesCount, onClick }: LikeButtonP
                     }`}
             >
                 <span className={`material-symbols-outlined text-[24px] transition-all ${isLiked
-                    ? "text-red-500 [font-variation-settings:'FILL'_1]"
-                    : "text-red-500 group-hover/like:[font-variation-settings:'FILL'_1]"
+                    ? "text-error [font-variation-settings:'FILL'_1]"
+                    : "text-error group-hover/like:[font-variation-settings:'FILL'_1]"
                     }`}>
                     favorite
                 </span>

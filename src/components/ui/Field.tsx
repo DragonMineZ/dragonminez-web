@@ -30,13 +30,13 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
         const currentValue = value !== undefined ? value : internalValue;
         const currentLength = String(currentValue || '').length;
 
-        const baseInputStyles = `w-full px-5 py-3 bg-surface border border-glass rounded-2xl text-foreground placeholder:text-muted/40 focus:outline-none focus:border-glass-strong focus:bg-surface-elevated/80 focus:backdrop-blur-md focus:shadow-lg transition-all shadow-inner ${error ? 'border-red-500/50 focus:border-red-500' : ''
+        const baseInputStyles = `w-full px-5 py-3 bg-surface border border-glass rounded-2xl text-foreground placeholder:text-muted/40 focus:outline-none focus:border-glass-strong focus:bg-surface-elevated/80 focus:backdrop-blur-md focus:shadow-lg transition-all shadow-inner ${error ? 'border-error/60 focus:border-error bg-error-glass/10 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : ''
             } ${className}`;
 
         return (
             <div className="space-y-2 w-full">
                 {label && (
-                    <label className="block text-sm font-semibold text-foreground/70 ml-1">
+                    <label className={`block text-sm font-semibold ml-1 transition-colors duration-300 ${error ? 'text-error' : 'text-foreground/70'}`}>
                         {label}
                     </label>
                 )}
@@ -52,7 +52,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
                                 className={`${baseInputStyles} resize-y min-h-[120px] pb-10 scrollbar-hide relative z-10 bg-transparent`}
                                 {...(props as any)}
                             />
-                            <div className="absolute inset-0 bg-surface rounded-2xl pointer-events-none group-focus-within:bg-surface-elevated/80 group-focus-within:backdrop-blur-md transition-all"></div>
+                            <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300 ${error ? 'bg-error-glass/5' : 'bg-surface group-focus-within:bg-surface-elevated/80 group-focus-within:backdrop-blur-md'}`}></div>
                             {appliedMaxLength && (
                                 <div className="absolute bottom-3 right-3 bg-surface border border-glass text-muted px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider pointer-events-none z-20 shadow-sm transition-all group-focus-within:text-foreground group-focus-within:border-glass-strong">
                                     {currentLength} / {appliedMaxLength}
@@ -72,7 +72,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
                     )}
                 </div>
                 {error && (
-                    <p className="text-red-500 text-xs ml-1 mt-1">{error}</p>
+                    <p className="text-error text-xs ml-1 mt-1 font-medium italic animate-slide-in-soft">{error}</p>
                 )}
             </div>
         );

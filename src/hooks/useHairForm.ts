@@ -12,6 +12,7 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         initialData?.categories?.map((c) => c.id_category) || []
     );
     const [error, setError] = useState("");
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const [formData, setFormData] = useState({
         name: initialData?.name || "",
@@ -21,6 +22,17 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
     });
 
     const isEditing = !!initialData;
+
+    const updateField = (field: keyof typeof formData, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
+                return newErrors;
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -84,8 +96,24 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         );
     };
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.name.trim()) newErrors.name = "formNameRequired";
+        if (!formData.code.trim()) newErrors.code = "formCodeRequired";
+        if (!formData.image_url.trim()) newErrors.image_url = "formImageRequired";
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!validate()) {
+            setError("formInvalidFields");
+            return;
+        }
+
         setLoading(true);
         setError("");
 
@@ -126,12 +154,14 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         fetchingUser,
         loading,
         error,
+        errors,
         formData,
-        setFormData,
+        updateField,
         selectedCategories,
         toggleCategory,
         filteredCategories,
         handleSubmit,
-        isEditing
+        isEditing,
+        setError
     };
 }

@@ -23,7 +23,7 @@ export function Button({
     const variants = {
         primary: "bg-foreground text-background hover:opacity-90 hover:scale-105 active:scale-95 focus:ring-foreground shadow-glow",
         secondary: "bg-surface-elevated text-foreground hover:bg-surface border border-glass hover:border-glass-strong focus:ring-glass",
-        danger: "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 focus:ring-red-500/50",
+        danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20 focus:ring-error/50",
         ghost: "bg-transparent text-muted hover:text-foreground hover:bg-glass",
         outline: "bg-transparent border border-glass text-foreground hover:bg-glass",
     };

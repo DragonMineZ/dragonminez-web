@@ -7,13 +7,16 @@ import aurora from "../assets/updates/dmz-aurora.png";
 import auroraLogo from "../assets/updates/dmz-aurora-logo.png";
 import ImageCarousel from "../components/ui/ImageCarousel.astro";
 import { Button } from "../components/ui/Button";
+import { DownloadDropdown } from "../components/ui/DownloadDropdown";
+import curseforgeIcon from "../assets/icons/social/curseforge.svg?raw";
+import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
 ---
 
 <Layout>
   <main>
 
     <!-- 1. Hero Section -->
-    <section class="relative min-h-screen flex items-end overflow-hidden bg-background">
+    <section class="relative min-h-screen flex items-end bg-background">
       <div class="absolute inset-0 z-0">
         <Image 
           src={heroImage} 
@@ -34,15 +37,17 @@ import { Button } from "../components/ui/Button";
             Vive la experiencia de Dragon Ball y recorre la historia junto a Goku.
           </p>
           <div class="flex flex-wrap items-center gap-4 pt-4">
-            <a href="/hairsalon">
-              <Button variant="primary" size="lg" className="gap-3">
-                <span class="material-symbols-rounded text-xl">download</span>
-                <span data-i18n="home.hero.cta">Descargar Mod</span>
-              </Button>
-            </a>
+            <DownloadDropdown 
+              client:load 
+              variant="primary" 
+              size="lg" 
+              curseforgeIcon={curseforgeIcon} 
+              modrinthIcon={modrinthIcon}
+            />
           </div>
         </div>
       </div>
+
 
       <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce opacity-60">
         <span class="material-symbols-rounded text-foreground text-2xl">keyboard_arrow_down</span>

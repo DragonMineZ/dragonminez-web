@@ -12,6 +12,7 @@ export interface Translations {
     welcome: string;
     confirm: string;
     back: string;
+    platform: string;
   };
   nav: {
     download: string;

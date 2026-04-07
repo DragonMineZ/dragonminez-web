@@ -12,6 +12,7 @@ const pt: Translations = {
     welcome: "Bem-vindo",
     confirm: "Confirmar",
     back: "Voltar",
+    platform: "Plataforma",
   },
   nav: {
     download: "Baixar",

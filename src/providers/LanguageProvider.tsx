@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import type { Language } from './types';
-import { i18nStore } from './store';
+import type { Language } from '../i18n/types';
+import { i18nStore } from '../i18n/store';
 
 interface LanguageContextType {
   language: Language;

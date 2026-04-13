@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import type { Hair, Category } from "../components/types/hair";
+import type { Hair, Category } from "../types/hair";
 
-export function useHairs() {
-    const [hairs, setHairs] = useState<Hair[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
+export function useHairs(initialHairs: Hair[] = [], initialCategories: Category[] = []) {
+    const [hairs, setHairs] = useState<Hair[]>(initialHairs);
+    const [categories, setCategories] = useState<Category[]>(initialCategories);
+    const [loading, setLoading] = useState(initialHairs.length === 0);
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = async () => {
@@ -34,8 +34,10 @@ export function useHairs() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (initialHairs.length === 0) {
+            fetchData();
+        }
+    }, [initialHairs.length]);
 
     const handleDeleteLocally = (id: number) => {
         setHairs((prev) => prev.filter((h: Hair) => h.id_hair !== id));
@@ -47,6 +49,7 @@ export function useHairs() {
                 const currentLikes = h._count?.likes || 0;
                 return {
                     ...h,
+                    is_liked_by_user: liked,
                     _count: {
                         ...h._count,
                         likes: liked ? currentLikes + 1 : Math.max(0, currentLikes - 1)

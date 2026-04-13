@@ -11,8 +11,9 @@ import ItemsPerPageSelector from "../../ui/ItemsPerPageSelector";
 import { useHairs } from "../../../hooks/useHairs";
 import { filterHairs, sortHairs } from "../../../lib/hairFilters";
 import { useLanguage } from "../../../i18n";
+import type { Hair, Category } from "../../../types/hair";
 
-export default function HairList() {
+export default function HairList({ initialHairs = [], initialCategories = [] }: { initialHairs?: Hair[], initialCategories?: Category[] }) {
   const { isLoaded: isAuthLoaded, isSignedIn, getToken, userId } = useAuth();
   const { t } = useLanguage();
 
@@ -24,7 +25,7 @@ export default function HairList() {
     fetchData,
     handleDeleteLocally,
     handleLikeToggleLocally
-  } = useHairs();
+  } = useHairs(initialHairs, initialCategories);
 
   // ... rest of state ...
   const [searchQuery, setSearchQuery] = useState("");

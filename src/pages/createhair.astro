@@ -7,14 +7,14 @@ import {SignedIn, SignedOut, UserButton, SignInButton} from "@clerk/astro/compon
 <Layout>
     <section class="container-base py-20">
         <div class="flex justify-end mb-6">
-            <SignedOut client:load>
+            <SignedOut>
                 <SignInButton mode="modal">
                     <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                         Iniciar Sesión
                     </button>
                 </SignInButton>
             </SignedOut>
-            <SignedIn client:load>
+            <SignedIn>
                 <div class="flex items-center gap-4">
                     <UserButton />
                 </div>

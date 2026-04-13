@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useCallback } from 'react';
-import { LanguageContext } from './LanguageProvider';
+import { LanguageContext } from '../providers/LanguageProvider';
 import { i18nStore } from './store';
 import type { Language } from './types';
 

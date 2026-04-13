@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import HairList from "../components/features/hairs/HairList.tsx";
 import CreateHairTrigger from "../components/features/hairs/CreateHairTrigger.tsx";
+import { prisma } from "../lib/prisma";
 import {
   SignedIn,
   SignedOut,
@@ -12,11 +13,38 @@ import { createClerkClient } from "@clerk/astro/server";
 
 const { userId } = Astro.locals.auth();
 let username = "";
+let dbUserId: number | null = null;
 
 if (userId) {
-  const clerk = createClerkClient({ secretKey: import.meta.env.CLERK_SECRET_KEY });
-  const user = await clerk.users.getUser(userId);
-  username = user.username || user.firstName || ""; // Let i18n handle fallback if empty
+  const dbUser = await prisma.user.findUnique({ where: { clerk_id: userId }, select: { id_user: true } });
+  dbUserId = dbUser?.id_user || null;
+}
+
+const clerk = createClerkClient({ secretKey: import.meta.env.CLERK_SECRET_KEY });
+
+const [user, rawHairs, categories] = await Promise.all([
+  userId ? clerk.users.getUser(userId).catch(() => null) : Promise.resolve(null),
+  prisma.hair.findMany({
+      include: {
+          categories: true,
+          artist: true,
+          likes: dbUserId ? { where: { id_user: dbUserId } } : false,
+          _count: { select: { likes: true } }
+      },
+  }),
+  prisma.category.findMany()
+]);
+
+const hairs = rawHairs.map(h => {
+  const { likes, ...rest } = h as any; // Strip out prisma strict type on map
+  return {
+    ...rest,
+    is_liked_by_user: likes ? likes.length > 0 : false
+  };
+});
+
+if (user) {
+  username = user.username || user.firstName || "";
 }
 ---
 
@@ -52,7 +80,7 @@ if (userId) {
     </div>
 
     <!-- Hair List (React Island) -->
-    <HairList client:load />
+    <HairList client:load initialHairs={hairs} initialCategories={categories} />
 
   </section>
 </Layout>

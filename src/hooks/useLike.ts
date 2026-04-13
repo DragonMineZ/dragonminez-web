@@ -3,26 +3,11 @@ import { useAuth } from "@clerk/astro/react";
 
 export function useLike(
     hairId: number,
+    initialIsLiked: boolean,
     onLikeToggle?: (hairId: number, liked: boolean) => void
 ) {
     const { getToken, isSignedIn } = useAuth();
-    const [isLiked, setIsLiked] = useState(false);
-
-    const checkInitialLikeStatus = useCallback(async () => {
-        if (!isSignedIn) return;
-        try {
-            const token = await getToken();
-            const res = await fetch(`/api/hairs/${hairId}/like`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setIsLiked(data.liked);
-            }
-        } catch (error) {
-            console.error("Error checking like status", error);
-        }
-    }, [hairId, isSignedIn, getToken]);
+    const [isLiked, setIsLiked] = useState(initialIsLiked);
 
     const toggleLike = async () => {
         if (!isSignedIn) return { success: false, requireAuth: true };
@@ -57,5 +42,5 @@ export function useLike(
         }
     };
 
-    return { isLiked, toggleLike, checkInitialLikeStatus };
+    return { isLiked, toggleLike };
 }

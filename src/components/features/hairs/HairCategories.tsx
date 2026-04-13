@@ -1,5 +1,5 @@
 import Chip from "../../ui/Chip";
-import type { Category } from "../../types/hair";
+import type { Category } from "../../../types/hair";
 import { useLanguage } from "../../../i18n";
 
 interface HairCategoriesProps {

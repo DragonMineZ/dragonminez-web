@@ -1,17 +1,35 @@
 import type { APIRoute } from "astro";
 import { prisma } from "../../../lib/prisma";
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
+    const { userId } = locals.auth();
+    let dbUserId: number | null = null;
+    
+    if (userId) {
+        const dbUser = await prisma.user.findUnique({ where: { clerk_id: userId }, select: { id_user: true } });
+        dbUserId = dbUser?.id_user || null;
+    }
+
     try {
-        const hairs = await prisma.hair.findMany({
+        const rawHairs = await prisma.hair.findMany({
             include: {
                 categories: true,
                 artist: true,
+                likes: dbUserId ? { where: { id_user: dbUserId } } : false,
                 _count: {
                     select: { likes: true }
                 }
             },
         });
+
+        const hairs = rawHairs.map(h => {
+            const { likes, ...rest } = h as any;
+            return {
+                ...rest,
+                is_liked_by_user: likes ? likes.length > 0 : false
+            };
+        });
+
         return new Response(JSON.stringify(hairs), {
             status: 200,
             headers: { "Content-Type": "application/json" },
@@ -25,17 +43,17 @@ export const GET: APIRoute = async () => {
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
-    const { isAuthenticated } = locals.auth()
+    const { userId } = locals.auth()
 
-    if (!isAuthenticated) {
+    if (!userId) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
     }
 
     try {
         const body = await request.json();
-        const { name, code, image_url, description, artistId, categoryIds } = body;
+        const { name, code, image_url, description, categoryIds } = body;
 
-        if (!name || !code || !image_url || !artistId) {
+        if (!name || !code || !image_url) {
             return new Response(
                 JSON.stringify({ error: "Faltan campos obligatorios" }),
                 { status: 400 }
@@ -48,7 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 code,
                 image_url,
                 description,
-                artist: { connect: { id_user: artistId } },
+                artist: { connect: { clerk_id: userId } },
                 categories: categoryIds
                     ? {
                         connect: categoryIds.map((id: number) => ({ id_category: id })),

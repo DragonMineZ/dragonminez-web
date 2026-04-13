@@ -12,6 +12,7 @@ export interface Hair {
         avatar_url: string;
     };
     categories?: Category[];
+    is_liked_by_user?: boolean;
     _count?: {
         likes: number;
     };

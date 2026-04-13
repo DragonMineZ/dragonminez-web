@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/astro/react";
-import type { Category, Hair } from "../components/types/hair";
+import type { Category, Hair } from "../types/hair";
 
 export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
     const { isLoaded, isSignedIn, getToken } = useAuth();

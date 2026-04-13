@@ -1,4 +1,4 @@
-import type { Hair } from "../components/types/hair";
+import type { Hair } from "../types/hair";
 
 export function filterHairs(
     hairs: Hair[],

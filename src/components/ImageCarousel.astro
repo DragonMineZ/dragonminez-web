@@ -1,4 +1,10 @@
 ---
+import { Image } from "astro:assets";
+import img1 from "../assets/carousel/1.png";
+import img2 from "../assets/carousel/2.png";
+import img3 from "../assets/carousel/3.png";
+import img4 from "../assets/carousel/4.png";
+import img5 from "../assets/carousel/5.png";
 ---
 
 <div class="relative w-full group">
@@ -8,49 +14,49 @@
             <!-- Clon del último slide -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/5.png" alt="Clone Last" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img5} alt="Clone Last" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Slide 1 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/1.png" alt="DragonMineZ Gallery 1" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img1} alt="DragonMineZ Gallery 1" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Slide 2 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/2.png" alt="DragonMineZ Gallery 2" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img2} alt="DragonMineZ Gallery 2" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Slide 3 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/3.png" alt="DragonMineZ Gallery 3" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img3} alt="DragonMineZ Gallery 3" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Slide 4 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/4.png" alt="DragonMineZ Gallery 4" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img4} alt="DragonMineZ Gallery 4" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Slide 5 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/5.png" alt="DragonMineZ Gallery 5" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img5} alt="DragonMineZ Gallery 5" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
             <!-- Clon del primer slide -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
-                    <img src="/carousel/1.png" alt="Clone First" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
+                    <Image src={img1} alt="Clone First" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 

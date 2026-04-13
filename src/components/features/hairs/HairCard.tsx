@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import type { Hair } from "../../types/hair";
+import { useState, useEffect, lazy, Suspense } from "react";
+import type { Hair } from "../../../types/hair";
 import { useAuth } from "@clerk/astro/react";
 import ActionButtons from "../../ui/ActionButtons";
 import Chip from "../../ui/Chip";
@@ -7,7 +7,6 @@ import AuthorTag from "../../ui/AuthorTag";
 import CodeClipboard from "../../ui/CodeClipboard";
 import LikeButton from "../../ui/LikeButton";
 import Modal from "../../ui/Modal";
-import CreateHairForm from "./CreateHairForm";
 import ConfirmDialog from "../../ui/ConfirmDialog";
 import SuccessAlert from "../../ui/SuccessAlert";
 import InfoDialog from "../../ui/InfoDialog";
@@ -16,7 +15,6 @@ import HairCategories from "./HairCategories";
 import { useLike } from "../../../hooks/useLike";
 import { useClipboard } from "../../../hooks/useClipboard";
 import { useLanguage } from "../../../i18n";
-
 interface HairCardProps {
     hair: Hair;
     isSignedIn: boolean;
@@ -25,12 +23,14 @@ interface HairCardProps {
     onLikeToggle?: (hairId: number, liked: boolean) => void;
 }
 
+const CreateHairForm = lazy(() => import('./CreateHairForm'));
+
 export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
     const { userId: clerkId } = useAuth();
     const { t } = useLanguage();
 
     // Abstracted logic into hooks
-    const { isLiked, toggleLike, checkInitialLikeStatus } = useLike(hair.id_hair, onLikeToggle);
+    const { isLiked, toggleLike } = useLike(hair.id_hair, !!hair.is_liked_by_user, onLikeToggle);
     const { copied, copy } = useClipboard();
 
     // UI States for Dialogs
@@ -40,13 +40,6 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     const [alert, setAlert] = useState({ show: false, message: "" });
 
     const isOwner = clerkId === hair.artist?.clerk_id;
-
-    // Check like status only once when auth changes
-    useEffect(() => {
-        if (isSignedIn && clerkId) {
-            checkInitialLikeStatus();
-        }
-    }, [isSignedIn, clerkId, checkInitialLikeStatus]);
 
     const handleCopyCode = () => {
         copy(hair.code, () => {
@@ -135,7 +128,13 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
             {/* Modals are still here but logic is clean and readable */}
             <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} noPadding={true}>
-                <CreateHairForm initialData={hair} onSuccess={handleEditSuccess} />
+                <Suspense fallback={
+                    <div className="h-48 flex items-center justify-center">
+                        <div className="w-10 h-10 border-4 border-foreground/20 border-t-foreground rounded-full animate-spin"></div>
+                    </div>
+                }>
+                    <CreateHairForm initialData={hair} onSuccess={handleEditSuccess} />
+                </Suspense>
             </Modal>
 
             <ConfirmDialog

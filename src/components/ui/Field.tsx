@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, type TextareaHTMLAttributes, forwardRef, useState } from 'react';
+import { type InputHTMLAttributes, type TextareaHTMLAttributes, forwardRef, useState, useId } from 'react';
 
 type FieldBaseProps = {
     label?: string;
@@ -12,7 +12,9 @@ type TextareaProps = FieldBaseProps & Omit<TextareaHTMLAttributes<HTMLTextAreaEl
 export type FieldProps = InputProps | TextareaProps;
 
 export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldProps>(
-    ({ label, error, as = 'input', className = '', onChange, value, defaultValue, maxLength, ...props }, ref) => {
+    ({ label, error, as = 'input', className = '', onChange, value, defaultValue, maxLength, id, ...props }, ref) => {
+        const generatedId = useId();
+        const elementId = id || generatedId;
         const isTextarea = as === 'textarea';
         const appliedMaxLength = isTextarea && maxLength === undefined ? 1000 : maxLength;
 
@@ -36,7 +38,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
         return (
             <div className="space-y-2 w-full">
                 {label && (
-                    <label className={`block text-sm font-semibold ml-1 transition-colors duration-300 ${error ? 'text-error' : 'text-foreground/70'}`}>
+                    <label htmlFor={elementId} className={`block text-sm font-semibold ml-1 transition-colors duration-300 ${error ? 'text-error' : 'text-foreground/70'}`}>
                         {label}
                     </label>
                 )}
@@ -44,6 +46,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
                     {isTextarea ? (
                         <>
                             <textarea
+                                id={elementId}
                                 ref={ref as any}
                                 value={value}
                                 defaultValue={defaultValue}
@@ -61,6 +64,7 @@ export const Field = forwardRef<HTMLInputElement | HTMLTextAreaElement, FieldPro
                         </>
                     ) : (
                         <input
+                            id={elementId}
                             ref={ref as any}
                             value={value}
                             defaultValue={defaultValue}

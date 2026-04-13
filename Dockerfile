@@ -7,7 +7,6 @@ COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 
 COPY . .
-# Generar el cliente de Prisma (usamos una URL dummy para que no falle en tiempo de build)
 RUN DATABASE_URL="postgresql://placeholder:5432/db" bun prisma generate
 RUN bun run build
 

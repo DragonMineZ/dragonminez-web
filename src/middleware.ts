@@ -63,6 +63,11 @@ const withClerkAuth = clerkMiddleware((auth, context) => {
     if (isProtectedRoute(context.request) && !userId) {
         return redirectToSignIn();
     }
+}, {
+    authorizedParties: [
+        import.meta.env.PUBLIC_APP_URL,
+        "http://localhost:4321"
+    ],
 });
 
 export const onRequest = sequence(withSecurityHeaders, withRateLimit, withClerkAuth);

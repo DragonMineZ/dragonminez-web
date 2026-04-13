@@ -3,7 +3,7 @@ WORKDIR /app
 
 # ── Build: Instalación y Compilación
 FROM base AS build
-COPY package.json bun.lock ./
+COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 
 COPY . .

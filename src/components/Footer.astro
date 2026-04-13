@@ -1,0 +1,119 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/dmz-title.png";
+import curseforgeIcon from "../assets/icons/social/curseforge.svg?raw";
+import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
+import Tooltip from "./ui/Tooltip";
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="w-full bg-[#1c1b22] text-white py-16 px-6 md:px-8 border-t border-white/5">
+  <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-4">
+    
+    <!-- ── Marca -->
+    <div class="mb-2">
+      <a href="/" class="block transform transition-transform hover:scale-105 active:scale-95">
+        <Image 
+          src={logo} 
+          alt="DragonMineZ Logo" 
+          class="h-10 md:h-12 w-auto object-contain drop-shadow-logo"
+        />
+      </a>
+    </div>
+
+    <!-- ── Información -->
+    <div class="flex flex-col gap-2">
+      <p class="text-base font-bold tracking-wide">
+        © {currentYear} <span data-i18n="footer.rights">DragonMineZ | Fair Use</span>
+      </p>
+      <p class="text-sm text-white/70 max-w-xl leading-relaxed" data-i18n="footer.description">
+        DragonMineZ es un proyecto hecho por fans para la comunidad de Minecraft y Dragon Ball Z.
+      </p>
+    </div>
+
+    <div class="w-2/3 max-w-[400px] h-px bg-white/20 rounded-full mt-2 mb-1"></div>
+
+    <!-- ── Redes Sociales -->
+    <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 mt-1">
+      <Tooltip content="Discord">
+        <a 
+          href="https://discord.gg/WfMTYMQtSz" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="Discord"
+        >
+          <i class="fa-brands fa-discord"></i>
+        </a>
+      </Tooltip>
+      <Tooltip content="GitHub">
+        <a 
+          href="https://github.com/DragonMineZ/dragonminez" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="GitHub"
+        >
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </Tooltip>
+      <Tooltip content="X (Twitter)">
+        <a 
+          href="https://x.com/DragonMineZ" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="X (Twitter)"
+        >
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+      </Tooltip>
+      <Tooltip content="YouTube">
+        <a 
+          href="https://www.youtube.com/@DragonMine-Z" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="YouTube"
+        >
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </Tooltip>
+      <Tooltip content="TikTok">
+        <a 
+          href="https://www.tiktok.com/@dragonminez" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="TikTok"
+        >
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+      </Tooltip>
+      <Tooltip content="CurseForge">
+        <a 
+          href="https://www.curseforge.com/minecraft/mc-mods/dragonminez" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="CurseForge"
+        >
+          <span class="flex items-center justify-center" set:html={curseforgeIcon} />
+        </a>
+      </Tooltip>
+      <Tooltip content="Modrinth">
+        <a 
+          href="#" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
+          aria-label="Modrinth"
+        >
+          <span class="flex items-center justify-center" set:html={modrinthIcon} />
+        </a>
+      </Tooltip>
+    </div>
+
+  </div>
+</footer>

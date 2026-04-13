@@ -1,0 +1,49 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="404 - Página No Encontrada">
+  <main class="min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden relative">
+    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-error/10 rounded-full blur-[120px] -z-10 animate-pulse-subtle"></div>
+    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-foreground/5 rounded-full blur-[100px] -z-10"></div>
+
+    <div class="container-base flex flex-col items-center text-center">
+      <div class="relative mb-8">
+        <span class="text-[12rem] font-black leading-none text-foreground/5 select-none md:text-[16rem]">
+          404
+        </span>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <i class="fa-solid fa-ghost text-6xl text-error drop-shadow-glow-orange animate-bounce"></i>
+        </div>
+      </div>
+
+      <h1 
+        class="text-4xl md:text-5xl font-bold mb-4 tracking-tight"
+        data-i18n="errors.title404"
+      >
+        404 - Ruta No Encontrada
+      </h1>
+      
+      <p 
+        class="text-muted text-lg max-w-md mb-10 leading-relaxed"
+        data-i18n="errors.desc404"
+      >
+        Lo sentimos, el camino del guerrero te ha llevado a un lugar inexistente.
+      </p>
+
+      <a 
+        href="/" 
+        class="px-8 py-4 bg-foreground text-background font-bold rounded-2xl hover:scale-105 transition-all active:scale-95 shadow-hero hover:shadow-glow-strong"
+        data-i18n="errors.goHome"
+      >
+        Volver al Inicio
+      </a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    background: radial-gradient(circle at center, var(--surface) 0%, var(--background) 100%);
+  }
+</style>

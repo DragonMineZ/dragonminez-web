@@ -3,14 +3,39 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
+    "dev": "bun astro dev",
+    "build": "bun astro build",
+    "preview": "bun astro preview",
+    "start": "bun ./dist/server/entry.mjs",
     "astro": "astro"
   },
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.16.6",
-    "tailwindcss": "^4.1.18"
+    "@astrojs/node": "9.5.3",
+    "@astrojs/react": "4.4.2",
+    "@astrojs/sitemap": "^3.7.2",
+    "@clerk/astro": "2.17.2",
+    "@clerk/themes": "2.4.52",
+    "@fontsource-variable/onest": "5.2.11",
+    "@prisma/adapter-neon": "7.4.1",
+    "@prisma/client": "7.4.1",
+    "@react-three/drei": "10.7.7",
+    "@react-three/fiber": "9.5.0",
+    "astro": "5.16.6",
+    "pako": "2.1.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "three": "0.183.2",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.18",
+    "@types/pako": "2.0.4",
+    "@types/three": "0.183.1",
+    "dotenv": "17.3.1",
+    "prisma": "7.4.1",
+    "tailwindcss": "4.1.18"
   }
 }

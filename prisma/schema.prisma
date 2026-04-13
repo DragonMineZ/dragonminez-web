@@ -1,0 +1,51 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id_user    Int    @id @default(autoincrement())
+  clerk_id   String @unique
+  username   String @unique
+  email      String @unique
+  avatar_url String
+  hairs      Hair[]
+  likes      Like[]
+}
+
+model Hair {
+  id_hair     Int        @id @default(autoincrement())
+  name        String
+  code        String     @db.Text
+  image_url   String
+  description String?
+  created_at  DateTime   @default(now())
+  artistId    Int
+  artist      User       @relation(fields: [artistId], references: [id_user], onDelete: Cascade)
+  likes       Like[]
+  categories  Category[] @relation("CategoryToHair")
+
+  @@index([created_at])  // ORDER BY created_at (recent / oldest sort)
+  @@index([artistId])    // WHERE artistId = ? (myCreations filter)
+}
+
+model Category {
+  id_category Int     @id @default(autoincrement())
+  description String?
+  hairs       Hair[]  @relation("CategoryToHair")
+}
+
+model Like {
+  id_user Int
+  id_hair Int
+  // onDelete: Cascade — deleting a Hair removes its Likes; deleting a User removes their Likes
+  hair    Hair @relation(fields: [id_hair], references: [id_hair], onDelete: Cascade)
+  user    User @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+
+  @@id([id_user, id_hair])
+  @@index([id_hair])  // COUNT(*) GROUP BY id_hair — used in sort=likes and _count aggregation
+  @@index([id_user])  // WHERE id_user = ? — used to fetch is_liked_by_user per request
+}

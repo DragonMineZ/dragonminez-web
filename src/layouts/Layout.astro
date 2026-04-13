@@ -1,13 +1,156 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import FloatingMenu from "../components/ui/FloatingMenu";
+
+import '@fontsource-variable/onest';
+import "../styles/global.css";
+
+export interface Props {
+  title?: string;
+  i18nTitle?: string;
+  description?: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+const { 
+  title = "DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft", 
+  i18nTitle,
+  description = "Únete a DragonMineZ, el mod de Dragon Ball Z líder para Minecraft. Personaliza tu pelo 3D, combate con ki, descubre transformaciones y enfréntate a las mejores raids.",
+  noindex = false,
+  ogImage = "/images/og-default.png"
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html class="dark" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- ── SEO & Metadata -->
+    <title>{title}</title>
+    {i18nTitle && <span id="page-i18n-title" data-i18n={i18nTitle} class="hidden"></span>}
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- ── Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.url)} />
+
+    <!-- ── Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(ogImage, Astro.url)} />
+
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        return 'dark';
+      })();
+    
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+
+    <!-- ── Google Fonts Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" media="print" onload={`this.onload=null;this.media='all'`} href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    </noscript>
+
+    <!-- ── FontAwesome Resource Hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" media="print" onload={`this.onload=null;this.media='all'`} href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <noscript>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </noscript>
+
+  </head>
+  <body class="bg-background text-foreground selection:bg-foreground/10">
+    <Header />
+    <slot />
+    <Footer />
+    <FloatingMenu client:idle />
+
+    <script>
+      import { i18nStore } from "../i18n/store";
+
+      function updateI18nElements() {
+        const { translations, isLoaded } = i18nStore.getState();
+        if (!isLoaded || !translations) return;
+
+        // ── Page Title
+        const pageTitleData = document.getElementById('page-i18n-title');
+        if (pageTitleData) {
+          const path = pageTitleData.getAttribute('data-i18n');
+          const keys = path.split('.');
+          let value = translations;
+          for (const key of keys) {
+            value = value && value[key];
+          }
+          if (typeof value === 'string') {
+            document.title = value;
+          }
+        }
+
+        const elements = document.querySelectorAll('[data-i18n]');
+        elements.forEach((el) => {
+          const path = el.getAttribute('data-i18n');
+          if (!path) return;
+
+          const keys = path.split('.');
+          let value: any = translations;
+          
+          for (const key of keys) {
+            if (value && typeof value === 'object' && key in value) {
+              value = value[key];
+            } else {
+              value = path;
+              break;
+            }
+          }
+
+          if (typeof value === 'string') {
+            // Support for placeholder attribute if requested
+            if (el.hasAttribute('data-i18n-placeholder')) {
+              el.setAttribute('placeholder', value);
+            } else {
+              el.textContent = value;
+            }
+          }
+        });
+      }
+
+      // Initial update
+      updateI18nElements();
+
+      i18nStore.subscribe(updateI18nElements);
+
+      document.addEventListener('astro:page-load', () => {
+        updateI18nElements();
+        i18nStore.subscribe(updateI18nElements);
+      });
+    </script>
+  </body>
 </html>

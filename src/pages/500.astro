@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="500 - Error de Energía">
+  <main class="min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden relative">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-error/5 rounded-full blur-[150px] -z-10 animate-pulse-subtle"></div>
+
+    <div class="container-base flex flex-col items-center text-center">
+      <div class="relative mb-8">
+        <span class="text-[12rem] font-black leading-none text-foreground/5 select-none md:text-[16rem]">
+          500
+        </span>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <i class="fa-solid fa-bolt-lightning text-6xl text-error drop-shadow-glow-orange"></i>
+        </div>
+      </div>
+
+      <h1 
+        class="text-4xl md:text-5xl font-bold mb-4 tracking-tight"
+        data-i18n="errors.title500"
+      >
+        500 - Error de Energía
+      </h1>
+      
+      <p 
+        class="text-muted text-lg max-w-md mb-10 leading-relaxed"
+        data-i18n="errors.desc500"
+      >
+        Parece que hubo una sobrecarga en nuestros servidores. Por favor, intenta de nuevo más tarde.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button 
+          onclick="window.location.reload()"
+          class="px-8 py-4 bg-surface-elevated border border-glass text-foreground font-bold rounded-2xl hover:bg-glass transition-all active:scale-95 shadow-glass"
+          data-i18n="common.error"
+        >
+          Reintentar
+        </button>
+        <a 
+          href="/" 
+          class="px-8 py-4 bg-foreground text-background font-bold rounded-2xl hover:scale-105 transition-all active:scale-95 shadow-hero hover:shadow-glow-strong"
+          data-i18n="errors.goHome"
+        >
+          Volver al Inicio
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    background: radial-gradient(circle at center, var(--surface) 0%, var(--background) 100%);
+  }
+</style>

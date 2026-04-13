@@ -31,6 +31,11 @@ export default defineConfig({
   vite: {
 
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@': '/src'
+      }
+    },
     ssr: {
       external: ['@prisma/client', '.prisma/client']
     },

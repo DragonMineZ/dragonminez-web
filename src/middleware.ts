@@ -58,7 +58,7 @@ const withRateLimit: MiddlewareHandler = async (context, next) => {
 };
 
 // ── Clerk Auth
-const withClerkAuth = clerkMiddleware((auth, context) => {
+const clerk = clerkMiddleware((auth, context) => {
     const { userId, redirectToSignIn } = auth();
     if (isProtectedRoute(context.request) && !userId) {
         return redirectToSignIn();
@@ -69,5 +69,13 @@ const withClerkAuth = clerkMiddleware((auth, context) => {
         "http://localhost:4321"
     ],
 });
+
+const withClerkAuth: MiddlewareHandler = (context, next) => {
+    // Saltarse Clerk Auth para webhooks (se validan internamente con su firma)
+    if (context.url.pathname.startsWith("/api/webhooks/")) {
+        return next();
+    }
+    return clerk(context, next);
+};
 
 export const onRequest = sequence(withSecurityHeaders, withRateLimit, withClerkAuth);

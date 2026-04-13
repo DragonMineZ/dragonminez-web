@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+bun.lockb
+bun.lock
+
+# Build outputs
+dist/
+.astro/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Version control
+.git/
+.gitignore
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.log
+
+# Docker
+Dockerfile
+.dockerignore

@@ -115,6 +115,7 @@ export interface Translations {
     unlike: string;
     author: string;
     categoryNormal: string;
+    itemsPerPage: string;
   };
   footer: {
     rights: string;

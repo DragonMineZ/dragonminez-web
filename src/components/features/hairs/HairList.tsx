@@ -5,8 +5,9 @@ import SearchBar from "../../ui/SearchBar";
 import FilterDropdown from "../../ui/FilterDropdown";
 import CreateHairTrigger from "./CreateHairTrigger";
 import SuccessAlert from "../../ui/SuccessAlert";
-import Pagination from "../../ui/Pagination";
 import Button from "../../ui/Button";
+import Pagination from "../../ui/Pagination";
+import ItemsPerPageSelector from "../../ui/ItemsPerPageSelector";
 import { useHairs } from "../../../hooks/useHairs";
 import { filterHairs, sortHairs } from "../../../lib/hairFilters";
 import { useLanguage } from "../../../i18n";
@@ -33,11 +34,11 @@ export default function HairList() {
   const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, sortBy, showMyCreations]);
+  }, [searchQuery, selectedCategory, sortBy, showMyCreations, itemsPerPage]);
 
   const handleDelete = async (id: number) => {
     const token = await getToken();
@@ -164,14 +165,22 @@ export default function HairList() {
         </div>
       )}
 
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+      {/* Paginación y Selector de items por página */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
+        <ItemsPerPageSelector
+          currentValue={itemsPerPage}
+          options={[10, 25, 50]}
+          onSelect={setItemsPerPage}
         />
-      )}
+        
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
+      </div>
 
       <SuccessAlert
         show={successAlert.show}

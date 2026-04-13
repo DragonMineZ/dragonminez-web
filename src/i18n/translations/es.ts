@@ -115,6 +115,7 @@ const es: Translations = {
     unlike: "Eliminado de tus favoritos",
     author: "Autor",
     categoryNormal: "Normal",
+    itemsPerPage: "Elementos por página",
   },
   footer: {
     rights: "DragonMineZ | Fair Use",

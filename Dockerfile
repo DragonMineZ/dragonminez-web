@@ -45,4 +45,4 @@ ENV HOST=0.0.0.0
 ENV PORT=4321
 
 EXPOSE 4321
-CMD ["bun", "run", "start"]
+CMD ["bun", "prisma", "migrate", "deploy", "&&", "bun", "run", "start"]

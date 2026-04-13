@@ -12,16 +12,18 @@ COPY . .
 ARG PUBLIC_CLERK_PUBLISHABLE_KEY
 ARG PUBLIC_APP_URL
 ARG CLERK_SECRET_KEY
+ARG DATABASE_URL
 ENV PUBLIC_CLERK_PUBLISHABLE_KEY=$PUBLIC_CLERK_PUBLISHABLE_KEY
 ENV PUBLIC_APP_URL=$PUBLIC_APP_URL
 ENV CLERK_SECRET_KEY=$CLERK_SECRET_KEY
+ENV DATABASE_URL=$DATABASE_URL
 
 # ── Desactivar telemetría y limitar memoria
 ENV ASTRO_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # ── Generar cliente Prisma y compilar
-RUN DATABASE_URL="postgresql://placeholder:5432/db" bun prisma generate
+RUN bun prisma generate
 RUN bun run build
 
 # ── Runtime

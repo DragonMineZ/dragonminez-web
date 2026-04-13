@@ -30,3 +30,4 @@ jobs:
             PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
             PUBLIC_APP_URL=${{ secrets.PUBLIC_APP_URL }}
             CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}

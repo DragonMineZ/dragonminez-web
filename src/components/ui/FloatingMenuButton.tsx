@@ -17,7 +17,6 @@ export const FloatingMenuButton = React.forwardRef<HTMLButtonElement, FloatingMe
             option: "bg-foreground text-background border border-glass shadow-glass rounded-[1.25rem] hover:rounded-full hover:opacity-90 hover:border-glass-strong w-12 h-12"
         };
 
-        // Micro-animation: Fill 1 when active OR hovered. Fill 0 normally.
         const fillStyle = variant === 'mainActive'
             ? "[font-variation-settings:'FILL'_1]"
             : "group-hover/fab:[font-variation-settings:'FILL'_1] [font-variation-settings:'FILL'_0]";

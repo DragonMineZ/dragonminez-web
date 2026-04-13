@@ -11,7 +11,7 @@ const PUBLIC_CACHE = {
     "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
 };
 
-// ── Handlers: GET
+// ── Handlers
 export const GET: APIRoute = async ({ params }) => {
     const hairId = parseId(params.id);
     if (!hairId) return badRequest("Hair id must be a positive integer");
@@ -26,7 +26,6 @@ export const GET: APIRoute = async ({ params }) => {
     }
 };
 
-// ── Handlers: PATCH
 export const PATCH = withAuth(async ({ params, request }, userId) => {
     const hairId = parseId(params.id);
     if (!hairId) return badRequest("Hair id must be a positive integer");
@@ -51,7 +50,6 @@ export const PATCH = withAuth(async ({ params, request }, userId) => {
     }
 });
 
-// ── Handlers: DELETE
 export const DELETE = withAuth(async ({ params }, userId) => {
     const hairId = parseId(params.id);
     if (!hairId) return badRequest("Hair id must be a positive integer");

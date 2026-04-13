@@ -15,6 +15,8 @@ class I18nStore {
   private listeners: Set<Listener> = new Set();
   private loadingPromise: Promise<void> | null = null;
 
+// ── Ciclo de Vida
+
   constructor() {
     this.state = {
       language: this.getInitialLanguage(),
@@ -22,7 +24,6 @@ class I18nStore {
       isLoaded: false,
     };
     
-    // Auto-load initial language on client
     if (typeof window !== 'undefined') {
       this.loadTranslations(this.state.language);
     }
@@ -57,7 +58,6 @@ class I18nStore {
   }
 
   async loadTranslations(lang: Language) {
-    // Avoid double loading the same thing
     if (this.loadingPromise && this.state.language === lang) return this.loadingPromise;
 
     this.loadingPromise = (async () => {
@@ -78,7 +78,6 @@ class I18nStore {
         this.notify();
       } catch (error) {
         console.error(`[i18n] Failed to load "${lang}":`, error);
-        // Fallback
         if (lang !== 'es') {
           await this.loadTranslations('es');
         }
@@ -102,5 +101,4 @@ class I18nStore {
   }
 }
 
-// Global singleton to share state across islands in the client
 export const i18nStore = new I18nStore();

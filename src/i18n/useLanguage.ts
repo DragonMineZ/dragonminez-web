@@ -4,21 +4,17 @@ import { i18nStore } from './store';
 import type { Language } from './types';
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  const [storeState, setStoreState] = useState(i18nStore.getState());
+// ── Estado
+    const context = useContext(LanguageContext);
+    const [storeState, setStoreState] = useState(i18nStore.getState());
 
-  // Subscribe to the store only if we are NOT inside a provider
-  useEffect(() => {
-    if (context) return;
-    return i18nStore.subscribe(setStoreState);
-  }, [context]);
+// ── Efectos
+    useEffect(() => {
+      if (context) return;
+      return i18nStore.subscribe(setStoreState);
+    }, [context]);
 
-  // If we have a context, we use its optimized (memoized) values
-  if (context) {
-    return context;
-  }
-
-  // Fallback for isolated islands:
+// ── Handlers
   const setLanguage = (lang: Language) => {
     i18nStore.setLanguage(lang);
   };

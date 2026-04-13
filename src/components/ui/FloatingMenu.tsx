@@ -6,13 +6,13 @@ import SuccessAlert from './SuccessAlert';
 import { useLanguage } from '../../i18n';
 
 export function FloatingMenu() {
+// ── Estado
     const { language, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
     const isFirstRender = useRef(true);
-    // ... rest of state stays the same
 
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const [isClient, setIsClient] = useState(false);
@@ -23,7 +23,7 @@ export function FloatingMenu() {
     useEffect(() => {
         setIsClient(true);
         const savedTheme = localStorage.getItem('theme');
-        const theme = savedTheme ? savedTheme === 'dark' : true; // Default to true (dark) if no saved theme
+        const theme = savedTheme ? savedTheme === 'dark' : true;
         setIsDark(theme);
         if (theme) {
             document.documentElement.classList.add('dark');
@@ -35,7 +35,6 @@ export function FloatingMenu() {
         if (savedPos) {
             try {
                 const parsed = JSON.parse(savedPos);
-                // Ensure it's not off-screen if window was resized while closed
                 const safeX = Math.min(Math.max(10, parsed.x), window.innerWidth - 70);
                 const safeY = Math.min(Math.max(10, parsed.y), window.innerHeight - 70);
                 setPosition({ x: safeX, y: safeY });
@@ -45,7 +44,6 @@ export function FloatingMenu() {
         }
 
         const handleResize = () => {
-            // Re-adjust position on window resize to avoid losing the button
             setPosition(prev => {
                 if (!prev) return prev;
                 return {
@@ -78,9 +76,8 @@ export function FloatingMenu() {
     };
 
     const handlePointerDown = (e: React.PointerEvent) => {
-        // Start Drag Tracking
         e.preventDefault();
-        if (e.button !== 0) return; // Left/Main touch only
+        if (e.button !== 0) return;
 
         setIsDragging(false);
 
@@ -114,7 +111,6 @@ export function FloatingMenu() {
         const currentX = position?.x ?? 0;
         const currentY = position?.y ?? 0;
 
-        // Drag threshold
         const moveX = Math.abs(e.clientX - (currentX + dragOffset.current.x));
         const moveY = Math.abs(e.clientY - (currentY + dragOffset.current.y));
         if (moveX > 3 || moveY > 3) {
@@ -129,8 +125,7 @@ export function FloatingMenu() {
             let newX = e.clientX - dragOffset.current.x;
             let newY = e.clientY - dragOffset.current.y;
 
-            // Boundaries
-            const maxX = window.innerWidth - 60; // 56px + some margin
+            const maxX = window.innerWidth - 60;
             const maxY = window.innerHeight - 60;
             newX = Math.max(10, Math.min(newX, maxX));
             newY = Math.max(10, Math.min(newY, maxY));
@@ -143,9 +138,7 @@ export function FloatingMenu() {
         if (menuRef.current) {
             menuRef.current.releasePointerCapture(e.pointerId);
         }
-
         if (!isDragging) {
-            // Treat as click
             if (isOpen) {
                 setIsOpen(false);
                 setIsLangOpen(false);
@@ -153,27 +146,23 @@ export function FloatingMenu() {
                 setIsOpen(true);
             }
         } else if (position) {
-            // Store new position
             localStorage.setItem('floating-menu-pos', JSON.stringify(position));
         }
 
-        // Small delay to prevent accidental click bindings
         setTimeout(() => setIsDragging(false), 50);
     };
 
-    if (!isClient) return null; // Avoid Hydration mismatch
+    if (!isClient) return null;
 
     return (
         <div
             className={`fixed z-[9999] flex flex-col items-center justify-end ${!position ? 'bottom-6 right-6' : ''}`}
             style={position ? { left: position.x, top: position.y, touchAction: 'none' } : { touchAction: 'none' }}
         >
-            {/* Options container (appears above main button) */}
             <div
                 className={`flex flex-col gap-3 mb-4 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-50 pointer-events-none'
                     }`}
             >
-                {/* Theme Toggle Button */}
                 <Tooltip content={isDark ? t('floatingMenu.themeLight') : t('floatingMenu.themeDark')} position="top">
                     <FloatingMenuButton
                         onClick={toggleTheme}
@@ -182,7 +171,6 @@ export function FloatingMenu() {
                     />
                 </Tooltip>
 
-                {/* Language Button with expanding options list */}
                 <div className="relative flex items-center justify-end">
                     <FloatingLanguageSelector isOpen={isLangOpen} />
                     <Tooltip content={t('floatingMenu.language')} position="top">
@@ -195,7 +183,6 @@ export function FloatingMenu() {
                 </div>
             </div>
 
-            {/* Main Draggable FAB */}
             <div className="touch-none" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
                 <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')} position="top">
                     <FloatingMenuButton
@@ -203,7 +190,7 @@ export function FloatingMenu() {
                         iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
                         icon="settings"
                         variant={isOpen ? 'mainActive' : 'main'}
-                        style={{ pointerEvents: 'none' }} // Div detects events for better dragging compatibility
+                        style={{ pointerEvents: 'none' }}
                     />
                 </Tooltip>
             </div>

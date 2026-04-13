@@ -13,7 +13,7 @@ const PUBLIC_CACHE = {
     "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
 };
 
-// ── Handlers: GET
+// ── Handlers
 export const GET: APIRoute = async ({ request, locals }) => {
 
     const { userId } = locals.auth();
@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         artistId: myCreations && dbUserId ? dbUserId : undefined,
     };
 
-    // ── Cache: Anónimo
+    // ── Cache
     if (!userId && !myCreations) {
         const cacheKey = url.search || "?";
         const cached = hairsCache.get(cacheKey);
@@ -80,7 +80,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 };
 
-// ── Handlers: POST
 export const POST = withAuth(async ({ request }, userId) => {
     let body: unknown;
     try {

@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/astro/react";
 import type { Category, Hair } from "../types/hair";
 
 export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
+// ── Estado
     const { isLoaded, isSignedIn, getToken } = useAuth();
     const [loading, setLoading] = useState(false);
     const [fetchingUser, setFetchingUser] = useState(true);
@@ -34,11 +35,11 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         }
     };
 
+// ── Efectos
     useEffect(() => {
         const fetchData = async () => {
             if (isLoaded && isSignedIn) {
                 const token = await getToken();
-                // Fetch User
                 const userRes = await fetch("/api/users/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -46,7 +47,6 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
                     const user = await userRes.json();
                     setCurrentUser(user);
                 }
-                // Fetch Categories
                 try {
                     const catRes = await fetch("/api/categories");
                     if (catRes.ok) {
@@ -106,6 +106,7 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         return Object.keys(newErrors).length === 0;
     };
 
+// ── Handlers
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         

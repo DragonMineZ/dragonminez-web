@@ -24,16 +24,13 @@ export default function Modal({ isOpen, onClose, children, showCloseButton = tru
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal Container */}
             <div className="relative w-full max-w-3xl animate-in fade-in zoom-in duration-200">
                 <div className="flex flex-col relative overflow-hidden rounded-[32px] border border-glass-strong bg-background shadow-2xl shadow-foreground/10 ring-1 ring-white/5 max-h-[85vh]">
-                    {/* Header/Close Button (Overlay) */}
                     {showCloseButton && (
                         <button
                             onClick={onClose}

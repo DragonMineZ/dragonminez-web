@@ -11,49 +11,42 @@ import img5 from "../assets/carousel/5.png";
     <div id="carousel-container" class="relative aspect-square md:aspect-[21/9] rounded-[2rem] overflow-hidden border border-glass shadow-hero bg-black/20">
         <div id="carousel-track" class="flex h-full will-change-transform">
 
-            <!-- Clon del último slide -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img5} alt="Clone Last" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Slide 1 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img1} alt="DragonMineZ Gallery 1" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Slide 2 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img2} alt="DragonMineZ Gallery 2" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Slide 3 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img3} alt="DragonMineZ Gallery 3" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Slide 4 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img4} alt="DragonMineZ Gallery 4" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Slide 5 -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img5} alt="DragonMineZ Gallery 5" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
                 </div>
             </div>
 
-            <!-- Clon del primer slide -->
             <div class="carousel-slide w-full h-full flex-shrink-0">
                 <div class="overflow-hidden w-full h-full">
                     <Image src={img1} alt="Clone First" format="webp" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" />
@@ -63,7 +56,7 @@ import img5 from "../assets/carousel/5.png";
         </div>
     </div>
 
-    <!-- Navigation Arrows -->
+    <!-- ── Navegación -->
     <button id="carousel-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-xl border border-glass-strong rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:text-black hover:scale-110 z-10">
         <i class="fa-solid fa-chevron-left"></i>
     </button>
@@ -71,7 +64,7 @@ import img5 from "../assets/carousel/5.png";
         <i class="fa-solid fa-chevron-right"></i>
     </button>
 
-    <!-- Indicators -->
+    <!-- ── Indicadores -->
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         <button class="carousel-indicator w-3 h-3 rounded-full bg-white transition-all duration-300" data-index="0"></button>
         <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 transition-all duration-300" data-index="1"></button>

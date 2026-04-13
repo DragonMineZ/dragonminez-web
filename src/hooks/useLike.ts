@@ -6,13 +6,14 @@ export function useLike(
     initialIsLiked: boolean,
     onLikeToggle?: (hairId: number, liked: boolean) => void
 ) {
+// ── Estado
     const { getToken, isSignedIn } = useAuth();
     const [isLiked, setIsLiked] = useState(initialIsLiked);
 
+// ── Handlers
     const toggleLike = async () => {
         if (!isSignedIn) return { success: false, requireAuth: true };
 
-        // Capture state before optimistic update so we can rollback correctly
         const currentlyLiked = isLiked;
         const newLikedState = !currentlyLiked;
 
@@ -21,7 +22,6 @@ export function useLike(
 
         try {
             const token = await getToken();
-            // PUT gives a like (idempotent), DELETE removes it (idempotent)
             const method = currentlyLiked ? "DELETE" : "PUT";
             const res = await fetch(`/api/hairs/${hairId}/like`, {
                 method,
@@ -31,10 +31,8 @@ export function useLike(
             if (res.ok) {
                 return { success: true, isLiked: newLikedState };
             } else {
-                // Rollback optimistic update on failure
                 setIsLiked(currentlyLiked);
                 if (onLikeToggle) onLikeToggle(hairId, currentlyLiked);
-                // Read the server error message so callers can surface it
                 const data = await res.json().catch(() => ({}));
                 return { success: false, requireAuth: false, errorMessage: data.error as string | undefined };
             }

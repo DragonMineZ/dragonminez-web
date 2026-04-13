@@ -4,7 +4,6 @@ export async function findUserByClerkId(clerkId: string) {
     return prisma.user.findUnique({ where: { clerk_id: clerkId } });
 }
 
-/** Returns user fields safe for external consumption (excludes clerk_id). */
 export async function findUserProfile(clerkId: string) {
     return prisma.user.findUnique({
         where: { clerk_id: clerkId },

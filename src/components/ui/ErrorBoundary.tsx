@@ -9,10 +9,6 @@ interface State {
   hasError: boolean;
 }
 
-/**
- * Capture runtime errors in React Islands to prevent total page crash.
- * Styled according to DragonMineZ design system.
- */
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false

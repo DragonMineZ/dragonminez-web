@@ -22,7 +22,6 @@ export default function ErrorAlert({ message, show, onClose, duration = 4000 }: 
     return (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] animate-in fade-in slide-in-from-bottom-8 duration-500 cubic-bezier(0.16, 1, 0.3, 1)">
             <div className="flex items-center bg-[#8B0000] border border-white/10 rounded-full overflow-hidden shadow-2xl">
-                {/* Text & Icon Section */}
                 <div className="flex items-center py-3.5 pl-8 pr-4 gap-3">
                     <span className="material-symbols-outlined text-white/90 text-[22px] [font-variation-settings:'wght'_600]">
                         report
@@ -32,7 +31,6 @@ export default function ErrorAlert({ message, show, onClose, duration = 4000 }: 
                     </p>
                 </div>
 
-                {/* Close Button - Perfectly Centered */}
                 <button 
                   onClick={onClose}
                   className="w-12 h-12 flex items-center justify-center transition-all hover:bg-black/10 border-l border-white/5"

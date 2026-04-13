@@ -2,10 +2,6 @@ import * as HairRepo from "../repositories/hair.repository";
 import type { HairQueryParams } from "../repositories/hair.repository";
 import { forbidden, notFound } from "../lib/api/response";
 
-/**
- * Fetches a paginated list of hairs with server-side filtering and sorting.
- * Computes `is_liked_by_user` and `isOwner` before stripping internal fields.
- */
 export async function getAllHairs(dbUserId: number | null, params: HairQueryParams) {
     const { hairs: rawHairs, total, page, limit } = await HairRepo.findHairsPaginated(
         dbUserId,
@@ -13,7 +9,6 @@ export async function getAllHairs(dbUserId: number | null, params: HairQueryPara
     );
 
     const data = rawHairs.map((h) => {
-        // Destructure internal/Prisma fields before spreading into the public response
         const { likes, artistId, ...rest } = h as typeof h & {
             likes?: unknown[];
             artistId: number;
@@ -39,14 +34,12 @@ export async function getAllHairs(dbUserId: number | null, params: HairQueryPara
 export async function getHairById(id: number) {
     const hair = await HairRepo.findHairById(id);
     if (!hair) return null;
-    // Strip the internal FK from the public response
     const { artistId: _artistId, ...rest } = hair as typeof hair & { artistId: number };
     return rest;
 }
 
 export async function createHair(data: HairRepo.CreateHairData) {
     const hair = await HairRepo.createHair(data);
-    // Strip artistId from the creation response as well
     const { artistId: _artistId, ...rest } = hair as typeof hair & { artistId: number };
     return rest;
 }

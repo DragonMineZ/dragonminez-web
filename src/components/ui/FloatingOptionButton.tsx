@@ -8,7 +8,6 @@ export interface FloatingOptionButtonProps extends React.ButtonHTMLAttributes<HT
 
 export const FloatingOptionButton = React.forwardRef<HTMLButtonElement, FloatingOptionButtonProps>(
     ({ icon, title, className, iconClassName = '', onClick, ...props }, ref) => {
-        // Micro-animation: Fill 1 when hovered. Fill 0 normally.
         const fillStyle = "group-hover/fab:[font-variation-settings:'FILL'_1] [font-variation-settings:'FILL'_0]";
 
         return (

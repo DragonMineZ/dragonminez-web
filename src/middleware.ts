@@ -6,10 +6,7 @@ import { readLimiter, writeLimiter, likeLimiter } from "./lib/api/cache";
 
 const isProtectedRoute = createRouteMatcher(["/createhair"]);
 
-/**
- * Injects security headers into every response.
- * Placed first in the sequence so headers are present even on Clerk redirects.
- */
+// ── Security
 const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
     const response = await next();
     response.headers.set("X-Content-Type-Options", "nosniff");
@@ -18,22 +15,12 @@ const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
     return response;
 };
 
-/**
- * Per-IP sliding window rate limiter for all /api/* routes.
- *
- * Limits:
- *   GET endpoints      → 60 req/min (readLimiter)
- *   Mutation endpoints → 20 req/min (writeLimiter)
- *   Like toggles       → 30 req/min (likeLimiter)
- *   Webhooks           → bypassed (Clerk signature verification handles security)
- */
+// ── Rate Limit
 const withRateLimit: MiddlewareHandler = async (context, next) => {
     const url = new URL(context.request.url);
 
-    // Only enforce on API routes
     if (!url.pathname.startsWith("/api/")) return next();
 
-    // Webhooks are verified cryptographically — skip rate limit
     if (url.pathname.startsWith("/api/webhooks/")) return next();
 
     const ip =
@@ -70,10 +57,7 @@ const withRateLimit: MiddlewareHandler = async (context, next) => {
     return next();
 };
 
-/**
- * Enforces auth redirects for front-end protected pages.
- * API route auth is enforced per-endpoint via withAuth().
- */
+// ── Clerk Auth
 const withClerkAuth = clerkMiddleware((auth, context) => {
     const { userId, redirectToSignIn } = auth();
     if (isProtectedRoute(context.request) && !userId) {

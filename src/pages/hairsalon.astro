@@ -13,9 +13,7 @@ import {
 const { userId } = Astro.locals.auth();
 let username = "";
 
-// Categories come from SSR for instant availability in HairList filters.
-// Username is fetched from our local DB (not the Clerk SDK) — avoids an
-// extra round-trip to Clerk's servers and respects the repository pattern.
+// ── Datos (SSR)
 const categories = await getAllCategories();
 
 if (userId) {
@@ -57,7 +55,6 @@ if (userId) {
       </SignedIn>
     </div>
 
-    <!-- HairList React Island — categories pre-loaded from SSR, hairs fetched client-side -->
     <HairList client:load initialCategories={categories} />
 
   </section>

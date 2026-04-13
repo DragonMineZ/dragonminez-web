@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useClipboard } from './useClipboard';
 
 export function useHairViewer(initialCode: string, initialName: string = '') {
+// ── Estado
     const [code, setCode] = useState(initialCode);
     const [hairName, setHairName] = useState(initialName);
     const [headY, setHeadY] = useState(0.25);
@@ -13,14 +14,14 @@ export function useHairViewer(initialCode: string, initialName: string = '') {
 
     const { copied, copy } = useClipboard();
 
-    // Sync state with initialCode/initialName prop (Astro hydration support)
+// ── Efectos
     useEffect(() => {
         if (initialCode) setCode(initialCode);
         if (initialName) setHairName(initialName);
     }, [initialCode, initialName]);
 
+// ── Handlers
     const handleRenderReset = useCallback(() => {
-        // Reset debug offsets/scales but keep code and color
         setHeadY(0.25);
         setHeadScaleX(1);
         setHeadScaleY(1);
@@ -38,7 +39,6 @@ export function useHairViewer(initialCode: string, initialName: string = '') {
     }, []);
 
     return {
-        // State
         code,
         setCode,
         hairName,
@@ -57,7 +57,6 @@ export function useHairViewer(initialCode: string, initialName: string = '') {
         setCustomColor,
         copied,
 
-        // Actions
         handleRenderReset,
         handleCopy,
         handleResetColor

@@ -18,7 +18,6 @@ export interface Hair {
     artist: Artist;
     categories?: Category[];
     is_liked_by_user?: boolean;
-    /** Whether the authenticated user owns this hair. Computed server-side. */
     isOwner?: boolean;
     _count?: {
         likes: number;

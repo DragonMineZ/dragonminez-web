@@ -10,11 +10,7 @@ export interface HairFetchParams {
     limit?: number;
 }
 
-/**
- * Manages server-side fetching of hairs with full pagination support.
- * All filtering, sorting, and pagination happen on the server.
- * The `fetchHairs` function is the single source of truth for data loading.
- */
+// ── Estado
 export function useHairs(initialCategories: Category[] = []) {
     const [hairs, setHairs] = useState<Hair[]>([]);
     const [meta, setMeta] = useState<HairMeta>({
@@ -27,6 +23,7 @@ export function useHairs(initialCategories: Category[] = []) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+// ── Handlers
     const fetchHairs = useCallback(async (params: HairFetchParams = {}) => {
         setLoading(true);
         setError(null);
@@ -53,10 +50,6 @@ export function useHairs(initialCategories: Category[] = []) {
         }
     }, []);
 
-    /**
-     * Optimistically updates the like state for a hair without refetching.
-     * The actual server state is authoritative; this is for immediate UI feedback.
-     */
     const handleLikeToggleLocally = useCallback((hairId: number, liked: boolean) => {
         setHairs((prev) =>
             prev.map((h) => {

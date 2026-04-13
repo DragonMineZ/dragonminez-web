@@ -26,7 +26,7 @@ export default function ConfirmDialog({
     const { t } = useLanguage();
     
     const displayTitle = title || t('hairSalon.deleteConfirmTitle');
-    const displayDescription = description || t('common.error'); // Fallback to common error if not provided
+    const displayDescription = description || t('common.error');
     const displayConfirmLabel = confirmLabel || t('common.confirm');
     const displayCancelLabel = cancelLabel || t('common.cancel');
 

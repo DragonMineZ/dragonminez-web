@@ -45,7 +45,7 @@ export function DownloadDropdown({
         },
         {
             name: 'Modrinth',
-            url: '#', // Placeholder as per Footer.astro
+            url: '#',
             icon: modrinthIcon
         }
     ];

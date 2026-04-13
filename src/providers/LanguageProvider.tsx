@@ -13,19 +13,20 @@ interface LanguageContextType {
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, setState] = useState(i18nStore.getState());
+// ── Estado
+    const [state, setState] = useState(i18nStore.getState());
 
-  // Subscribe to Global Store Updates
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    return i18nStore.subscribe(setState);
-  }, []);
+// ── Efectos
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      return i18nStore.subscribe(setState);
+    }, []);
 
   const setLanguage = useCallback((lang: Language) => {
     i18nStore.setLanguage(lang);
   }, []);
 
-  // Memoized t function
+// ── Handlers
   const t = useCallback((path: string): string => {
     const translations = state.translations;
     if (!translations) return path;

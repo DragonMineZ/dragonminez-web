@@ -13,6 +13,7 @@ const es: Translations = {
     confirm: "Confirmar",
     back: "Volver",
     platform: "Plataforma",
+    connectionError: "Error de conexión con el servidor",
   },
   nav: {
     download: "Descargar",
@@ -116,6 +117,8 @@ const es: Translations = {
     author: "Autor",
     categoryNormal: "Normal",
     itemsPerPage: "Elementos por página",
+    createError: "Error al publicar el cabello",
+    updateError: "Error al actualizar el cabello",
   },
   footer: {
     rights: "DragonMineZ | Fair Use",
@@ -140,6 +143,17 @@ const es: Translations = {
     title500: "500 - Error de Energía",
     desc500: "Parece que hubo una sobrecarga en nuestros servidores. Por favor, intenta de nuevo más tarde.",
     goHome: "Volver al Inicio",
+    api: {
+      alreadyExists: "Este registro ya existe",
+      recordNotFound: "Registro no encontrado. Si es tu primera acción, intenta cerrar sesión e iniciar de nuevo.",
+      invalidReference: "Uno o más IDs de referencia no existen",
+      databaseError: "Error de base de datos",
+      serverError: "Error inesperado del servidor",
+      unauthorized: "No tienes permiso para realizar esta acción",
+      badRequest: "Solicitud incorrecta",
+      hairNotFound: "Cabello no encontrado",
+      notOwned: "No eres el dueño de este diseño",
+    },
   },
   viewer: {
     title: "Visor 3D | DragonMineZ",

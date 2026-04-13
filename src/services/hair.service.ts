@@ -52,9 +52,9 @@ export async function updateHair(
     data: HairRepo.UpdateHairData
 ): Promise<ServiceResult<Omit<Awaited<ReturnType<typeof HairRepo.updateHair>>, "artistId">>> {
     const existing = await HairRepo.findHairWithArtist(hairId);
-    if (!existing) return { error: notFound("Hair not found") };
+    if (!existing) return { error: notFound("errors.api.hairNotFound") };
     if (existing.artist.clerk_id !== clerkId) {
-        return { error: forbidden("You do not own this hair") };
+        return { error: forbidden("errors.api.notOwned") };
     }
     const updated = await HairRepo.updateHair(hairId, data);
     const { artistId: _artistId, ...rest } = updated as typeof updated & { artistId: number };
@@ -66,9 +66,9 @@ export async function removeHair(
     clerkId: string
 ): Promise<ServiceResult<{ message: string }>> {
     const existing = await HairRepo.findHairWithArtist(hairId);
-    if (!existing) return { error: notFound("Hair not found") };
+    if (!existing) return { error: notFound("errors.api.hairNotFound") };
     if (existing.artist.clerk_id !== clerkId) {
-        return { error: forbidden("You do not own this hair") };
+        return { error: forbidden("errors.api.notOwned") };
     }
     await HairRepo.deleteHair(hairId);
     return { data: { message: "Hair deleted successfully" } };

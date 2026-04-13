@@ -4,19 +4,12 @@ import { badRequest, conflict, serverError } from "./response";
 export function handlePrismaError(err: unknown): Response {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
         switch (err.code) {
-            case "P2002": {
-                const targets = Array.isArray(err.meta?.target)
-                    ? (err.meta.target as string[]).join(", ")
-                    : "a field";
-                return conflict(`${targets} already exists`);
-            }
+            case "P2002":
+                return conflict("errors.api.alreadyExists");
             case "P2025":
-                return badRequest(
-                    "Referenced record not found. If this is your first action on this account, " +
-                    "please sign out and back in to sync your profile."
-                );
+                return badRequest("errors.api.recordNotFound");
             case "P2003":
-                return badRequest("One or more referenced IDs do not exist");
+                return badRequest("errors.api.invalidReference");
             default:
                 console.error(JSON.stringify({
                     timestamp: new Date().toISOString(),
@@ -26,7 +19,7 @@ export function handlePrismaError(err: unknown): Response {
                     message: err.message,
                     meta: err.meta
                 }));
-                return serverError("Database error");
+                return serverError("errors.api.databaseError");
         }
     }
 
@@ -40,7 +33,7 @@ export function handlePrismaError(err: unknown): Response {
             stack: err.stack
         } : err
     }));
-    return serverError("Unexpected server error");
+    return serverError("errors.api.serverError");
 }
 
 

@@ -85,7 +85,7 @@ export const POST = withAuth(async ({ request }, userId) => {
     try {
         body = await request.json();
     } catch {
-        return badRequest("Could not parse request body as JSON");
+        return badRequest("errors.api.badRequest");
     }
 
     const validation = validateBody(createHairSchema, body);

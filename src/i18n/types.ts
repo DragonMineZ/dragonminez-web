@@ -13,6 +13,7 @@ export interface Translations {
     confirm: string;
     back: string;
     platform: string;
+    connectionError: string;
   };
   nav: {
     download: string;
@@ -116,6 +117,8 @@ export interface Translations {
     author: string;
     categoryNormal: string;
     itemsPerPage: string;
+    createError: string;
+    updateError: string;
   };
   footer: {
     rights: string;
@@ -140,6 +143,17 @@ export interface Translations {
     title500: string;
     desc500: string;
     goHome: string;
+    api: {
+      alreadyExists: string;
+      recordNotFound: string;
+      invalidReference: string;
+      databaseError: string;
+      serverError: string;
+      unauthorized: string;
+      badRequest: string;
+      hairNotFound: string;
+      notOwned: string;
+    };
   };
   viewer: {
     title: string;

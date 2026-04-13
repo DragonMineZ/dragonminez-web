@@ -13,6 +13,7 @@ const en: Translations = {
     confirm: "Confirm",
     back: "Back",
     platform: "Platform",
+    connectionError: "Connection error with the server",
   },
   nav: {
     download: "Download",
@@ -116,6 +117,8 @@ const en: Translations = {
     author: "Author",
     categoryNormal: "Normal",
     itemsPerPage: "Items per page",
+    createError: "Error publishing the hair",
+    updateError: "Error updating the hair",
   },
   footer: {
     rights: "DragonMineZ | Fair Use",
@@ -140,6 +143,17 @@ const en: Translations = {
     title500: "500 - Energy Error",
     desc500: "It seems there was an overload on our servers. Please try again later.",
     goHome: "Go Back Home",
+    api: {
+      alreadyExists: "This record already exists",
+      recordNotFound: "Record not found. If this is your first action, please sign out and back in.",
+      invalidReference: "One or more referenced IDs do not exist",
+      databaseError: "Database error",
+      serverError: "Unexpected server error",
+      unauthorized: "You do not have permission to perform this action",
+      badRequest: "Bad request",
+      hairNotFound: "Hair not found",
+      notOwned: "You do not own this design",
+    },
   },
   viewer: {
     title: "3D Viewer | DragonMineZ",

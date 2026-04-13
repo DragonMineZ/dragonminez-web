@@ -111,7 +111,7 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         e.preventDefault();
         
         if (!validate()) {
-            setError("formInvalidFields");
+            setError("hairSalon.formInvalidFields");
             return;
         }
 
@@ -141,10 +141,10 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
                 else window.location.href = "/hairsalon";
             } else {
                 const data = await res.json();
-                setError(data.error || `Error al ${isEditing ? "editar" : "crear"} el cabello`);
+                setError(data.error || (isEditing ? 'hairSalon.updateError' : 'hairSalon.createError'));
             }
         } catch (err) {
-            setError("Error de conexión");
+            setError("common.connectionError");
         } finally {
             setLoading(false);
         }

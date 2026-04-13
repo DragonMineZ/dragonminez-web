@@ -122,7 +122,7 @@ export default function CreateHairForm({
 
                     <ErrorAlert
                         show={!!error}
-                        message={error.includes('.') ? t(error as any) : (error === 'formInvalidFields' ? t('hairSalon.formInvalidFields') : error)}
+                        message={t(error as any)}
                         onClose={() => setError('')}
                     />
                 </form>

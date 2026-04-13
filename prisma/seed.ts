@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaNeon } from '@prisma/adapter-neon'
 import { config } from 'dotenv'
 
 config()

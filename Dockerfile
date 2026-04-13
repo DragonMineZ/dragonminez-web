@@ -1,4 +1,4 @@
-FROM oven/bun:1.1 as base
+FROM oven/bun:latest AS base
 WORKDIR /app
 
 # ── Build: Instalación y Compilación

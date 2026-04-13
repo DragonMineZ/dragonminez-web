@@ -1,6 +1,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { useLanguage } from '../../../i18n';
 import { decodeHairCode } from '../../../lib/hair_decoder';
 import { parseNbt, extractHairForms } from '../../../lib/nbt_reader';
 import type { HairFormData } from '../../../lib/nbt_reader';
@@ -27,6 +28,7 @@ export default function HairViewer3D({
     customColor,
     onFormChange
 }: HairViewer3DProps) {
+    const { t } = useLanguage();
 
     // ── Estado
     const [hairForms, setHairForms] = useState<Record<string, HairFormData>>({});
@@ -40,7 +42,7 @@ export default function HairViewer3D({
     useEffect(() => {
         setError(null);
         if (!code) {
-            setError('No code provided');
+            setError(t('viewer.noCode'));
             setIsLoading(false);
             return;
         }
@@ -51,7 +53,7 @@ export default function HairViewer3D({
             const decoded = decodeHairCode(code);
 
             if (!decoded || !decoded.data) {
-                setError('Failed to decode hair code');
+                setError(t('viewer.decodeError'));
                 setIsLoading(false);
                 return;
             }
@@ -65,10 +67,10 @@ export default function HairViewer3D({
             setCurrentFormIndex(0);
             setIsLoading(false);
         } catch (e) {
-            setError('Error parsing hair data');
+            setError(t('viewer.parseError'));
             setIsLoading(false);
         }
-    }, [code]);
+    }, [code, t]);
 
     useEffect(() => {
         if (onFormChange && availableForms.length > 0) {
@@ -152,18 +154,18 @@ export default function HairViewer3D({
                         <button
                             onClick={handlePrevForm}
                             className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground hover:bg-foreground hover:text-background transition-all shadow-dropdown group/btn active:scale-95"
-                            title="Previous Form"
+                            title={t('viewer.prevForm')}
                         >
                             <span className="material-symbols-outlined text-2xl group-hover/btn:-translate-x-0.5 transition-transform">chevron_left</span>
                         </button>
                         <div className="pointer-events-auto flex flex-col items-center justify-center h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground min-w-[140px] px-6 shadow-dropdown">
-                            <span className="text-[10px] text-muted font-black uppercase tracking-[0.2em] leading-none mb-1">Current Form</span>
+                            <span className="text-[10px] text-muted font-black uppercase tracking-[0.2em] leading-none mb-1">{t('viewer.currentForm')}</span>
                             <span className="font-black uppercase tracking-tight text-sm leading-none">{currentFormKey}</span>
                         </div>
                         <button
                             onClick={handleNextForm}
                             className="pointer-events-auto flex items-center justify-center w-12 h-12 bg-surface/80 backdrop-blur-xl border border-glass rounded-2xl text-foreground hover:bg-foreground hover:text-background transition-all shadow-dropdown group/btn active:scale-95"
-                            title="Next Form"
+                            title={t('viewer.nextForm')}
                         >
                             <span className="material-symbols-outlined text-2xl group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
                         </button>

@@ -6,7 +6,7 @@ const code = Astro.url.searchParams.get('code') || '';
 const name = Astro.url.searchParams.get('name') || '';
 ---
 
-<Layout title="Hair Viewer | DragonMineZ" noindex={true}>
+<Layout title="Hair Viewer | DragonMineZ" i18nTitle="viewer.title" noindex={true}>
 
   <section class="min-h-screen pt-20 pb-8">
     <HairViewerPage client:only="react" code={code} name={name} />

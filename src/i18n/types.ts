@@ -141,6 +141,36 @@ export interface Translations {
     desc500: string;
     goHome: string;
   };
+  viewer: {
+    title: string;
+    backToList: string;
+    hairCode: string;
+    rawData: string;
+    placeholderCode: string;
+    render: string;
+    copy: string;
+    done: string;
+    appearance: string;
+    customColor: string;
+    resetColor: string;
+    identification: string;
+    unnamedDesign: string;
+    unnamed: string;
+    adjustment: string;
+    position: string;
+    verticalOffset: string;
+    scaling: string;
+    width: string;
+    height: string;
+    depth: string;
+    form: string;
+    currentForm: string;
+    prevForm: string;
+    nextForm: string;
+    noCode: string;
+    decodeError: string;
+    parseError: string;
+  };
 }
 
 

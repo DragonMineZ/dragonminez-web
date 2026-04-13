@@ -8,6 +8,7 @@ import "../styles/global.css";
 
 export interface Props {
   title?: string;
+  i18nTitle?: string;
   description?: string;
   noindex?: boolean;
   ogImage?: string;
@@ -15,6 +16,7 @@ export interface Props {
 
 const { 
   title = "DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft", 
+  i18nTitle,
   description = "Únete a DragonMineZ, el mod de Dragon Ball Z líder para Minecraft. Personaliza tu pelo 3D, combate con ki, descubre transformaciones y enfréntate a las mejores raids.",
   noindex = false,
   ogImage = "/images/og-default.png"
@@ -33,6 +35,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     
     <!-- ── SEO & Metadata -->
     <title>{title}</title>
+    {i18nTitle && <span id="page-i18n-title" data-i18n={i18nTitle} class="hidden"></span>}
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -96,6 +99,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       function updateI18nElements() {
         const { translations, isLoaded } = i18nStore.getState();
         if (!isLoaded || !translations) return;
+
+        // ── Page Title
+        const pageTitleData = document.getElementById('page-i18n-title');
+        if (pageTitleData) {
+          const path = pageTitleData.getAttribute('data-i18n');
+          const keys = path.split('.');
+          let value = translations;
+          for (const key of keys) {
+            value = value && value[key];
+          }
+          if (typeof value === 'string') {
+            document.title = value;
+          }
+        }
 
         const elements = document.querySelectorAll('[data-i18n]');
         elements.forEach((el) => {

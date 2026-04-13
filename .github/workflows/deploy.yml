@@ -26,3 +26,6 @@ jobs:
           push: true
           tags: bennndev/dragonminez-web:latest
           platforms: linux/amd64
+          build-args: |
+            PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
+            PUBLIC_APP_URL=${{ secrets.PUBLIC_APP_URL }}

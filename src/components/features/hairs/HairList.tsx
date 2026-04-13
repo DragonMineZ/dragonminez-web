@@ -1,5 +1,5 @@
 import { useAuth, SignedIn } from "@clerk/astro/react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import HairCard from "./HairCard";
 import SearchBar from "../../ui/SearchBar";
 import FilterDropdown from "../../ui/FilterDropdown";
@@ -8,89 +8,127 @@ import SuccessAlert from "../../ui/SuccessAlert";
 import Button from "../../ui/Button";
 import Pagination from "../../ui/Pagination";
 import ItemsPerPageSelector from "../../ui/ItemsPerPageSelector";
-import { useHairs } from "../../../hooks/useHairs";
-import { filterHairs, sortHairs } from "../../../lib/hairFilters";
+import { useHairs, type HairFetchParams } from "../../../hooks/useHairs";
 import { useLanguage } from "../../../i18n";
-import type { Hair, Category } from "../../../types/hair";
+import type { Category } from "../../../types/hair";
 
-export default function HairList({ initialHairs = [], initialCategories = [] }: { initialHairs?: Hair[], initialCategories?: Category[] }) {
-  const { isLoaded: isAuthLoaded, isSignedIn, getToken, userId } = useAuth();
+export default function HairList({ initialCategories = [] }: { initialCategories?: Category[] }) {
+  const { isLoaded: isAuthLoaded, isSignedIn, getToken } = useAuth();
   const { t } = useLanguage();
 
-  const {
-    hairs,
-    categories,
-    loading,
-    error,
-    fetchData,
-    handleDeleteLocally,
-    handleLikeToggleLocally
-  } = useHairs(initialHairs, initialCategories);
+  const { hairs, meta, categories, loading, error, fetchHairs, handleLikeToggleLocally } =
+    useHairs(initialCategories);
 
-  // ... rest of state ...
+// ── Estado
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
   const [showMyCreations, setShowMyCreations] = useState(false);
-  const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [successAlert, setSuccessAlert] = useState<{ show: boolean; message: string }>({
+    show: false,
+    message: "",
+  });
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, sortBy, showMyCreations, itemsPerPage]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
+  const fetchParams = useMemo<HairFetchParams>(
+    () => ({
+      search: debouncedSearch || undefined,
+      category: selectedCategory !== "all" ? (selectedCategory as number) : undefined,
+      sort: sortBy as "recent" | "likes" | "oldest",
+      myCreations: showMyCreations,
+      page: currentPage,
+      limit: itemsPerPage,
+    }),
+    [debouncedSearch, selectedCategory, sortBy, showMyCreations, currentPage, itemsPerPage]
+  );
+
+  useEffect(() => {
+    fetchHairs(fetchParams);
+  }, [fetchParams, fetchHairs]);
+
+  // ── Handlers
+  const handleCategoryChange = useCallback((cat: number | string) => {
+    setSelectedCategory(cat);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSortChange = useCallback((sort: string) => {
+    setSortBy(sort);
+    setCurrentPage(1);
+  }, []);
+
+  const handleMyCreationsToggle = useCallback(() => {
+    setShowMyCreations((prev) => !prev);
+    setCurrentPage(1);
+  }, []);
+
+  const handleItemsPerPageChange = useCallback((limit: number) => {
+    setItemsPerPage(limit);
+    setCurrentPage(1);
+  }, []);
+
+  // ── Acciones
   const handleDelete = async (id: number) => {
     const token = await getToken();
     const res = await fetch(`/api/hairs/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-
     if (res.ok) {
-      handleDeleteLocally(id);
-      setSuccessAlert({ show: true, message: t('hairSalon.deleteSuccess') });
+      fetchHairs(fetchParams);
+      setSuccessAlert({ show: true, message: t("hairSalon.deleteSuccess") });
     } else {
-      window.alert(t('hairSalon.deleteError'));
+      const data = await res.json().catch(() => ({}));
+      window.alert(data.error || t("hairSalon.deleteError"));
     }
   };
 
   const handleCreateSuccess = () => {
-    fetchData();
-    setSuccessAlert({ show: true, message: t('hairSalon.createSuccess') });
+    fetchHairs(fetchParams);
+    setSuccessAlert({ show: true, message: t("hairSalon.createSuccess") });
   };
 
   const handleUpdateSuccess = () => {
-    fetchData();
-    setSuccessAlert({ show: true, message: t('hairSalon.updateSuccess') });
+    fetchHairs(fetchParams);
+    setSuccessAlert({ show: true, message: t("hairSalon.updateSuccess") });
   };
 
-  const filteredHairs = filterHairs(hairs, searchQuery, selectedCategory, showMyCreations, !!isSignedIn, userId);
-  const processedHairs = sortHairs(filteredHairs, sortBy);
-
-  const totalPages = Math.ceil(processedHairs.length / itemsPerPage);
-  const currentItems = processedHairs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  // ── Opciones
+  const categoryOptions = useMemo(
+    () => [
+      { id: "all", label: t("hairSalon.filterAll") },
+      ...categories.map((c) => ({ id: c.id_category, label: c.description })),
+    ],
+    [categories, t]
   );
 
-  const categoryOptions = useMemo(() => [
-    { id: "all", label: t('hairSalon.filterAll') },
-    ...categories.map(c => ({ id: c.id_category, label: c.description }))
-  ], [categories, t]);
+  const popularityOptions = useMemo(
+    () => [
+      { id: "recent", label: t("hairSalon.sortRecent") },
+      { id: "likes", label: t("hairSalon.sortPopular") },
+      { id: "oldest", label: t("hairSalon.sortOldest") },
+    ],
+    [t]
+  );
 
-  const popularityOptions = useMemo(() => [
-    { id: "recent", label: t('hairSalon.sortRecent') },
-    { id: "likes", label: t('hairSalon.sortPopular') },
-    { id: "oldest", label: t('hairSalon.sortOldest') }
-  ], [t]);
-
+  // ── Render
   if (!isAuthLoaded || loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 animate-pulse">
         <div className="h-10 w-48 bg-glass-strong rounded-2xl"></div>
-        <p className="text-muted" data-i18n="hairSalon.preparingCatalog">{t('hairSalon.preparingCatalog')}</p>
+        <p className="text-muted" data-i18n="hairSalon.preparingCatalog">
+          {t("hairSalon.preparingCatalog")}
+        </p>
       </div>
     );
   }
@@ -105,31 +143,28 @@ export default function HairList({ initialHairs = [], initialCategories = [] }: 
 
   return (
     <div className="flex flex-col gap-8">
-
-      {/* Búsqueda */}
       <SearchBar onSearch={setSearchQuery} />
 
-      {/* Filtros y acciones */}
       <div className="flex flex-wrap items-center gap-3">
         <FilterDropdown
-          label={t('hairSalon.categoriesLabel')}
+          label={t("hairSalon.categoriesLabel")}
           options={categoryOptions}
           selectedId={selectedCategory}
-          onSelect={setSelectedCategory}
+          onSelect={handleCategoryChange}
         />
         <FilterDropdown
-          label={t('hairSalon.sortLabel')}
+          label={t("hairSalon.sortLabel")}
           options={popularityOptions}
           selectedId={sortBy}
-          onSelect={(id) => setSortBy(String(id))}
+          onSelect={(id) => handleSortChange(String(id))}
         />
         {isSignedIn && (
           <Button
             variant={showMyCreations ? "primary" : "secondary"}
             size="md"
-            onClick={() => setShowMyCreations(!showMyCreations)}
+            onClick={handleMyCreationsToggle}
           >
-            {t('hairSalon.myCreations')}
+            {t("hairSalon.myCreations")}
           </Button>
         )}
         <SignedIn>
@@ -139,21 +174,18 @@ export default function HairList({ initialHairs = [], initialCategories = [] }: 
         </SignedIn>
       </div>
 
-      {/* Lista o estado vacío */}
-      {processedHairs.length === 0 ? (
+      {hairs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4 bg-glass rounded-3xl border border-dashed border-glass-strong">
-          <span className="material-symbols-outlined text-muted text-6xl">
-            search_off
-          </span>
+          <span className="material-symbols-outlined text-muted text-6xl">search_off</span>
           <p className="text-lg text-muted">
             {searchQuery
-              ? `${t('hairSalon.noResults')} ("${searchQuery}")`
-              : t('hairSalon.noResults')}
+              ? `${t("hairSalon.noResults")} ("${searchQuery}")`
+              : t("hairSalon.noResults")}
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          {currentItems.map((hair) => (
+          {hairs.map((hair) => (
             <HairCard
               key={hair.id_hair}
               hair={hair}
@@ -166,18 +198,16 @@ export default function HairList({ initialHairs = [], initialCategories = [] }: 
         </div>
       )}
 
-      {/* Paginación y Selector de items por página */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
         <ItemsPerPageSelector
           currentValue={itemsPerPage}
           options={[10, 25, 50]}
-          onSelect={setItemsPerPage}
+          onSelect={handleItemsPerPageChange}
         />
-        
-        {totalPages > 1 && (
+        {meta.totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={meta.totalPages}
             onPageChange={setCurrentPage}
           />
         )}

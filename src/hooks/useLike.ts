@@ -12,33 +12,37 @@ export function useLike(
     const toggleLike = async () => {
         if (!isSignedIn) return { success: false, requireAuth: true };
 
-        const newLikedState = !isLiked;
-        setIsLiked(newLikedState);
+        // Capture state before optimistic update so we can rollback correctly
+        const currentlyLiked = isLiked;
+        const newLikedState = !currentlyLiked;
 
-        if (onLikeToggle) {
-            onLikeToggle(hairId, newLikedState);
-        }
+        setIsLiked(newLikedState);
+        if (onLikeToggle) onLikeToggle(hairId, newLikedState);
 
         try {
             const token = await getToken();
+            // PUT gives a like (idempotent), DELETE removes it (idempotent)
+            const method = currentlyLiked ? "DELETE" : "PUT";
             const res = await fetch(`/api/hairs/${hairId}/like`, {
-                method: "POST",
-                headers: { Authorization: `Bearer ${token}` }
+                method,
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             if (res.ok) {
                 return { success: true, isLiked: newLikedState };
             } else {
-                // Rollback on failure
-                setIsLiked(!newLikedState);
-                if (onLikeToggle) onLikeToggle(hairId, !newLikedState);
-                return { success: false, requireAuth: false };
+                // Rollback optimistic update on failure
+                setIsLiked(currentlyLiked);
+                if (onLikeToggle) onLikeToggle(hairId, currentlyLiked);
+                // Read the server error message so callers can surface it
+                const data = await res.json().catch(() => ({}));
+                return { success: false, requireAuth: false, errorMessage: data.error as string | undefined };
             }
         } catch (error) {
-            setIsLiked(!newLikedState);
-            if (onLikeToggle) onLikeToggle(hairId, !newLikedState);
+            setIsLiked(currentlyLiked);
+            if (onLikeToggle) onLikeToggle(hairId, currentlyLiked);
             console.error("Error toggling like", error);
-            return { success: false, requireAuth: false };
+            return { success: false, requireAuth: false, errorMessage: undefined };
         }
     };
 

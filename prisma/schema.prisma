@@ -24,9 +24,12 @@ model Hair {
   description String?
   created_at  DateTime   @default(now())
   artistId    Int
-  artist      User       @relation(fields: [artistId], references: [id_user])
+  artist      User       @relation(fields: [artistId], references: [id_user], onDelete: Cascade)
   likes       Like[]
   categories  Category[] @relation("CategoryToHair")
+
+  @@index([created_at])  // ORDER BY created_at (recent / oldest sort)
+  @@index([artistId])    // WHERE artistId = ? (myCreations filter)
 }
 
 model Category {
@@ -38,8 +41,11 @@ model Category {
 model Like {
   id_user Int
   id_hair Int
-  hair    Hair @relation(fields: [id_hair], references: [id_hair])
-  user    User @relation(fields: [id_user], references: [id_user])
+  // onDelete: Cascade — deleting a Hair removes its Likes; deleting a User removes their Likes
+  hair    Hair @relation(fields: [id_hair], references: [id_hair], onDelete: Cascade)
+  user    User @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
 
   @@id([id_user, id_hair])
+  @@index([id_hair])  // COUNT(*) GROUP BY id_hair — used in sort=likes and _count aggregation
+  @@index([id_user])  // WHERE id_user = ? — used to fetch is_liked_by_user per request
 }

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Bloquear páginas de herramientas internas e islands dinámicos
+Disallow: /viewer
+Disallow: /createhair
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://dragonminez.com/sitemap-index.xml

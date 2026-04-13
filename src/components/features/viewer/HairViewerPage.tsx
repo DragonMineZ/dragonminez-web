@@ -40,9 +40,9 @@ export default function HairViewerPage({ code: initialCode, name: initialName = 
                     onResetColor={handleResetColor}
                 />
 
-                {/* 3D Viewer - Center */}
                 <div className="flex-1 min-w-0">
                     <div className="h-full bg-background rounded-3xl overflow-hidden border border-glass shadow-glass relative group/viewer">
+
                         <HairViewer3D
                             code={code}
                             hairName={hairName}

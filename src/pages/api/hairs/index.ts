@@ -1,95 +1,112 @@
 import type { APIRoute } from "astro";
-import { prisma } from "../../../lib/prisma";
+import { ok, badRequest, serverError } from "../../../lib/api/response";
+import { withAuth } from "../../../lib/api/guards";
+import { parseId } from "../../../lib/api/params";
+import { validateBody, createHairSchema } from "../../../lib/api/schemas";
+import { handlePrismaError } from "../../../lib/api/errors";
+import { hairsCache } from "../../../lib/api/cache";
+import * as HairService from "../../../services/hair.service";
+import { getUserByClerkId } from "../../../services/user.service";
+import type { HairQueryParams } from "../../../repositories/hair.repository";
 
-export const GET: APIRoute = async ({ locals }) => {
+const PUBLIC_CACHE = {
+    "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+};
+
+// ── Handlers: GET
+export const GET: APIRoute = async ({ request, locals }) => {
+
     const { userId } = locals.auth();
     let dbUserId: number | null = null;
-    
+
     if (userId) {
-        const dbUser = await prisma.user.findUnique({ where: { clerk_id: userId }, select: { id_user: true } });
-        dbUserId = dbUser?.id_user || null;
+        const dbUser = await getUserByClerkId(userId);
+        dbUserId = dbUser?.id_user ?? null;
     }
 
-    try {
-        const rawHairs = await prisma.hair.findMany({
-            include: {
-                categories: true,
-                artist: true,
-                likes: dbUserId ? { where: { id_user: dbUserId } } : false,
-                _count: {
-                    select: { likes: true }
-                }
-            },
-        });
+    const url = new URL(request.url);
+    const search = url.searchParams.get("search") ?? undefined;
+    const categoryParam = url.searchParams.get("category");
+    const sortParam = url.searchParams.get("sort");
+    const pageParam = url.searchParams.get("page");
+    const limitParam = url.searchParams.get("limit");
+    const myCreations = url.searchParams.get("myCreations") === "true";
 
-        const hairs = rawHairs.map(h => {
-            const { likes, ...rest } = h as any;
-            return {
-                ...rest,
-                is_liked_by_user: likes ? likes.length > 0 : false
-            };
-        });
-
-        return new Response(JSON.stringify(hairs), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
-    } catch (error) {
-        return new Response(JSON.stringify({ error: "Error al obtener hairs" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
-    }
-};
-
-export const POST: APIRoute = async ({ request, locals }) => {
-    const { userId } = locals.auth()
-
-    if (!userId) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
-    }
-
-    try {
-        const body = await request.json();
-        const { name, code, image_url, description, categoryIds } = body;
-
-        if (!name || !code || !image_url) {
-            return new Response(
-                JSON.stringify({ error: "Faltan campos obligatorios" }),
-                { status: 400 }
-            );
+    let categoryId: number | undefined;
+    if (categoryParam) {
+        const parsed = parseInt(categoryParam, 10);
+        if (isNaN(parsed) || parsed <= 0) {
+            return badRequest("category must be a positive integer");
         }
+        categoryId = parsed;
+    }
 
-        const newHair = await prisma.hair.create({
-            data: {
-                name,
-                code,
-                image_url,
-                description,
-                artist: { connect: { clerk_id: userId } },
-                categories: categoryIds
-                    ? {
-                        connect: categoryIds.map((id: number) => ({ id_category: id })),
-                    }
-                    : undefined,
-            },
-            include: {
-                categories: true,
-                _count: {
-                    select: { likes: true }
-                }
-            },
-        });
+    const page = pageParam ? parseInt(pageParam, 10) : 1;
+    const limit = limitParam ? parseInt(limitParam, 10) : 10;
 
-        return new Response(JSON.stringify(newHair), {
-            status: 201,
-            headers: { "Content-Type": "application/json" },
-        });
-    } catch (error) {
-        console.error(error);
-        return new Response(JSON.stringify({ error: "Error al crear el hair" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
+    const params: HairQueryParams = {
+        search,
+        categoryId,
+        sort: (["recent", "likes", "oldest"].includes(sortParam ?? "")
+            ? sortParam
+            : "recent") as HairQueryParams["sort"],
+        page: isNaN(page) || page < 1 ? 1 : page,
+        limit: isNaN(limit) || limit < 1 ? 10 : Math.min(limit, 50),
+        artistId: myCreations && dbUserId ? dbUserId : undefined,
+    };
+
+    // ── Cache: Anónimo
+    if (!userId && !myCreations) {
+        const cacheKey = url.search || "?";
+        const cached = hairsCache.get(cacheKey);
+        if (cached) return ok(cached, PUBLIC_CACHE);
+
+        try {
+            const result = await HairService.getAllHairs(null, params);
+            hairsCache.set(cacheKey, result, 30_000);
+            return ok(result, PUBLIC_CACHE);
+
+        } catch (err) {
+            return handlePrismaError(err);
+        }
+    }
+
+    try {
+        const result = await HairService.getAllHairs(dbUserId, params);
+        return ok(result, PUBLIC_CACHE);
+
+    } catch (err) {
+        return handlePrismaError(err);
     }
 };
+
+// ── Handlers: POST
+export const POST = withAuth(async ({ request }, userId) => {
+    let body: unknown;
+    try {
+        body = await request.json();
+    } catch {
+        return badRequest("Could not parse request body as JSON");
+    }
+
+    const validation = validateBody(createHairSchema, body);
+    if (!validation.success) return validation.error;
+
+    const { name, code, image_url, description, categoryIds } = validation.data;
+
+    try {
+        const hair = await HairService.createHair({
+            name,
+            code,
+            image_url,
+            description,
+            clerkId: userId,
+            categoryIds,
+        });
+        hairsCache.clear();
+        return ok(hair);
+    } catch (err) {
+        return handlePrismaError(err);
+    }
+});
+

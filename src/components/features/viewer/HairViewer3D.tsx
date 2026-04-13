@@ -27,6 +27,8 @@ export default function HairViewer3D({
     customColor,
     onFormChange
 }: HairViewer3DProps) {
+
+    // ── Estado
     const [hairForms, setHairForms] = useState<Record<string, HairFormData>>({});
     const [availableForms, setAvailableForms] = useState<string[]>([]);
     const [currentFormIndex, setCurrentFormIndex] = useState(0);
@@ -34,6 +36,7 @@ export default function HairViewer3D({
     const [error, setError] = useState<string | null>(null);
     const [isFullSet, setIsFullSet] = useState(false);
 
+    // ── Efectos
     useEffect(() => {
         setError(null);
         if (!code) {
@@ -62,7 +65,6 @@ export default function HairViewer3D({
             setCurrentFormIndex(0);
             setIsLoading(false);
         } catch (e) {
-            console.error('Error parsing hair:', e);
             setError('Error parsing hair data');
             setIsLoading(false);
         }
@@ -75,6 +77,7 @@ export default function HairViewer3D({
         }
     }, [currentFormIndex, availableForms, onFormChange]);
 
+    // ── Handlers
     const handlePrevForm = () => {
         setCurrentFormIndex((prev) => (prev - 1 + availableForms.length) % availableForms.length);
     };
@@ -83,6 +86,7 @@ export default function HairViewer3D({
         setCurrentFormIndex((prev) => (prev + 1) % availableForms.length);
     };
 
+    // ── Render
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -169,3 +173,4 @@ export default function HairViewer3D({
         </div>
     );
 }
+

@@ -134,6 +134,14 @@ export interface Translations {
     themeDark: string;
     language: string;
   };
+  errors: {
+    title404: string;
+    desc404: string;
+    title500: string;
+    desc500: string;
+    goHome: string;
+  };
 }
+
 
 export type TranslationKey = keyof Translations | string;

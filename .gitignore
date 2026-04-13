@@ -1,26 +1,30 @@
 # build output
 dist/
-
-# generated types
 .astro/
 
 # dependencies
 node_modules/
+.bun/
 
 # logs
+*.log
+logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
 # environment variables
-.env
-.env.production
+.env*
 
-# macOS-specific files
+# system files
 .DS_Store
+Thumbs.db
 
-# jetbrains setting folder
+# ides
 .idea/
 .vscode/
+
+# prisma
 /src/generated/prisma
+

@@ -111,12 +111,10 @@ import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
     window.addEventListener('scroll', onScroll, { passive: true });
     menuButton?.addEventListener('click', toggleMenu);
 
-    // Initial check
     updateHeaderStyle();
   }
 
-  // Handle Astro page transitions if any
   document.addEventListener('astro:page-load', initHeader);
-  // Fallback for initial load
   initHeader();
 </script>
+

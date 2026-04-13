@@ -1,73 +1,34 @@
-import type { APIRoute } from "astro";
-import { prisma } from "../../../../lib/prisma";
+import { ok, badRequest, serverError } from "../../../../lib/api/response";
+import { withAuth } from "../../../../lib/api/guards";
+import { parseId } from "../../../../lib/api/params";
+import { handlePrismaError } from "../../../../lib/api/errors";
+import { giveLike, removeLike } from "../../../../services/like.service";
 
-export const POST: APIRoute = async ({ params, locals }) => {
-    const { userId: clerkId } = locals.auth();
-
-    if (!clerkId) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
-    }
-
-    const { id } = params;
-    if (!id) return new Response(null, { status: 400 });
+// ── Handlers: PUT
+export const PUT = withAuth(async ({ params }, userId) => {
+    const hairId = parseId(params.id);
+    if (!hairId) return badRequest("Hair id must be a positive integer");
 
     try {
-        const hairId = parseInt(id);
-
-        // Buscar el usuario local por su clerk_id
-        const user = await prisma.user.findUnique({
-            where: { clerk_id: clerkId }
-        });
-
-        if (!user) {
-            return new Response(JSON.stringify({ error: "Usuario no registrado localmente" }), { status: 404 });
-        }
-
-        const userId = user.id_user;
-
-        // Verificar si ya existe el like para toggle
-        const existingLike = await prisma.like.findUnique({
-            where: {
-                id_user_id_hair: {
-                    id_user: userId,
-                    id_hair: hairId
-                }
-            }
-        });
-
-        if (existingLike) {
-            // Quitar like
-            await prisma.like.delete({
-                where: {
-                    id_user_id_hair: {
-                        id_user: userId,
-                        id_hair: hairId
-                    }
-                }
-            });
-
-            return new Response(JSON.stringify({ liked: false }), {
-                status: 200,
-                headers: { "Content-Type": "application/json" }
-            });
-        } else {
-            // Dar like
-            await prisma.like.create({
-                data: {
-                    id_user: userId,
-                    id_hair: hairId
-                }
-            });
-
-            return new Response(JSON.stringify({ liked: true }), {
-                status: 200,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
-    } catch (error) {
-        console.error("Error toggling like:", error);
-        return new Response(JSON.stringify({ error: "Error al procesar el like" }), {
-            status: 500
-        });
+        const result = await giveLike(userId, hairId);
+        if ("error" in result) return result.error;
+        return ok(result.data);
+    } catch (err) {
+        return handlePrismaError(err);
     }
-};
+});
+
+// ── Handlers: DELETE
+export const DELETE = withAuth(async ({ params }, userId) => {
+    const hairId = parseId(params.id);
+    if (!hairId) return badRequest("Hair id must be a positive integer");
+
+    try {
+        const result = await removeLike(userId, hairId);
+        if ("error" in result) return result.error;
+        return ok(result.data);
+    } catch (err) {
+        return handlePrismaError(err);
+    }
+});
+

@@ -1,56 +1,32 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import HairList from "../components/features/hairs/HairList.tsx";
-import CreateHairTrigger from "../components/features/hairs/CreateHairTrigger.tsx";
-import { prisma } from "../lib/prisma";
+import { getAllCategories } from "../services/category.service";
+import { getUserByClerkId } from "../services/user.service";
 import {
   SignedIn,
   SignedOut,
   UserButton,
   SignInButton
 } from "@clerk/astro/components";
-import { createClerkClient } from "@clerk/astro/server";
 
 const { userId } = Astro.locals.auth();
 let username = "";
-let dbUserId: number | null = null;
+
+// Categories come from SSR for instant availability in HairList filters.
+// Username is fetched from our local DB (not the Clerk SDK) — avoids an
+// extra round-trip to Clerk's servers and respects the repository pattern.
+const categories = await getAllCategories();
 
 if (userId) {
-  const dbUser = await prisma.user.findUnique({ where: { clerk_id: userId }, select: { id_user: true } });
-  dbUserId = dbUser?.id_user || null;
-}
-
-const clerk = createClerkClient({ secretKey: import.meta.env.CLERK_SECRET_KEY });
-
-const [user, rawHairs, categories] = await Promise.all([
-  userId ? clerk.users.getUser(userId).catch(() => null) : Promise.resolve(null),
-  prisma.hair.findMany({
-      include: {
-          categories: true,
-          artist: true,
-          likes: dbUserId ? { where: { id_user: dbUserId } } : false,
-          _count: { select: { likes: true } }
-      },
-  }),
-  prisma.category.findMany()
-]);
-
-const hairs = rawHairs.map(h => {
-  const { likes, ...rest } = h as any; // Strip out prisma strict type on map
-  return {
-    ...rest,
-    is_liked_by_user: likes ? likes.length > 0 : false
-  };
-});
-
-if (user) {
-  username = user.username || user.firstName || "";
+  const dbUser = await getUserByClerkId(userId);
+  username = dbUser?.username || "";
 }
 ---
 
 <Layout title="HairSalon | DragonMineZ">
   <section class="container-base py-24 md:py-32">
-    
+
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
       <div>
         <h1 class="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl" data-i18n="hairSalon.title">
@@ -66,7 +42,9 @@ if (user) {
         </SignedOut>
         <SignedIn>
           <p class="text-muted mt-2">
-            <span data-i18n="common.welcome">¡Bienvenido</span> <span class="text-foreground font-semibold">{username || <span data-i18n="hairSalon.usernameFallback">Guerrer@</span>}</span>!, <span data-i18n="hairSalon.publishCreations">puedes empezar a publicar tus creaciones</span>
+            <span data-i18n="common.welcome">¡Bienvenido</span>
+            <span class="text-foreground font-semibold">{username || <span data-i18n="hairSalon.usernameFallback">Guerrer@</span>}</span>,
+            <span data-i18n="hairSalon.publishCreations">puedes empezar a publicar tus creaciones</span>
           </p>
         </SignedIn>
       </div>
@@ -79,8 +57,8 @@ if (user) {
       </SignedIn>
     </div>
 
-    <!-- Hair List (React Island) -->
-    <HairList client:load initialHairs={hairs} initialCategories={categories} />
+    <!-- HairList React Island — categories pre-loaded from SSR, hairs fetched client-side -->
+    <HairList client:load initialCategories={categories} />
 
   </section>
 </Layout>

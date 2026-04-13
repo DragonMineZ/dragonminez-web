@@ -39,7 +39,7 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
             if (isLoaded && isSignedIn) {
                 const token = await getToken();
                 // Fetch User
-                const userRes = await fetch("/api/user/me", {
+                const userRes = await fetch("/api/users/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (userRes.ok) {

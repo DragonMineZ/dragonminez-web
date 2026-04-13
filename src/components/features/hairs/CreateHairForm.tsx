@@ -39,7 +39,6 @@ export default function CreateHairForm({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85vh]">
-            {/* Sticky Header */}
             <div className="shrink-0 p-6 md:p-8 pb-4 sticky top-0 bg-background z-20 w-full flex flex-col">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                     {isEditing ? t('hairSalon.editTitle') : t('hairSalon.publishTitle')}
@@ -51,9 +50,9 @@ export default function CreateHairForm({
                 </p>
             </div>
 
-            {/* Scrollable Form Body */}
             <div className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-hide">
                 <form id="hair-form" onSubmit={handleSubmit} noValidate className="space-y-6">
+
                     <Field
                         label={t('hairSalon.formName')}
                         type="text"
@@ -129,8 +128,8 @@ export default function CreateHairForm({
                 </form>
       </div>
 
-      {/* Sticky Footer */}
       <div className="shrink-0 p-6 md:p-8 pt-4 sticky bottom-0 bg-background z-20 w-full flex justify-end">
+
         <Button
           type="submit"
           form="hair-form"

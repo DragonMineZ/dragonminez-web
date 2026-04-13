@@ -134,6 +134,14 @@ const en: Translations = {
     themeDark: "Dark Mode",
     language: "Language",
   },
+  errors: {
+    title404: "404 - Path Not Found",
+    desc404: "Sorry, the warrior's path has led you to a non-existent place.",
+    title500: "500 - Energy Error",
+    desc500: "It seems there was an overload on our servers. Please try again later.",
+    goHome: "Go Back Home",
+  },
 };
+
 
 export default en;

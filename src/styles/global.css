@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ── Variables & Tema */
 :root {
   --background: #f9fafb;
   --surface: #ffffff;
@@ -89,6 +90,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* ── Animaciones */
 @keyframes pulse-subtle {
   0%, 100% {
     opacity: 1;
@@ -121,7 +123,7 @@ body {
   animation: slide-in-soft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Hide scrollbar for clean Modal UI */
+/* ── Utilidades */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -131,7 +133,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Tooltip Micro-animation */
+/* ── Componentes */
 @layer components {
   .container-base {
     @apply w-full max-w-7xl mx-auto px-6 md:px-8;
@@ -177,4 +179,5 @@ body {
     content: '';
     @apply block w-full h-px rounded-full bg-glass;
   }
-}
+}
+

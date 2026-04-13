@@ -1,6 +1,5 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, lazy, Suspense } from "react";
 import type { Hair } from "../../../types/hair";
-import { useAuth } from "@clerk/astro/react";
 import ActionButtons from "../../ui/ActionButtons";
 import Chip from "../../ui/Chip";
 import AuthorTag from "../../ui/AuthorTag";
@@ -26,21 +25,19 @@ interface HairCardProps {
 const CreateHairForm = lazy(() => import('./CreateHairForm'));
 
 export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
-    const { userId: clerkId } = useAuth();
     const { t } = useLanguage();
 
-    // Abstracted logic into hooks
     const { isLiked, toggleLike } = useLike(hair.id_hair, !!hair.is_liked_by_user, onLikeToggle);
     const { copied, copy } = useClipboard();
 
-    // UI States for Dialogs
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: "" });
 
-    const isOwner = clerkId === hair.artist?.clerk_id;
+    const isOwner = hair.isOwner ?? false;
 
+    // ── Handlers
     const handleCopyCode = () => {
         copy(hair.code, () => {
             setAlert({ show: true, message: t('hairSalon.copySuccess') });
@@ -57,6 +54,8 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 show: true,
                 message: result.isLiked ? t('hairSalon.addedToFavorites') : t('hairSalon.removedFromFavorites')
             });
+        } else if (result.errorMessage) {
+            setAlert({ show: true, message: result.errorMessage });
         }
     };
 
@@ -69,6 +68,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
         }
     };
 
+    // ── Render
     return (
         <div className="group/card relative bg-surface rounded-[32px] border border-glass p-4 md:p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
             <div className="relative w-full md:w-48 aspect-square shrink-0">
@@ -99,17 +99,14 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     </div>
                 </div>
 
-                {/* Categories */}
                 <HairCategories categories={hair.categories} className="mb-3" />
 
-                {/* Copy Code Button */}
                 <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
 
                 <p className="text-sm text-foreground/70 line-clamp-3 leading-[1.6] mb-4 font-normal">
                     {hair.description || t('hairSalon.noDescription')}
                 </p>
 
-                {/* Author Info & Actions */}
                 <div className="flex items-center justify-between pt-4 border-t border-glass mt-auto">
                     <AuthorTag
                         avatarUrl={hair.artist.avatar_url}
@@ -126,7 +123,6 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 </div>
             </div>
 
-            {/* Modals are still here but logic is clean and readable */}
             <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} noPadding={true}>
                 <Suspense fallback={
                     <div className="h-48 flex items-center justify-center">
@@ -160,3 +156,4 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
         </div>
     );
 }
+

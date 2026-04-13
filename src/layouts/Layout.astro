@@ -9,12 +9,18 @@ import "../styles/global.css";
 export interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
+  ogImage?: string;
 }
 
 const { 
   title = "DragonMineZ - El mejor mod de Dragon Ball Z para Minecraft", 
-  description = "Únete a DragonMineZ, el mod de Dragon Ball Z líder para Minecraft. Personaliza tu pelo 3D, combate con ki, descubre transformaciones y enfréntate a las mejores raids." 
+  description = "Únete a DragonMineZ, el mod de Dragon Ball Z líder para Minecraft. Personaliza tu pelo 3D, combate con ki, descubre transformaciones y enfréntate a las mejores raids.",
+  noindex = false,
+  ogImage = "/images/og-default.png" // Me aseguraré de que exista o sugeriré crearla
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -25,6 +31,26 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     
+    <!-- SEO & Metadata -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.url)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(ogImage, Astro.url)} />
+
     <script is:inline>
       const theme = (() => {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
@@ -56,8 +82,7 @@ const {
     <noscript>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </noscript>
-    <title>{title}</title>
-    <meta name="description" content={description} />
+
   </head>
   <body class="bg-background text-foreground selection:bg-foreground/10">
     <Header />

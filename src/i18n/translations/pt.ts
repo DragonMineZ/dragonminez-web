@@ -134,6 +134,14 @@ const pt: Translations = {
     themeDark: "Modo Escuro",
     language: "Idioma",
   },
+  errors: {
+    title404: "404 - Caminho Não Encontrado",
+    desc404: "Desculpe, o caminho do guerreiro levou você a um lugar inexistente.",
+    title500: "500 - Erro de Energia",
+    desc500: "Parece que houve uma sobrecarga em nossos servidores. Por favor, tente novamente mais tarde.",
+    goHome: "Voltar ao Início",
+  },
 };
+
 
 export default pt;

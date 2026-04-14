@@ -25,7 +25,7 @@ export function DownloadDropdown({
 }: DownloadDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const { t } = useLanguage();
+    const { t, isLoaded } = useLanguage();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -70,8 +70,8 @@ export function DownloadDropdown({
                     </span>
                 )}
                 {showLabel && (
-                    <span data-i18n={label ? '' : "home.hero.cta"}>
-                        {label || t('home.hero.cta')}
+                    <span {...(!label && { 'data-i18n': 'home.hero.cta' })}>
+                        {label || (isLoaded ? t('home.hero.cta') : '')}
                     </span>
                 )}
                 <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>

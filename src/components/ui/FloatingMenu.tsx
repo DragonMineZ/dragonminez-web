@@ -156,7 +156,7 @@ export function FloatingMenu() {
 
     return (
         <div
-            className={`fixed z-[9999] flex flex-col items-center justify-end ${!position ? 'bottom-6 right-6' : ''}`}
+            className={`fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit ${!position ? 'bottom-6 right-6' : ''}`}
             style={position ? { left: position.x, top: position.y, touchAction: 'none' } : { touchAction: 'none' }}
         >
             <div
@@ -183,7 +183,7 @@ export function FloatingMenu() {
                 </div>
             </div>
 
-            <div className="touch-none" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
+            <div className="touch-none pointer-events-auto" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
                 <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')} position="top">
                     <FloatingMenuButton
                         ref={menuRef}

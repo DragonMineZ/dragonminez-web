@@ -14,7 +14,7 @@ import type { Category } from "../../../types/hair";
 
 export default function HairList({ initialCategories = [] }: { initialCategories?: Category[] }) {
   const { isLoaded: isAuthLoaded, isSignedIn, getToken } = useAuth();
-  const { t } = useLanguage();
+  const { t, isLoaded: isI18nLoaded } = useLanguage();
 
   const { hairs, meta, categories, loading, error, fetchHairs, handleLikeToggleLocally } =
     useHairs(initialCategories);
@@ -126,9 +126,11 @@ export default function HairList({ initialCategories = [] }: { initialCategories
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 animate-pulse">
         <div className="h-10 w-48 bg-glass-strong rounded-2xl"></div>
-        <p className="text-muted" data-i18n="hairSalon.preparingCatalog">
-          {t("hairSalon.preparingCatalog")}
-        </p>
+        {isI18nLoaded && (
+          <p className="text-muted">
+            {t("hairSalon.preparingCatalog")}
+          </p>
+        )}
       </div>
     );
   }

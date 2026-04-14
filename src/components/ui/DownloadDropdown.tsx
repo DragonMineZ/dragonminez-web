@@ -70,7 +70,7 @@ export function DownloadDropdown({
                     </span>
                 )}
                 {showLabel && (
-                    <span {...(!label && { 'data-i18n': 'home.hero.cta' })}>
+                    <span data-i18n={!label ? 'home.hero.cta' : undefined}>
                         {label || (isLoaded ? t('home.hero.cta') : '')}
                     </span>
                 )}

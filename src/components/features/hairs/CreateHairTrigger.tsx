@@ -6,7 +6,7 @@ import { useLanguage } from '../../../i18n';
 
 export default function CreateHairTrigger({ onSuccess }: { onSuccess?: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { t } = useLanguage();
+    const { t, isLoaded } = useLanguage();
 
     const handleSuccess = () => {
         setIsModalOpen(false);
@@ -23,7 +23,7 @@ export default function CreateHairTrigger({ onSuccess }: { onSuccess?: () => voi
                 <span className="material-symbols-outlined text-[20px]">
                     add
                 </span>
-                {t('hairSalon.publishTitle')}
+                {isLoaded ? t('hairSalon.publishTitle') : ''}
             </Button>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} noPadding={true}>

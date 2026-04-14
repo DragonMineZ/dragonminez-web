@@ -7,7 +7,7 @@ import { useLanguage } from '../../i18n';
 
 export function FloatingMenu() {
 // ── Estado
-    const { language, t } = useLanguage();
+    const { language, t, isLoaded: isI18nLoaded } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
@@ -163,7 +163,7 @@ export function FloatingMenu() {
                 className={`flex flex-col gap-3 mb-4 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-50 pointer-events-none'
                     }`}
             >
-                <Tooltip content={isDark ? t('floatingMenu.themeLight') : t('floatingMenu.themeDark')} position="top">
+                <Tooltip content={isI18nLoaded ? (isDark ? t('floatingMenu.themeLight') : t('floatingMenu.themeDark')) : ''} position="top">
                     <FloatingMenuButton
                         onClick={toggleTheme}
                         icon={isDark ? 'light_mode' : 'dark_mode'}
@@ -173,7 +173,7 @@ export function FloatingMenu() {
 
                 <div className="relative flex items-center justify-end">
                     <FloatingLanguageSelector isOpen={isLangOpen} />
-                    <Tooltip content={t('floatingMenu.language')} position="top">
+                    <Tooltip content={isI18nLoaded ? t('floatingMenu.language') : ''} position="top">
                         <FloatingMenuButton
                             onClick={() => setIsLangOpen(!isLangOpen)}
                             icon="translate"
@@ -184,7 +184,7 @@ export function FloatingMenu() {
             </div>
 
             <div className="touch-none pointer-events-auto" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-                <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')} position="top">
+                <Tooltip content={isI18nLoaded ? (isOpen ? t('floatingMenu.close') : t('floatingMenu.options')) : ''} position="top">
                     <FloatingMenuButton
                         ref={menuRef}
                         iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
@@ -197,7 +197,7 @@ export function FloatingMenu() {
 
             <SuccessAlert
                 show={showAlert}
-                message={t('languages.languageSuccess')}
+                message={isI18nLoaded ? t('languages.languageSuccess') : ''}
                 duration={2000}
                 onClose={() => setShowAlert(false)}
             />

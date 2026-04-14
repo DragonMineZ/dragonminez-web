@@ -13,9 +13,9 @@ interface DownloadDropdownProps {
     showIcon?: boolean;
 }
 
-export function DownloadDropdown({ 
-    variant = 'primary', 
-    size = 'md', 
+export function DownloadDropdown({
+    variant = 'primary',
+    size = 'md',
     className = '',
     curseforgeIcon,
     modrinthIcon,
@@ -45,7 +45,7 @@ export function DownloadDropdown({
         },
         {
             name: 'Modrinth',
-            url: '#',
+            url: 'https://modrinth.com/mod/dragonminez',
             icon: modrinthIcon
         }
     ];
@@ -54,15 +54,13 @@ export function DownloadDropdown({
         <div className={`relative inline-block ${className}`} ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-2 transition-all transition-colors duration-200 cursor-pointer ${
-                    variant === 'ghost' 
-                    ? 'text-xl font-medium text-white/80 hover:text-white bg-transparent p-0' 
-                    : `font-bold tracking-tight rounded-full outline-none focus:ring-2 focus:ring-gray-300 ${
-                        variant === 'primary' 
-                        ? 'bg-foreground text-background px-8 py-3 hover:opacity-90 hover:scale-105 active:scale-95 shadow-glow'
-                        : 'bg-surface-elevated text-foreground hover:bg-surface border border-glass hover:border-glass-strong px-6 py-2.5'
-                      }`
-                }`}
+                className={`flex items-center gap-2 transition-all transition-colors duration-200 cursor-pointer ${variant === 'ghost'
+                        ? 'text-xl font-medium text-white/80 hover:text-white bg-transparent p-0'
+                        : `font-bold tracking-tight rounded-full outline-none focus:ring-2 focus:ring-gray-300 ${variant === 'primary'
+                            ? 'bg-foreground text-background px-8 py-3 hover:opacity-90 hover:scale-105 active:scale-95 shadow-glow'
+                            : 'bg-surface-elevated text-foreground hover:bg-surface border border-glass hover:border-glass-strong px-6 py-2.5'
+                        }`
+                    }`}
             >
                 {showIcon && (
                     <span className="material-symbols-rounded text-xl transition-transform group-hover:scale-110">
@@ -70,7 +68,7 @@ export function DownloadDropdown({
                     </span>
                 )}
                 {showLabel && (
-                    <span data-i18n={!label ? 'home.hero.cta' : undefined}>
+                    <span>
                         {label || (isLoaded ? t('home.hero.cta') : '')}
                     </span>
                 )}
@@ -91,7 +89,7 @@ export function DownloadDropdown({
                                 className="flex items-center gap-4 px-5 py-4 rounded-3xl transition-all hover:bg-white/10 group active:scale-[0.98]"
                                 onClick={() => setIsOpen(false)}
                             >
-                                <div 
+                                <div
                                     className="w-10 h-10 flex items-center justify-center text-2xl transition-transform group-hover:scale-110"
                                     dangerouslySetInnerHTML={{ __html: option.icon }}
                                 />

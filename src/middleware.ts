@@ -9,6 +9,23 @@ const isProtectedRoute = createRouteMatcher(["/createhair"]);
 // ── Security
 const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
     const response = await next();
+    
+    // Clerk Production Domains
+    const clerkApiUrl = "https://clerk.dragonminez.com";
+    const clerkAccountsUrl = "https://accounts.dragonminez.com";
+
+    const cspDirectives = [
+        "default-src 'self'",
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkApiUrl} ${clerkAccountsUrl} https://challenges.cloudflare.com`,
+        `connect-src 'self' ${clerkApiUrl} ${clerkAccountsUrl}`,
+        "img-src 'self' https://img.clerk.com https://images.clerk.dev data:",
+        "worker-src 'self' blob:",
+        "style-src 'self' 'unsafe-inline'",
+        "frame-src 'self' https://challenges.cloudflare.com",
+        "form-action 'self'",
+    ].join("; ");
+
+    response.headers.set("Content-Security-Policy", cspDirectives);
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
     response.headers.set("X-Frame-Options", "SAMEORIGIN");

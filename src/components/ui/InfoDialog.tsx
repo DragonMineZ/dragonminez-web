@@ -33,18 +33,18 @@ export default function InfoDialog({
                     className="w-[200px] md:w-[260px] h-auto mb-8 drop-shadow-glow-orange animate-pulse-subtle"
                 />
 
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-tight">
                     {displayTitle}
                 </h2>
 
-                <p className="text-white/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
+                <p className="text-foreground/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
                     {displayDescription}
                 </p>
 
                 <div className="flex justify-center w-full px-4 sm:px-0">
                     <button
                         onClick={onClose}
-                        className="w-full sm:w-[160px] px-8 py-3.5 rounded-full bg-white text-surface font-bold hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-lg shadow-glass"
+                        className="w-full sm:w-[160px] px-8 py-3.5 rounded-full bg-foreground text-background font-bold hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-lg shadow-glass"
                     >
                         {displayButtonLabel}
                     </button>

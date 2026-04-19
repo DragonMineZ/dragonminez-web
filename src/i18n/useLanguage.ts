@@ -7,9 +7,11 @@ export const useLanguage = () => {
 // ── Estado
     const context = useContext(LanguageContext);
     const [storeState, setStoreState] = useState(i18nStore.getState());
+    const [mounted, setMounted] = useState(false);
 
 // ── Efectos
     useEffect(() => {
+      setMounted(true);
       if (context) return;
       return i18nStore.subscribe(setStoreState);
     }, [context]);
@@ -42,6 +44,7 @@ export const useLanguage = () => {
     language: storeState.language,
     setLanguage,
     t,
-    isLoaded: storeState.isLoaded
+    isLoaded: mounted ? storeState.isLoaded : false
   };
 };
+

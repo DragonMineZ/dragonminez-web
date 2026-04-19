@@ -14,7 +14,7 @@ export function FloatingMenu() {
     const [showAlert, setShowAlert] = useState(false);
     const isFirstRender = useRef(true);
 
-    const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
+    const [position, setPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [isClient, setIsClient] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const dragOffset = useRef({ x: 0, y: 0 });
@@ -51,13 +51,10 @@ export function FloatingMenu() {
         }
 
         const handleResize = () => {
-            setPosition(prev => {
-                if (!prev) return prev;
-                return {
-                    x: Math.min(prev.x, window.innerWidth - 70),
-                    y: Math.min(prev.y, window.innerHeight - 70)
-                };
-            });
+            setPosition(prev => ({
+                x: Math.min(prev.x, window.innerWidth - 70),
+                y: Math.min(prev.y, window.innerHeight - 70)
+            }));
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -70,6 +67,17 @@ export function FloatingMenu() {
         }
         setShowAlert(true);
     }, [language]);
+
+    useEffect(() => {
+        const handleDoubleClick = (e: MouseEvent) => {
+            if (isDragging) return;
+            const newPos = { x: e.clientX - 30, y: e.clientY - 30 };
+            setPosition(newPos);
+            localStorage.setItem('floating-menu-pos', JSON.stringify(newPos));
+        };
+        document.addEventListener('dblclick', handleDoubleClick);
+        return () => document.removeEventListener('dblclick', handleDoubleClick);
+    }, [isDragging]);
 
     const toggleTheme = () => {
         const newDark = !isDark;

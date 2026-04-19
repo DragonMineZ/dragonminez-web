@@ -19,7 +19,7 @@ export const useLanguage = () => {
     i18nStore.setLanguage(lang);
   };
 
-  const t = (path: string): string => {
+  const t = useCallback((path: string): string => {
     const translations = storeState.translations;
     if (!translations) return path;
 
@@ -35,7 +35,8 @@ export const useLanguage = () => {
     }
 
     return typeof value === 'string' ? value : path;
-  };
+  }, [storeState.translations]);
+
 
   return {
     language: storeState.language,

@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useLanguage } from '../../../i18n';
@@ -37,6 +37,8 @@ export default function HairViewer3D({
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFullSet, setIsFullSet] = useState(false);
+    const lastCodeRef = useRef<string | null>(null);
+
 
     // ── Efectos
     useEffect(() => {
@@ -64,8 +66,15 @@ export default function HairViewer3D({
             setHairForms(forms);
             setAvailableForms(formsList);
             setIsFullSet(decoded.isFullSet);
-            setCurrentFormIndex(0);
+            
+            // Only reset form index if it's a new code
+            if (lastCodeRef.current !== code) {
+                setCurrentFormIndex(0);
+                lastCodeRef.current = code;
+            }
+            
             setIsLoading(false);
+
         } catch (e) {
             setError(t('viewer.parseError'));
             setIsLoading(false);

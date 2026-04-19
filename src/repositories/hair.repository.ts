@@ -1,5 +1,10 @@
+import { createHash } from "crypto";
 import { prisma } from "../lib/prisma";
 import type { Prisma } from "../generated/client/client";
+
+function computeCodeHash(code: string): string {
+    return createHash("sha256").update(code).digest("hex");
+}
 
 const publicArtistSelect = {
     username: true,
@@ -21,14 +26,6 @@ export interface CreateHairData {
     image_url: string;
     description?: string | null;
     clerkId: string;
-    categoryIds?: number[];
-}
-
-export interface UpdateHairData {
-    name?: string;
-    code?: string;
-    image_url?: string;
-    description?: string | null;
     categoryIds?: number[];
 }
 
@@ -101,6 +98,7 @@ export async function createHair(data: CreateHairData) {
         data: {
             name: data.name,
             code: data.code,
+            code_hash: computeCodeHash(data.code),
             image_url: data.image_url,
             description: data.description,
             artist: { connect: { clerk_id: data.clerkId } },
@@ -122,6 +120,7 @@ export async function updateHair(id: number, data: UpdateHairData) {
         data: {
             name: data.name,
             code: data.code,
+            code_hash: data.code ? computeCodeHash(data.code) : undefined,
             image_url: data.image_url,
             description: data.description,
             categories: data.categoryIds

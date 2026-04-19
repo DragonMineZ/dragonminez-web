@@ -21,6 +21,7 @@ model Hair {
   id_hair     Int        @id @default(autoincrement())
   name        String
   code        String     @db.Text
+  code_hash   String     @unique
   image_url   String
   description String?
   created_at  DateTime   @default(now())

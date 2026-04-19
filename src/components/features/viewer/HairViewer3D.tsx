@@ -77,7 +77,8 @@ export default function HairViewer3D({
             const currentFormKey = availableForms[currentFormIndex] || availableForms[0];
             onFormChange(currentFormKey);
         }
-    }, [currentFormIndex, availableForms, onFormChange]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentFormIndex, availableForms]);
 
     // ── Handlers
     const handlePrevForm = () => {

@@ -20,6 +20,11 @@ export function FloatingMenu() {
     const dragOffset = useRef({ x: 0, y: 0 });
     const menuRef = useRef<HTMLButtonElement>(null);
 
+    const getDefaultPosition = () => ({
+        x: Math.max(10, window.innerWidth / 2 - 30),
+        y: Math.max(10, window.innerHeight / 2 - 30)
+    });
+
     useEffect(() => {
         setIsClient(true);
         const savedTheme = localStorage.getItem('theme');
@@ -39,8 +44,10 @@ export function FloatingMenu() {
                 const safeY = Math.min(Math.max(10, parsed.y), window.innerHeight - 70);
                 setPosition({ x: safeX, y: safeY });
             } catch (e) {
-                setPosition(null);
+                setPosition(getDefaultPosition());
             }
+        } else {
+            setPosition(getDefaultPosition());
         }
 
         const handleResize = () => {
@@ -156,8 +163,8 @@ export function FloatingMenu() {
 
     return (
         <div
-            className={`fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit ${!position ? 'bottom-6 right-6' : ''}`}
-            style={position ? { left: position.x, top: position.y, touchAction: 'none' } : { touchAction: 'none' }}
+            className="fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit"
+            style={{ left: position.x, top: position.y, touchAction: 'none' }}
         >
             <div
                 className={`flex flex-col gap-3 mb-4 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-50 pointer-events-none'

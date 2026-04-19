@@ -1,50 +1,48 @@
-# DragonMineZ Web
+<div align="center">
+  <img src=".github/docs/img/dragonminez_big_logo.png" alt="DMZ Banner" width="70%" />
+</div>
 
-<p align="center">
-  <img src="public/favicon.svg" alt="DragonMineZ Logo" width="120" />
-</p>
+## About
 
-<p align="center">
-  <strong>Plataforma web oficial de DragonMineZ</strong>
-</p>
+DragonMineZ Web is the official web platform for [DragonMineZ](https://github.com/DragonMineZ/dragonminez), a Minecraft mod inspired by Dragon Ball Z. This website allows you to explore, create and share hair designs for your character.
 
-<p align="center">
-  🌎 English | 🇪🇸 Español | 🇧🇷 Português
-</p>
+<div align="center">
+  <a href="https://discord.com/servers/dragonmine-z-1216429657273012415" target="_blank" rel="nofollow noopener"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=Discord&logoColor=white&label=Discord&color=orange" alt="Discord"></a>
+  <a href="https://github.com/DragonMineZ/dragonminez-web" target="_blank" rel="nofollow noopener"><img src="https://img.shields.io/badge/GitHub-Web_Repository-181717?style=for-the-badge&logo=GitHub" alt="GitHub"></a>
+</div>
 
----
+## Tech Stack
 
-## Descripción
+<div align="center">
+  <img src="https://img.shields.io/badge/Astro-5.16.6-FF5D01?style=for-the-badge&logo=astro&logoColor=white" alt="Astro">
+  <img src="https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4.1.18-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Prisma-7.4.1-5B4FD9?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Clerk_Auth-2.17.2-6C5CE7?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk Auth">
+  <img src="https://img.shields.io/badge/Three.js-0.183.2-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js">
+</div>
 
-DragonMineZ Web es la plataforma oficial del proyecto DragonMineZ, un mod de Minecraft inspirado en Dragon Ball Z. Este sitio web te permite explorar, crear y compartir diseños de cabello para tu personaje.
+## Features
 
-### Funcionalidades
+- **HairSalon** — Explore thousands of hair designs created by the community
+- **3D Viewer** — Preview any hair design in real-time with multiple angles
+- **Design Creator** — Publish your own hair designs to the community
+- **Favorites** — Save your favorite designs for quick access
+- **Multi-language** — Interface available in Spanish, English and Portuguese
 
-- **HairSalon** — Explora miles de diseños de cabello creados por la comunidad
-- **Visor 3D** — Previsualiza cualquier diseño de cabello en tiempo real con múltiples ángulos
-- **Creador de Diseños** — Publica tus propios diseños de cabello en la comunidad
-- **Favoritos** — Guarda tus diseños preferidos para acceder rápidamente
-- **Multiidioma** — Interfaz disponible en español, inglés y portugués
+## Authors
 
----
+### Developers
 
-## Enlaces
+- [benja](https://github.com/bennndev) | *Programmer, Deploy & UX/UI Designer*.
 
-[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/servers/dragonmine-z-1216429657273012415)
-[![X](https://img.shields.io/badge/X-000?style=for-the-badge&logo=x)](https://x.com/DragonMineZ)
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube)](https://www.youtube.com/@DragonMine-Z)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)](https://github.com/DragonMineZ/dragonminez)
+### Contributors
 
----
+- [facub8](https://github.com/facub8) | *3D Viewer implementation*.
 
-## Legal
+## License
 
-**DragonMineZ es un proyecto de fans y no está afiliado con Bandai Namco, Toei Animation o cualquiera de sus empresas asociadas.**
-
-Dragon Ball Z™ y todos los personajes relacionados son marcas registradas de Shueisha, Toei Animation y empresas asociadas.
-
----
-
-<p align="center">
-  <sub>Hecho con 💪 por fans, para fans</sub>
-</p>
+2025, DragonMineZ. This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License or (at your option) any later version.
+[GNU General Public License v3.0](https://github.com/DragonMineZ/dragonminez-web/blob/main/LICENSE)

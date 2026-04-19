@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/src/assets/dmz-title.png" alt="DMZ Banner" width="70%" />
+  <img src="src/assets/dmz-title.png" alt="DMZ Banner" width="70%" />
 </div>
 
 ## About

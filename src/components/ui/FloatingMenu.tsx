@@ -14,16 +14,11 @@ export function FloatingMenu() {
     const [showAlert, setShowAlert] = useState(false);
     const isFirstRender = useRef(true);
 
-    const [position, setPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const [isClient, setIsClient] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const dragOffset = useRef({ x: 0, y: 0 });
     const menuRef = useRef<HTMLButtonElement>(null);
-
-    const getDefaultPosition = () => ({
-        x: window.innerWidth - 80,
-        y: window.innerHeight - 80
-    });
 
     useEffect(() => {
         setIsClient(true);
@@ -44,17 +39,18 @@ export function FloatingMenu() {
                 const safeY = Math.min(Math.max(10, parsed.y), window.innerHeight - 70);
                 setPosition({ x: safeX, y: safeY });
             } catch (e) {
-                setPosition(getDefaultPosition());
+                setPosition(null);
             }
-        } else {
-            setPosition(getDefaultPosition());
         }
 
         const handleResize = () => {
-            setPosition(prev => ({
-                x: Math.min(prev.x, window.innerWidth - 70),
-                y: Math.min(prev.y, window.innerHeight - 70)
-            }));
+            setPosition(prev => {
+                if (!prev) return prev;
+                return {
+                    x: Math.min(prev.x, window.innerWidth - 70),
+                    y: Math.min(prev.y, window.innerHeight - 70)
+                };
+            });
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -171,8 +167,8 @@ export function FloatingMenu() {
 
     return (
         <div
-            className="fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit"
-            style={{ left: position.x, top: position.y, touchAction: 'none' }}
+            className={`fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit ${!position ? 'bottom-6 right-6' : ''}`}
+            style={position ? { left: position.x, top: position.y, touchAction: 'none' } : { touchAction: 'none' }}
         >
             <div
                 className={`flex flex-col gap-3 mb-4 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-50 pointer-events-none'

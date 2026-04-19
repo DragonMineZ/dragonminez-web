@@ -16,12 +16,13 @@ const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
 
     const cspDirectives = [
         "default-src 'self'",
-        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkApiUrl} ${clerkAccountsUrl} https://challenges.cloudflare.com`,
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkApiUrl} ${clerkAccountsUrl} https://challenges.cloudflare.com https://static.cloudflareinsights.com`,
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com`,
+        `font-src 'self' data: https://fonts.gstatic.com`,
+        `img-src 'self' https://img.clerk.com https://images.clerk.dev https://flagcdn.com data:`,
+        `frame-src 'self' https://challenges.cloudflare.com https://www.youtube.com`,
         `connect-src 'self' ${clerkApiUrl} ${clerkAccountsUrl}`,
-        "img-src 'self' https://img.clerk.com https://images.clerk.dev data:",
         "worker-src 'self' blob:",
-        "style-src 'self' 'unsafe-inline'",
-        "frame-src 'self' https://challenges.cloudflare.com",
         "form-action 'self'",
     ].join("; ");
 

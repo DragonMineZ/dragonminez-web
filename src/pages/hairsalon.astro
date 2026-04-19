@@ -55,7 +55,7 @@ if (userId) {
       </SignedIn>
     </div>
 
-    <HairList client:load initialCategories={categories} />
+    <HairList client:only="react" initialCategories={categories} />
 
   </section>
 </Layout>

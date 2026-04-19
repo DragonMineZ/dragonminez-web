@@ -157,7 +157,10 @@ export function FloatingMenu() {
                 setIsOpen(true);
             }
         } else if (position) {
-            localStorage.setItem('floating-menu-pos', JSON.stringify(position));
+            const isRealDrag = dragOffset.current.x > 30 || dragOffset.current.y > 30;
+            if (isRealDrag) {
+                localStorage.setItem('floating-menu-pos', JSON.stringify(position));
+            }
         }
 
         setTimeout(() => setIsDragging(false), 50);

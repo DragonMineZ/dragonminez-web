@@ -18,6 +18,8 @@ export default defineConfig({
       appearance: {
         theme: dark,
       },
+      signInUrl: "/hairsalon",
+      signOutUrl: "/hairsalon",
     }),
     react(),
     sitemap()

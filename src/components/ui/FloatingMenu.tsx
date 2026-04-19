@@ -21,8 +21,8 @@ export function FloatingMenu() {
     const menuRef = useRef<HTMLButtonElement>(null);
 
     const getDefaultPosition = () => ({
-        x: Math.max(10, window.innerWidth / 2 - 30),
-        y: Math.max(10, window.innerHeight / 2 - 30)
+        x: window.innerWidth - 80,
+        y: window.innerHeight - 80
     });
 
     useEffect(() => {

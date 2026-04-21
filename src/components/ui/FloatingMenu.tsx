@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import FloatingMenuButton from './FloatingMenuButton';
 import FloatingLanguageSelector from './FloatingLanguageSelector';
 import Tooltip from './Tooltip';
@@ -6,22 +6,13 @@ import SuccessAlert from './SuccessAlert';
 import { useLanguage } from '../../i18n';
 
 export function FloatingMenu() {
-// ── Estado
     const { language, t, isLoaded: isI18nLoaded } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
-    const isFirstRender = useRef(true);
-
-    const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
-    const [isClient, setIsClient] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
-    const dragOffset = useRef({ x: 0, y: 0 });
-    const menuRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        setIsClient(true);
         const savedTheme = localStorage.getItem('theme');
         const theme = savedTheme ? savedTheme === 'dark' : true;
         setIsDark(theme);
@@ -30,50 +21,11 @@ export function FloatingMenu() {
         } else {
             document.documentElement.classList.remove('dark');
         }
-
-        const savedPos = localStorage.getItem('floating-menu-pos');
-        if (savedPos) {
-            try {
-                const parsed = JSON.parse(savedPos);
-                const safeX = Math.min(Math.max(10, parsed.x), window.innerWidth - 70);
-                const safeY = Math.min(Math.max(10, parsed.y), window.innerHeight - 70);
-                setPosition({ x: safeX, y: safeY });
-            } catch (e) {
-                setPosition(null);
-            }
-        }
-
-        const handleResize = () => {
-            setPosition(prev => {
-                if (!prev) return prev;
-                return {
-                    x: Math.min(prev.x, window.innerWidth - 70),
-                    y: Math.min(prev.y, window.innerHeight - 70)
-                };
-            });
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
         setShowAlert(true);
     }, [language]);
-
-    useEffect(() => {
-        const handleDoubleClick = (e: MouseEvent) => {
-            if (isDragging) return;
-            const newPos = { x: e.clientX - 30, y: e.clientY - 30 };
-            setPosition(newPos);
-            localStorage.setItem('floating-menu-pos', JSON.stringify(newPos));
-        };
-        document.addEventListener('dblclick', handleDoubleClick);
-        return () => document.removeEventListener('dblclick', handleDoubleClick);
-    }, [isDragging]);
 
     const toggleTheme = () => {
         const newDark = !isDark;
@@ -86,93 +38,12 @@ export function FloatingMenu() {
         }
     };
 
-    const handlePointerDown = (e: React.PointerEvent) => {
-        e.preventDefault();
-        if (e.button !== 0) return;
-
-        setIsDragging(false);
-
-        let currentX = position?.x;
-        let currentY = position?.y;
-
-        if (currentX === undefined || currentY === undefined) {
-            const wrapper = menuRef.current?.parentElement;
-            if (wrapper) {
-                const rect = wrapper.getBoundingClientRect();
-                currentX = rect.left;
-                currentY = rect.top;
-                setPosition({ x: currentX, y: currentY });
-            } else {
-                return;
-            }
-        }
-
-        dragOffset.current = {
-            x: e.clientX - currentX,
-            y: e.clientY - currentY,
-        };
-        if (menuRef.current) {
-            menuRef.current.setPointerCapture(e.pointerId);
-        }
+    const handleToggle = () => {
+        setIsOpen(!isOpen);
     };
-
-    const handlePointerMove = (e: React.PointerEvent) => {
-        if (!menuRef.current?.hasPointerCapture(e.pointerId)) return;
-
-        const currentX = position?.x ?? 0;
-        const currentY = position?.y ?? 0;
-
-        const moveX = Math.abs(e.clientX - (currentX + dragOffset.current.x));
-        const moveY = Math.abs(e.clientY - (currentY + dragOffset.current.y));
-        if (moveX > 3 || moveY > 3) {
-            setIsDragging(true);
-            if (isOpen) {
-                setIsOpen(false);
-                setIsLangOpen(false);
-            }
-        }
-
-        if (isDragging) {
-            let newX = e.clientX - dragOffset.current.x;
-            let newY = e.clientY - dragOffset.current.y;
-
-            const maxX = window.innerWidth - 60;
-            const maxY = window.innerHeight - 60;
-            newX = Math.max(10, Math.min(newX, maxX));
-            newY = Math.max(10, Math.min(newY, maxY));
-
-            setPosition({ x: newX, y: newY });
-        }
-    };
-
-    const handlePointerUp = (e: React.PointerEvent) => {
-        if (menuRef.current) {
-            menuRef.current.releasePointerCapture(e.pointerId);
-        }
-        if (!isDragging) {
-            if (isOpen) {
-                setIsOpen(false);
-                setIsLangOpen(false);
-            } else {
-                setIsOpen(true);
-            }
-        } else if (position) {
-            const isRealDrag = dragOffset.current.x > 30 || dragOffset.current.y > 30;
-            if (isRealDrag) {
-                localStorage.setItem('floating-menu-pos', JSON.stringify(position));
-            }
-        }
-
-        setTimeout(() => setIsDragging(false), 50);
-    };
-
-    if (!isClient) return null;
 
     return (
-        <div
-            className={`fixed z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit ${!position ? 'bottom-6 right-6' : ''}`}
-            style={position ? { left: position.x, top: position.y, touchAction: 'none' } : { touchAction: 'none' }}
-        >
+        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit">
             <div
                 className={`flex flex-col gap-3 mb-4 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-50 pointer-events-none'
                     }`}
@@ -197,17 +68,14 @@ export function FloatingMenu() {
                 </div>
             </div>
 
-            <div className="touch-none pointer-events-auto" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-                <Tooltip content={isI18nLoaded ? (isOpen ? t('floatingMenu.close') : t('floatingMenu.options')) : ''} position="top">
-                    <FloatingMenuButton
-                        ref={menuRef}
-                        iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
-                        icon="settings"
-                        variant={isOpen ? 'mainActive' : 'main'}
-                        style={{ pointerEvents: 'none' }}
-                    />
-                </Tooltip>
-            </div>
+            <Tooltip content={isI18nLoaded ? (isOpen ? t('floatingMenu.close') : t('floatingMenu.options')) : ''} position="top">
+                <FloatingMenuButton
+                    onClick={handleToggle}
+                    iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
+                    icon="settings"
+                    variant={isOpen ? 'mainActive' : 'main'}
+                />
+            </Tooltip>
 
             <SuccessAlert
                 show={showAlert}

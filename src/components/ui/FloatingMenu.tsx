@@ -68,8 +68,9 @@ export function FloatingMenu() {
                 </div>
             </div>
 
-            <Tooltip content={isI18nLoaded ? (isOpen ? t('floatingMenu.close') : t('floatingMenu.options')) : ''} position="top">
+            <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')}>
                 <FloatingMenuButton
+                    type="button"
                     onClick={handleToggle}
                     iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
                     icon="settings"

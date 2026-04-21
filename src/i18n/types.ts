@@ -103,6 +103,7 @@ export interface Translations {
     formNameRequired: string;
     formCodeRequired: string;
     formImageRequired: string;
+    formImageInvalidProvider: string;
     formInvalidFields: string;
     updating: string;
     publishing: string;

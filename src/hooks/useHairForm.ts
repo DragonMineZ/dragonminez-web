@@ -96,11 +96,31 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         );
     };
 
+    const ALLOWED_IMAGE_PROVIDERS = [
+        'i.imgur.com',
+        'imgur.com',
+        'media.discordapp.net',
+        'cdn.discord.app',
+    ];
+
     const validate = () => {
         const newErrors: Record<string, string> = {};
         if (!formData.name.trim()) newErrors.name = "formNameRequired";
         if (!formData.code.trim()) newErrors.code = "formCodeRequired";
-        if (!formData.image_url.trim()) newErrors.image_url = "formImageRequired";
+        if (!formData.image_url.trim()) {
+            newErrors.image_url = "formImageRequired";
+        } else {
+            try {
+                const url = new URL(formData.image_url);
+                const host = url.host.toLowerCase();
+                const isAllowed = ALLOWED_IMAGE_PROVIDERS.some(provider => host === provider || host.endsWith(`.${provider}`));
+                if (!isAllowed) {
+                    newErrors.image_url = "formImageInvalidProvider";
+                }
+            } catch {
+                newErrors.image_url = "formImageInvalidProvider";
+            }
+        }
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;

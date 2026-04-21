@@ -11,8 +11,10 @@ export function FloatingMenu() {
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         const savedTheme = localStorage.getItem('theme');
         const theme = savedTheme ? savedTheme === 'dark' : true;
         setIsDark(theme);
@@ -24,8 +26,9 @@ export function FloatingMenu() {
     }, []);
 
     useEffect(() => {
+        if (!isMounted) return;
         setShowAlert(true);
-    }, [language]);
+    }, [language, isMounted]);
 
     const toggleTheme = () => {
         const newDark = !isDark;
@@ -40,7 +43,12 @@ export function FloatingMenu() {
 
     const handleToggle = () => {
         setIsOpen(!isOpen);
+        if (isOpen) {
+            setIsLangOpen(false);
+        }
     };
+
+    if (!isMounted) return null;
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-center justify-end pointer-events-none w-fit h-fit">
@@ -68,15 +76,17 @@ export function FloatingMenu() {
                 </div>
             </div>
 
-            <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')}>
-                <FloatingMenuButton
-                    type="button"
-                    onClick={handleToggle}
-                    iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
-                    icon="settings"
-                    variant={isOpen ? 'mainActive' : 'main'}
-                />
-            </Tooltip>
+            <div className="pointer-events-auto">
+                <Tooltip content={isOpen ? t('floatingMenu.close') : t('floatingMenu.options')}>
+                    <FloatingMenuButton
+                        type="button"
+                        onClick={handleToggle}
+                        iconClassName={`${isOpen ? 'rotate-90' : 'rotate-0'}`}
+                        icon="settings"
+                        variant={isOpen ? 'mainActive' : 'main'}
+                    />
+                </Tooltip>
+            </div>
 
             <SuccessAlert
                 show={showAlert}

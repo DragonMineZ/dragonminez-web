@@ -103,7 +103,7 @@ const es: Translations = {
     formNameRequired: "El nombre está incompleto",
     formCodeRequired: "El código es obligatorio",
     formImageRequired: "La imagen es obligatoria",
-    formImageInvalidProvider: "La imagen debe ser de Imgur o Discord",
+    formImageInvalidProvider: "La imagen debe ser de https://i.imgur.com o Discord",
     formInvalidFields: "Por favor, completa los campos requeridos",
     updating: "Actualizando...",
     publishing: "Publicando...",

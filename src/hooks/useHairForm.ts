@@ -98,7 +98,6 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
 
     const ALLOWED_IMAGE_PROVIDERS = [
         'i.imgur.com',
-        'imgur.com',
         'media.discordapp.net',
         'cdn.discord.app',
     ];

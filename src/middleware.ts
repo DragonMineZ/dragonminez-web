@@ -9,7 +9,7 @@ const isProtectedRoute = createRouteMatcher(["/createhair"]);
 // ── Security
 const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
     const response = await next();
-    
+
     // Clerk Production Domains
     const clerkApiUrl = "https://clerk.dragonminez.com";
     const clerkAccountsUrl = "https://accounts.dragonminez.com";
@@ -19,7 +19,7 @@ const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
         `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkApiUrl} ${clerkAccountsUrl} https://challenges.cloudflare.com https://static.cloudflareinsights.com`,
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com`,
         `font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com`,
-        `img-src 'self' https://img.clerk.com https://images.clerk.dev https://media.discordapp.net https://cdn.discord.app https://flagcdn.com https://i.imgur.com https://imgur.com data:`,
+        `img-src 'self' https://img.clerk.com https://images.clerk.dev https://media.discordapp.net https://cdn.discord.app https://flagcdn.com https://i.imgur.com`,
         `frame-src 'self' https://challenges.cloudflare.com https://www.youtube.com`,
         `connect-src 'self' ${clerkApiUrl} ${clerkAccountsUrl}`,
         "worker-src 'self' blob:",

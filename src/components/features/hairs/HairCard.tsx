@@ -10,6 +10,7 @@ import ConfirmDialog from "../../ui/ConfirmDialog";
 import SuccessAlert from "../../ui/SuccessAlert";
 import InfoDialog from "../../ui/InfoDialog";
 import HairCategories from "./HairCategories";
+import notFoundImage from '../../../assets/hairsalon/not_found.svg';
 
 import { useLike } from "../../../hooks/useLike";
 import { useClipboard } from "../../../hooks/useClipboard";
@@ -76,6 +77,10 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     src={hair.image_url}
                     alt={hair.name}
                     className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover/card:scale-105"
+                    onError={(e) => {
+                        e.currentTarget.src = notFoundImage.src;
+                        e.currentTarget.onerror = null;
+                    }}
                 />
             </div>
 

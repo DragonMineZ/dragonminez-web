@@ -28,9 +28,35 @@ DragonMineZ Web is the official web platform for [DragonMineZ](https://github.co
 
 - **HairSalon** — Explore thousands of hair designs created by the community
 - **3D Viewer** — Preview any hair design in real-time with multiple angles
+- **Hair Editor** — Create and edit hairs in the browser with a live 3D preview, fully compatible with the in-game editor codes (`DMZ1:` / `DMZF1:`)
 - **Design Creator** — Publish your own hair designs to the community
+- **Blog** — News, guides and updates with categories and subcategories, written by users holding the DMZ Author Discord role
+- **Moderation** — DMZ Authors and Moderators can remove HairSalon designs; Moderators can remove blog posts
 - **Favorites** — Save your favorite designs for quick access
 - **Multi-language** — Interface available in Spanish, English and Portuguese
+
+## Configuration
+
+### Environment variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | ✅ | PostgreSQL connection string |
+| `PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` | ✅ | Clerk authentication (Discord social connection) |
+| `CLERK_WEBHOOK_SIGNING_SECRET` | ✅ | Clerk → DB user sync webhook |
+| `DISCORD_GUILD_ID` | For roles | ID of the DMZ Discord server |
+| `DISCORD_AUTHOR_ROLE_ID` | For roles | Role ID granting blog publishing + salon moderation |
+| `DISCORD_MODERATOR_ROLE_ID` | For roles | Role ID granting salon + blog moderation |
+| `DISCORD_BOT_TOKEN` | Optional | Bot token (bot must be in the guild). Preferred role-lookup method; without it the user's Discord OAuth token is used, which requires the `guilds.members.read` scope on Clerk's Discord connection |
+
+After changing the Prisma schema run `bunx prisma migrate deploy` against your database (the blog tables ship in `prisma/migrations/20260609000000_add_blog`). Seed blog/hair categories with `bun prisma/seed.ts`.
+
+### Landing page content
+
+The home page intro videos and the GIF/info showcase sections are configured in
+[`src/config/landing.ts`](src/config/landing.ts) — drop files into `public/videos/`
+and `public/media/`, then list them there. Every text field accepts either a plain
+string or `{ es, en, pt }` per-language values.
 
 ## Authors
 

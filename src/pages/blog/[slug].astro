@@ -1,0 +1,133 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PostActions from "../../components/features/blog/PostActions.tsx";
+import { findPostBySlugWithAuthor } from "../../repositories/blog.repository";
+import { getUserPermissions } from "../../services/permission.service";
+import { renderMarkdown, readingTimeMinutes } from "../../lib/markdown";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/404");
+
+const post = await findPostBySlugWithAuthor(slug);
+if (!post) return Astro.redirect("/404");
+
+const { userId } = Astro.locals.auth();
+const isOwner = !!userId && post.author.clerk_id === userId;
+const permissions = userId ? await getUserPermissions(Astro, userId) : null;
+const canModerate = permissions?.canModerateBlog ?? false;
+
+// Drafts are only visible to their author or to moderators
+if (!post.published && !isOwner && !canModerate) {
+    return Astro.redirect("/404");
+}
+
+const showActions = isOwner || canModerate;
+const html = renderMarkdown(post.content);
+const readingTime = readingTimeMinutes(post.content);
+const publishedDate = new Date(post.created_at).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+});
+
+const categoryLabel = post.category
+    ? post.category.parent
+        ? `${post.category.parent.name} · ${post.category.name}`
+        : post.category.name
+    : null;
+---
+
+<Layout
+    title={`${post.title} | DragonMineZ Blog`}
+    description={post.excerpt ?? post.title}
+    ogImage={post.cover_image_url ?? undefined}
+    noindex={!post.published}
+>
+    <article class="pb-24">
+        {/* ── Cover hero */}
+        <header class="relative">
+            <div class="relative h-[420px] md:h-[520px] overflow-hidden">
+                {
+                    post.cover_image_url ? (
+                        <img
+                            src={post.cover_image_url}
+                            alt={post.title}
+                            class="absolute inset-0 w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div class="absolute inset-0 bg-gradient-to-br from-surface-elevated via-background to-background" />
+                    )
+                }
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20"
+                >
+                </div>
+
+                <div class="absolute inset-x-0 bottom-0">
+                    <div class="container-base pb-10 md:pb-14">
+                        <div class="max-w-3xl flex flex-col gap-4 reveal reveal-up revealed">
+                            <div class="flex flex-wrap items-center gap-2">
+                                {
+                                    categoryLabel && (
+                                        <span class="px-3 py-1 bg-background/70 backdrop-blur-sm border border-glass rounded-full text-[11px] font-bold text-foreground tracking-wider uppercase">
+                                            {categoryLabel}
+                                        </span>
+                                    )
+                                }
+                                {
+                                    !post.published && (
+                                        <span class="px-3 py-1 bg-error/80 rounded-full text-[11px] font-bold text-white tracking-wider uppercase">
+                                            <span data-i18n="blog.draftBadge">Borrador</span>
+                                        </span>
+                                    )
+                                }
+                            </div>
+                            <h1
+                                class="text-3xl sm:text-5xl font-black tracking-tight text-foreground leading-tight"
+                            >
+                                {post.title}
+                            </h1>
+                            <div class="flex flex-wrap items-center gap-3 text-sm text-muted">
+                                {
+                                    post.author.avatar_url && (
+                                        <img
+                                            src={post.author.avatar_url}
+                                            alt={post.author.username}
+                                            class="w-8 h-8 rounded-full border border-glass object-cover"
+                                        />
+                                    )
+                                }
+                                <span>
+                                    <span data-i18n="blog.by">Por</span>{" "}
+                                    <span class="text-foreground font-semibold">{post.author.username}</span>
+                                </span>
+                                <span class="opacity-40">•</span>
+                                <time datetime={String(post.created_at)}>{publishedDate}</time>
+                                <span class="opacity-40">•</span>
+                                <span>{readingTime} <span data-i18n="blog.minuteRead">min de lectura</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        {/* ── Body */}
+        <div class="container-base">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center justify-between gap-4 py-6 border-b border-glass mb-10">
+                    <a
+                        href="/blog"
+                        class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors font-semibold"
+                    >
+                        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                        <span data-i18n="blog.backToBlog">Volver al Blog</span>
+                    </a>
+                    {showActions && <PostActions client:idle postId={post.id_post} isOwner={isOwner} />}
+                </div>
+
+                <div class="article-body" set:html={html} />
+            </div>
+        </div>
+    </article>
+</Layout>

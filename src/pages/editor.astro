@@ -1,0 +1,21 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HairEditorPage from "../components/features/editor/HairEditorPage.tsx";
+
+const { userId } = Astro.locals.auth();
+const isSignedIn = !!userId;
+
+// ?code=… preloads an existing design (e.g. "Open in editor" from the salon)
+const rawCode = Astro.url.searchParams.get("code") ?? undefined;
+const initialCode = rawCode?.trim() || undefined;
+---
+
+<Layout
+    title="Editor de Cabello | DragonMineZ"
+    i18nTitle="editor.title"
+    description="Crea y edita cabellos de DragonMineZ en 3D, directamente desde el navegador."
+>
+    <section class="pt-20 min-h-screen">
+        <HairEditorPage client:only="react" initialCode={initialCode} isSignedIn={isSignedIn} />
+    </section>
+</Layout>

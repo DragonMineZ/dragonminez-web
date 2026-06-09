@@ -1,0 +1,254 @@
+---
+/**
+ * VideoHero — cinematic full-viewport hero.
+ *
+ * When heroVideos is non-empty: muted autoplay reel with ~1s crossfade,
+ * per-clip caption label, mute/unmute toggle.
+ * When empty: static dmz-hero.png with Ken Burns slow-zoom fallback.
+ *
+ * Overlay: dark cinematic bars top/bottom, DMZ title + hero copy + CTA on top.
+ */
+import { Image } from "astro:assets";
+import titleImg from "../../assets/dmz-title.png";
+import heroImg   from "../../assets/dmz-hero.png";
+import { DownloadDropdown } from "../ui/DownloadDropdown";
+import curseforgeIcon from "../../assets/icons/social/curseforge.svg?raw";
+import modrinthIcon   from "../../assets/icons/social/modrinth.svg?raw";
+import { heroVideos, resolveText } from "../../config/landing";
+
+const lang = "es"; // server-render default; client script resolves on lang change
+const hasVideos = heroVideos.length > 0;
+
+// Pre-resolve labels for server render (es default)
+const videoData = heroVideos.map((v) => ({
+  src: v.src,
+  poster: v.poster ?? "",
+  label: typeof v.label === "string"
+    ? { es: v.label, en: v.label, pt: v.label }
+    : (v.label ?? {}),
+  labelEs: resolveText(v.label, "es"),
+}));
+---
+
+<section
+  id="hero-section"
+  class="relative min-h-screen flex items-end overflow-hidden bg-black"
+>
+  <!-- ── Background layer ───────────────────────────────────────────────── -->
+  {hasVideos ? (
+    /* Video reel */
+    <div id="hero-video-reel" class="absolute inset-0 z-0">
+      {videoData.map((v, i) => (
+        <video
+          class={`hero-clip absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === 0 ? "opacity-100" : "opacity-0"}`}
+          src={v.src}
+          poster={v.poster || undefined}
+          muted
+          autoplay={i === 0}
+          playsinline
+          preload="metadata"
+          data-index={i}
+          data-label={JSON.stringify(v.label)}
+        />
+      ))}
+    </div>
+  ) : (
+    /* Static Ken Burns fallback */
+    <div class="absolute inset-0 z-0 overflow-hidden">
+      <div class="w-full h-full animate-ken-burns will-change-transform">
+        <Image
+          src={heroImg}
+          alt="DragonMineZ Hero Background"
+          class="w-full h-full object-cover"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  )}
+
+  <!-- ── Cinematic gradient overlays ───────────────────────────────────── -->
+  <!-- Top bar -->
+  <div class="absolute inset-x-0 top-0 h-40 z-10 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none"></div>
+  <!-- Bottom bar -->
+  <div class="absolute inset-x-0 bottom-0 h-[28rem] z-10 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none"></div>
+
+  <!-- ── Clip caption (videos only) ────────────────────────────────────── -->
+  {hasVideos && (
+    <div
+      id="hero-caption"
+      class="absolute bottom-44 left-1/2 -translate-x-1/2 z-20 px-5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/80 text-sm font-semibold tracking-widest uppercase transition-opacity duration-700 opacity-0"
+    >
+      <span id="hero-caption-text"></span>
+    </div>
+  )}
+
+  <!-- ── Main content ───────────────────────────────────────────────────── -->
+  <div class="container-base relative z-20 pb-28 md:pb-36 pt-48">
+    <div class="flex flex-col gap-7 max-w-3xl">
+
+      <!-- Title artwork -->
+      <div class="reveal reveal-up">
+        <Image
+          src={titleImg}
+          alt="DragonMineZ"
+          class="h-16 sm:h-20 md:h-28 w-auto object-contain drop-shadow-[0_0_40px_rgba(255,100,0,0.35)]"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+
+      <h1
+        class="reveal reveal-up reveal-delay-1 text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-black text-white italic leading-[0.9] tracking-tighter drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
+        data-i18n="home.hero.title"
+      >
+        ¡Tu aventura <br/>empieza aquí!
+      </h1>
+
+      <p
+        class="reveal reveal-up reveal-delay-2 text-lg sm:text-xl md:text-2xl text-white/75 font-medium leading-relaxed max-w-2xl"
+        data-i18n="home.hero.subtitle"
+      >
+        Vive la experiencia de Dragon Ball y recorre la historia junto a Goku.
+      </p>
+
+      <div class="reveal reveal-up reveal-delay-3 flex flex-wrap items-center gap-4 pt-2">
+        <DownloadDropdown
+          client:idle
+          variant="primary"
+          size="lg"
+          curseforgeIcon={curseforgeIcon}
+          modrinthIcon={modrinthIcon}
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Mute toggle (videos only) ─────────────────────────────────────── -->
+  {hasVideos && (
+    <button
+      id="hero-mute-btn"
+      class="absolute bottom-8 right-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/80 text-sm font-semibold hover:bg-white/20 transition-colors"
+      aria-label="Toggle mute"
+    >
+      <span class="material-symbols-rounded text-base" id="hero-mute-icon">volume_off</span>
+      <span
+        id="hero-mute-label"
+        data-i18n="home.intro.soundOn"
+        data-localized-on={JSON.stringify({ es: "Activar sonido", en: "Unmute", pt: "Ativar som" })}
+        data-localized-off={JSON.stringify({ es: "Silenciar", en: "Mute", pt: "Silenciar" })}
+      >Activar sonido</span>
+    </button>
+  )}
+
+  <!-- ── Scroll hint ────────────────────────────────────────────────────── -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1">
+    <span
+      class="text-white/40 text-xs font-semibold tracking-widest uppercase"
+      data-i18n="home.intro.scrollHint"
+    >
+      Desliza para descubrir
+    </span>
+    <span class="material-symbols-rounded text-white/40 text-2xl animate-bounce">keyboard_arrow_down</span>
+  </div>
+</section>
+
+{hasVideos && (
+  <script define:vars={{ videoData }}>
+    (function () {
+      const clips = Array.from(document.querySelectorAll('.hero-clip'));
+      const captionEl = document.getElementById('hero-caption');
+      const captionText = document.getElementById('hero-caption-text');
+      const muteBtn = document.getElementById('hero-mute-btn');
+      const muteIcon = document.getElementById('hero-mute-icon');
+      const muteLabel = document.getElementById('hero-mute-label');
+
+      if (!clips.length) return;
+
+      let currentIdx = 0;
+      let isMuted = true;
+      let lang = 'es';
+
+      // Same key the i18n store persists the language under
+      function getLang() {
+        try {
+          const storeStr = localStorage.getItem('dragonminez_lang');
+          if (storeStr) lang = storeStr;
+        } catch (_) {}
+      }
+
+      function showCaption(idx) {
+        if (!captionEl || !captionText) return;
+        const data = videoData[idx];
+        if (!data) return;
+        getLang();
+        const labelObj = data.label;
+        const text = labelObj[lang] ?? labelObj['es'] ?? labelObj['en'] ?? labelObj['pt'] ?? '';
+        if (text) {
+          captionText.textContent = text;
+          captionEl.style.opacity = '1';
+        } else {
+          captionEl.style.opacity = '0';
+        }
+      }
+
+      function advance() {
+        const next = (currentIdx + 1) % clips.length;
+        const current = clips[currentIdx];
+        const nextClip = clips[next];
+
+        // Start loading next clip
+        nextClip.style.opacity = '0';
+        nextClip.muted = isMuted;
+        nextClip.currentTime = 0;
+        nextClip.play().catch(() => {});
+
+        // Crossfade
+        nextClip.style.transition = 'opacity 1s ease-in-out';
+        nextClip.style.opacity = '1';
+        current.style.transition = 'opacity 1s ease-in-out';
+        current.style.opacity = '0';
+
+        setTimeout(() => {
+          current.pause();
+          current.currentTime = 0;
+        }, 1000);
+
+        currentIdx = next;
+        showCaption(currentIdx);
+      }
+
+      // Init first clip
+      const first = clips[0];
+      first.muted = true;
+      first.play().catch(() => {});
+      showCaption(0);
+
+      // Advance when clip ends (or poll if no 'ended' event)
+      clips.forEach((clip) => {
+        clip.addEventListener('ended', advance);
+        // Fallback: if clip loops or has no duration, advance after 8s
+        clip.addEventListener('loadedmetadata', () => {
+          if (!clip.duration || clip.duration > 30) {
+            setTimeout(advance, 8000);
+          }
+        });
+      });
+
+      // Mute toggle
+      muteBtn?.addEventListener('click', () => {
+        isMuted = !isMuted;
+        clips.forEach((c) => { c.muted = isMuted; });
+        if (muteIcon) muteIcon.textContent = isMuted ? 'volume_off' : 'volume_up';
+        if (muteLabel) {
+          muteLabel.setAttribute('data-i18n', isMuted ? 'home.intro.soundOn' : 'home.intro.soundOff');
+          try {
+            getLang();
+            const dict = JSON.parse(muteLabel.getAttribute(isMuted ? 'data-localized-on' : 'data-localized-off') || '{}');
+            muteLabel.textContent = dict[lang] ?? dict['es'] ?? muteLabel.textContent;
+          } catch (_) {}
+        }
+      });
+    })();
+  </script>
+)}

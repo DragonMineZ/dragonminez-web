@@ -7,6 +7,7 @@ import { handlePrismaError } from "../../../lib/api/errors";
 import { hairsCache } from "../../../lib/api/cache";
 import * as HairService from "../../../services/hair.service";
 import { getUserByClerkId } from "../../../services/user.service";
+import { getUserPermissions } from "../../../services/permission.service";
 import type { HairQueryParams } from "../../../repositories/hair.repository";
 
 const PUBLIC_CACHE = {
@@ -14,8 +15,8 @@ const PUBLIC_CACHE = {
 };
 
 // ── Handlers
-export const GET: APIRoute = async ({ request, locals }) => {
-
+export const GET: APIRoute = async (context) => {
+    const { request, locals } = context;
     const { userId } = locals.auth();
     let dbUserId: number | null = null;
 
@@ -55,14 +56,15 @@ export const GET: APIRoute = async ({ request, locals }) => {
         artistId: myCreations && dbUserId ? dbUserId : undefined,
     };
 
-    // ── Cache
+    // ── Cache (anonymous, non-personalised requests only)
     if (!userId && !myCreations) {
         const cacheKey = url.search || "?";
         const cached = hairsCache.get(cacheKey);
+        // Cached results never contain canModerate:true — safe to return directly
         if (cached) return ok(cached, PUBLIC_CACHE);
 
         try {
-            const result = await HairService.getAllHairs(null, params);
+            const result = await HairService.getAllHairs(null, params, false);
             hairsCache.set(cacheKey, result, 30_000);
             return ok(result, PUBLIC_CACHE);
 
@@ -71,9 +73,15 @@ export const GET: APIRoute = async ({ request, locals }) => {
         }
     }
 
+    // ── Authenticated: resolve permissions once per request
+    const { canModerateSalon } = userId
+        ? await getUserPermissions(context, userId)
+        : { canModerateSalon: false };
+
     try {
-        const result = await HairService.getAllHairs(dbUserId, params);
-        return ok(result, PUBLIC_CACHE);
+        const result = await HairService.getAllHairs(dbUserId, params, canModerateSalon);
+        // Personalised response (isOwner/canModerate) — never share-cache it
+        return ok(result, { "Cache-Control": "private, no-store" });
 
     } catch (err) {
         return handlePrismaError(err);

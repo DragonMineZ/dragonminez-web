@@ -134,6 +134,74 @@ body {
 }
 
 /* ── Componentes */
+/* ── Scroll-Reveal Animation System ─────────────────────────────────────────
+ * Usage: add .reveal + variant (.reveal-up, .reveal-left, .reveal-right,
+ * .reveal-scale) to any element. Add .reveal-delay-1 through .reveal-delay-4
+ * for staggered delays (+100ms each). The JS observer adds .revealed.
+ * Elements are only hidden when html.js-loaded is present (JS fallback).
+ * ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-loaded .reveal {
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html.js-loaded .reveal-up    { transform: translateY(24px); }
+  html.js-loaded .reveal-left  { transform: translateX(-24px); }
+  html.js-loaded .reveal-right { transform: translateX(24px); }
+  html.js-loaded .reveal-scale { transform: scale(0.95); }
+
+  html.js-loaded .reveal-delay-1 { transition-delay: 100ms; }
+  html.js-loaded .reveal-delay-2 { transition-delay: 200ms; }
+  html.js-loaded .reveal-delay-3 { transition-delay: 300ms; }
+  html.js-loaded .reveal-delay-4 { transition-delay: 400ms; }
+
+  html.js-loaded .reveal.revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Ken Burns animation for static hero fallback */
+@keyframes ken-burns {
+  0%   { transform: scale(1)    translateX(0)     translateY(0); }
+  33%  { transform: scale(1.05) translateX(-1%)   translateY(-1%); }
+  66%  { transform: scale(1.08) translateX(1%)    translateY(-0.5%); }
+  100% { transform: scale(1)    translateX(0)     translateY(0); }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 20s ease-in-out infinite;
+}
+
+/* ── Video hero crossfade */
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hero-clip-active {
+  animation: hero-fade-in 1s ease-in-out forwards;
+}
+
+/* ── Gradient border utility */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 @layer components {
   .container-base {
     @apply w-full max-w-7xl mx-auto px-6 md:px-8;
@@ -180,4 +248,118 @@ body {
     @apply block w-full h-px rounded-full bg-glass;
   }
 }
-
+
+/* ── Blog article typography (rendered markdown) ─────────────────────────── */
+@layer components {
+  .article-body {
+    @apply text-foreground/90 leading-relaxed text-[1.05rem];
+  }
+
+  .article-body h1,
+  .article-body h2 {
+    @apply text-foreground font-black tracking-tight text-3xl mt-12 mb-5 first:mt-0;
+  }
+
+  .article-body h3 {
+    @apply text-foreground font-bold tracking-tight text-2xl mt-10 mb-4;
+  }
+
+  .article-body h4,
+  .article-body h5,
+  .article-body h6 {
+    @apply text-foreground font-bold text-xl mt-8 mb-3;
+  }
+
+  .article-body p {
+    @apply my-5;
+  }
+
+  .article-body a {
+    @apply text-foreground font-semibold underline underline-offset-4 decoration-glass-strong hover:decoration-foreground transition-colors;
+  }
+
+  .article-body strong {
+    @apply text-foreground font-bold;
+  }
+
+  .article-body ul {
+    @apply list-disc pl-6 my-5 space-y-2;
+  }
+
+  .article-body ol {
+    @apply list-decimal pl-6 my-5 space-y-2;
+  }
+
+  .article-body blockquote {
+    @apply border-l-4 border-glass-strong bg-glass rounded-r-2xl px-6 py-4 my-6 text-muted italic;
+  }
+
+  .article-body code {
+    @apply bg-glass border border-glass rounded-md px-1.5 py-0.5 text-[0.9em] font-mono text-foreground;
+  }
+
+  .article-body pre {
+    @apply bg-surface border border-glass rounded-2xl p-5 my-6 overflow-x-auto;
+  }
+
+  .article-body pre code {
+    @apply bg-transparent border-0 p-0;
+  }
+
+  .article-body img {
+    @apply rounded-2xl border border-glass my-8 mx-auto max-h-[560px] object-contain;
+  }
+
+  .article-body hr {
+    @apply border-glass my-10;
+  }
+
+  .article-body table {
+    @apply w-full my-6 text-sm border-collapse;
+  }
+
+  .article-body th {
+    @apply text-left font-bold text-foreground border-b border-glass-strong px-3 py-2;
+  }
+
+  .article-body td {
+    @apply border-b border-glass px-3 py-2 text-muted;
+  }
+}
+
+/* ── Hair editor range slider ────────────────────────────────────────────── */
+.editor-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--foreground);
+  border: 2px solid var(--background);
+  box-shadow: 0 0 0 1px var(--glass-strong);
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.editor-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.editor-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+.editor-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--foreground);
+  border: 2px solid var(--background);
+  box-shadow: 0 0 0 1px var(--glass-strong);
+  cursor: grab;
+}
+
+.editor-slider::-moz-range-track {
+  background: transparent;
+}

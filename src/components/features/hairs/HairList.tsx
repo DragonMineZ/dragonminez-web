@@ -11,6 +11,7 @@ import ItemsPerPageSelector from "../../ui/ItemsPerPageSelector";
 import { useHairs, type HairFetchParams } from "../../../hooks/useHairs";
 import { useLanguage } from "../../../i18n";
 import type { Category } from "../../../types/hair";
+import Chip from "../../ui/Chip";
 
 export default function HairList({ initialCategories = [] }: { initialCategories?: Category[] }) {
   const { isLoaded: isAuthLoaded, isSignedIn, getToken } = useAuth();
@@ -170,7 +171,15 @@ export default function HairList({ initialCategories = [] }: { initialCategories
           </Button>
         )}
         <SignedIn>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Chip
+              href="/editor"
+              icon="brush"
+              variant="outline"
+              title={t("hairSalon.createWithEditor")}
+            >
+              {t("hairSalon.createWithEditor")}
+            </Chip>
             <CreateHairTrigger onSuccess={handleCreateSuccess} />
           </div>
         </SignedIn>
@@ -192,6 +201,7 @@ export default function HairList({ initialCategories = [] }: { initialCategories
               key={hair.id_hair}
               hair={hair}
               isSignedIn={isSignedIn || false}
+              canModerate={meta.canModerate ?? false}
               onDelete={handleDelete}
               onUpdateSuccess={handleUpdateSuccess}
               onLikeToggle={handleLikeToggleLocally}

@@ -16,9 +16,12 @@
  * Required env vars: DISCORD_GUILD_ID, DISCORD_AUTHOR_ROLE_ID,
  * DISCORD_MODERATOR_ROLE_ID and optionally DISCORD_BOT_TOKEN.
  */
-import type { APIContext } from "astro";
+import type { APIContext, AstroGlobal } from "astro";
 import { clerkClient } from "@clerk/astro/server";
 import { TtlCache } from "../lib/api/cache";
+
+/** Works from both API routes and .astro page frontmatter. */
+type RequestContext = APIContext | AstroGlobal;
 
 export interface UserPermissions {
     /** The Clerk account has a linked Discord account. */
@@ -80,7 +83,7 @@ async function fetchRolesWithBotToken(discordUserId: string): Promise<string[] |
 }
 
 async function fetchRolesWithOauthToken(
-    context: APIContext,
+    context: RequestContext,
     clerkUserId: string,
 ): Promise<string[] | null> {
     const guildId = env("DISCORD_GUILD_ID");
@@ -88,7 +91,7 @@ async function fetchRolesWithOauthToken(
 
     let token: string | undefined;
     try {
-        const tokens = await clerkClient(context).users.getUserOauthAccessToken(
+        const tokens = await clerkClient(context as APIContext).users.getUserOauthAccessToken(
             clerkUserId,
             "discord",
         );
@@ -114,7 +117,7 @@ async function fetchRolesWithOauthToken(
  * lookup error yields no elevated permissions.
  */
 export async function getUserPermissions(
-    context: APIContext,
+    context: RequestContext,
     clerkUserId: string | null | undefined,
 ): Promise<UserPermissions> {
     if (!clerkUserId) return NO_PERMISSIONS;
@@ -124,7 +127,7 @@ export async function getUserPermissions(
 
     let permissions = NO_PERMISSIONS;
     try {
-        const user = await clerkClient(context).users.getUser(clerkUserId);
+        const user = await clerkClient(context as APIContext).users.getUser(clerkUserId);
         const discordAccount = user.externalAccounts.find(
             (acc) => acc.provider === "discord" || acc.provider === "oauth_discord",
         );

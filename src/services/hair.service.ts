@@ -2,7 +2,11 @@ import * as HairRepo from "../repositories/hair.repository";
 import type { HairQueryParams } from "../repositories/hair.repository";
 import { forbidden, notFound } from "../lib/api/response";
 
-export async function getAllHairs(dbUserId: number | null, params: HairQueryParams) {
+export async function getAllHairs(
+    dbUserId: number | null,
+    params: HairQueryParams,
+    canModerate = false,
+) {
     const { hairs: rawHairs, total, page, limit } = await HairRepo.findHairsPaginated(
         dbUserId,
         params
@@ -27,6 +31,7 @@ export async function getAllHairs(dbUserId: number | null, params: HairQueryPara
             page,
             limit,
             totalPages: Math.ceil(total / limit),
+            canModerate,
         },
     };
 }
@@ -63,11 +68,13 @@ export async function updateHair(
 
 export async function removeHair(
     hairId: number,
-    clerkId: string
+    clerkId: string,
+    isModerator = false,
 ): Promise<ServiceResult<{ message: string }>> {
     const existing = await HairRepo.findHairWithArtist(hairId);
     if (!existing) return { error: notFound("errors.api.hairNotFound") };
-    if (existing.artist.clerk_id !== clerkId) {
+    const isOwner = existing.artist.clerk_id === clerkId;
+    if (!isOwner && !isModerator) {
         return { error: forbidden("errors.api.notOwned") };
     }
     await HairRepo.deleteHair(hairId);

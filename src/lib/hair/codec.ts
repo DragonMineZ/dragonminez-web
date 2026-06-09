@@ -137,7 +137,7 @@ function pick(obj: Record<string, unknown>, ...keys: string[]): unknown {
 }
 
 function loadStrand(tag: StrandData, face: HairFace, index: number): HairStrandModel {
-    const raw = tag as Record<string, unknown>;
+    const raw = tag as unknown as Record<string, unknown>;
     const strand = createEmptyStrand(face, index);
     strand.length = Math.max(0, Math.min(50, num(pick(raw, "l", "Length"), 0)));
     strand.lengthScale = num(pick(raw, "ls", "LengthScale"), 1);
@@ -173,7 +173,7 @@ export function hairFromNbtObject(data: HairFormData): CustomHairModel {
         const strands = hair.strands[face];
         for (let i = 0; i < list.length; i++) {
             const tag = list[i] as StrandData;
-            const idInTag = num(pick(tag as Record<string, unknown>, "i", "Id"), 0);
+            const idInTag = num(pick(tag as unknown as Record<string, unknown>, "i", "Id"), 0);
 
             let targetIndex = i;
             if (version >= 2) {

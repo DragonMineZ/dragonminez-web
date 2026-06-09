@@ -1,0 +1,41 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import BlogList from "../../components/features/blog/BlogList.tsx";
+import { getCategories } from "../../services/blog.service";
+import { getUserPermissions } from "../../services/permission.service";
+
+const { userId } = Astro.locals.auth();
+
+// ── Datos (SSR)
+const categories = await getCategories().catch(() => []);
+const permissions = userId ? await getUserPermissions(Astro, userId) : null;
+const canPost = permissions?.canPostBlog ?? false;
+---
+
+<Layout
+    title="Blog | DragonMineZ"
+    i18nTitle="blog.title"
+    description="Noticias, guías y novedades del universo DragonMineZ."
+>
+    <section class="container-base py-24 md:py-32">
+        <div class="relative mb-12">
+            <div
+                class="absolute -top-20 left-1/4 w-72 h-72 bg-orange-500/10 rounded-full blur-[120px] pointer-events-none"
+            >
+            </div>
+            <div class="reveal reveal-up">
+                <h1
+                    class="text-4xl sm:text-6xl font-black italic uppercase tracking-tighter text-foreground"
+                    data-i18n="blog.title"
+                >
+                    Blog
+                </h1>
+                <p class="text-muted mt-3 max-w-xl text-lg" data-i18n="blog.subtitle">
+                    Noticias, guías y novedades del universo DragonMineZ.
+                </p>
+            </div>
+        </div>
+
+        <BlogList client:only="react" initialCategories={categories} canPost={canPost} />
+    </section>
+</Layout>

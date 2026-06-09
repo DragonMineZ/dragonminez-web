@@ -4,7 +4,11 @@ import type { MiddlewareHandler } from "astro";
 import { tooManyRequests } from "./lib/api/response";
 import { readLimiter, writeLimiter, likeLimiter } from "./lib/api/cache";
 
-const isProtectedRoute = createRouteMatcher(["/createhair"]);
+const isProtectedRoute = createRouteMatcher([
+    "/createhair",
+    "/blog/new",
+    "/blog/edit(.*)",
+]);
 
 // ── Security
 const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {

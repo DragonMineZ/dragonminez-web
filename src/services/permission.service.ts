@@ -13,8 +13,9 @@
  *  2. OAuth token — the user's Discord OAuth access token from Clerk; needs
  *     the `guilds.members.read` scope enabled on Clerk's Discord connection.
  *
- * Required env vars: DISCORD_GUILD_ID, DISCORD_AUTHOR_ROLE_ID,
- * DISCORD_MODERATOR_ROLE_ID and optionally DISCORD_BOT_TOKEN.
+ * The DMZ guild/role ids ship as in-code defaults (they are public, not
+ * secret); env vars DISCORD_GUILD_ID, DISCORD_AUTHOR_ROLE_ID and
+ * DISCORD_MODERATOR_ROLE_ID override them. DISCORD_BOT_TOKEN is optional.
  */
 import type { APIContext, AstroGlobal } from "astro";
 import { clerkClient } from "@clerk/astro/server";
@@ -46,8 +47,22 @@ const DISCORD_API = "https://discord.com/api/v10";
 const PERMISSIONS_TTL_MS = 5 * 60 * 1000;
 const permissionsCache = new TtlCache<UserPermissions>(1000);
 
+/**
+ * DMZ Discord server defaults. Guild and role ids are public identifiers
+ * (not secrets) — env vars of the same name override them if they change.
+ */
+const DEFAULTS: Record<string, string> = {
+    DISCORD_GUILD_ID: "1216429657273012415",
+    DISCORD_AUTHOR_ROLE_ID: "1309022450671161476",
+    DISCORD_MODERATOR_ROLE_ID: "1472821034418962573",
+};
+
 function env(name: string): string | undefined {
-    return process.env[name] ?? (import.meta.env as Record<string, string | undefined>)[name];
+    return (
+        process.env[name] ??
+        (import.meta.env as Record<string, string | undefined>)[name] ??
+        DEFAULTS[name]
+    );
 }
 
 function buildPermissions(hasDiscord: boolean, roleIds: string[]): UserPermissions {

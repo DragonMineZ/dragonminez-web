@@ -44,10 +44,10 @@ DragonMineZ Web is the official web platform for [DragonMineZ](https://github.co
 | `DATABASE_URL` | ✅ | PostgreSQL connection string |
 | `PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` | ✅ | Clerk authentication (Discord social connection) |
 | `CLERK_WEBHOOK_SIGNING_SECRET` | ✅ | Clerk → DB user sync webhook |
-| `DISCORD_GUILD_ID` | For roles | ID of the DMZ Discord server |
-| `DISCORD_AUTHOR_ROLE_ID` | For roles | Role ID granting blog publishing + salon moderation |
-| `DISCORD_MODERATOR_ROLE_ID` | For roles | Role ID granting salon + blog moderation |
-| `DISCORD_BOT_TOKEN` | Optional | Bot token (bot must be in the guild). Preferred role-lookup method; without it the user's Discord OAuth token is used, which requires the `guilds.members.read` scope on Clerk's Discord connection |
+| `DISCORD_GUILD_ID` | Optional | DMZ server ID — ships as an in-code default, override only if it changes |
+| `DISCORD_AUTHOR_ROLE_ID` | Optional | Author role ID — ships as an in-code default |
+| `DISCORD_MODERATOR_ROLE_ID` | Optional | Moderator role ID — ships as an in-code default |
+| `DISCORD_BOT_TOKEN` | Optional | Bot token (bot must be in the guild). Preferred role-lookup method; without it the user's Discord OAuth token is used, which **requires the `guilds.members.read` scope on Clerk's Discord connection** |
 
 After changing the Prisma schema run `bunx prisma migrate deploy` against your database (the blog tables ship in `prisma/migrations/20260609000000_add_blog`). Seed blog/hair categories with `bun prisma/seed.ts`.
 

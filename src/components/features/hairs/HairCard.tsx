@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import type { Hair } from "../../../types/hair";
 import ActionButtons from "../../ui/ActionButtons";
 import Chip from "../../ui/Chip";
+import Tooltip from "../../ui/Tooltip";
 import AuthorTag from "../../ui/AuthorTag";
 import CodeClipboard from "../../ui/CodeClipboard";
 import LikeButton from "../../ui/LikeButton";
@@ -18,6 +19,7 @@ import { useLanguage } from "../../../i18n";
 interface HairCardProps {
     hair: Hair;
     isSignedIn: boolean;
+    canModerate?: boolean;
     onDelete: (id: number) => void;
     onUpdateSuccess?: () => void;
     onLikeToggle?: (hairId: number, liked: boolean) => void;
@@ -25,7 +27,7 @@ interface HairCardProps {
 
 const CreateHairForm = lazy(() => import('./CreateHairForm'));
 
-export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
+export default function HairCard({ hair, isSignedIn, canModerate = false, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
     const { t } = useLanguage();
 
     const { isLiked, toggleLike } = useLike(hair.id_hair, !!hair.is_liked_by_user, onLikeToggle);
@@ -33,10 +35,14 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isModDeleteModalOpen, setIsModDeleteModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: "" });
 
     const isOwner = hair.isOwner ?? false;
+    // Moderator delete is only shown when the user has moderation rights but is NOT the owner
+    // (owners already see the full ActionButtons with edit+delete)
+    const showModDelete = isSignedIn && canModerate && !isOwner;
 
     // ── Handlers
     const handleCopyCode = () => {
@@ -96,6 +102,12 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                             variant="outline"
                             title={t('hairSalon.view3D')}
                         />
+                        <Chip
+                            href={`/editor?code=${encodeURIComponent(hair.code)}`}
+                            icon="brush"
+                            variant="outline"
+                            title={t('hairSalon.openInEditor')}
+                        />
                         <LikeButton
                             isLiked={isLiked}
                             likesCount={hair._count?.likes || 0}
@@ -125,6 +137,29 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                             onDelete={() => setIsDeleteModalOpen(true)}
                         />
                     )}
+
+                    {showModDelete && (
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-error/10 text-error border border-error/20">
+                                <span className="material-symbols-outlined text-[14px] leading-none">shield</span>
+                                {t('hairSalon.moderationBadge')}
+                            </span>
+                            <Tooltip content={t('hairSalon.deleteDesign')}>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setIsModDeleteModalOpen(true);
+                                    }}
+                                    className="group/action flex items-center justify-center w-10 h-10 text-error/70 hover:bg-error hover:text-background border border-error/20 hover:border-transparent rounded-xl transition-all duration-300 shadow-sm"
+                                    aria-label={t('hairSalon.deleteDesign')}
+                                >
+                                    <span className="material-symbols-outlined text-[24px] group-hover/action:[font-variation-settings:'FILL'_1]">
+                                        delete
+                                    </span>
+                                </button>
+                            </Tooltip>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -143,6 +178,13 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={() => onDelete(hair.id_hair)}
                 description={t('hairSalon.deleteConfirmDesc')}
+            />
+
+            <ConfirmDialog
+                isOpen={isModDeleteModalOpen}
+                onClose={() => setIsModDeleteModalOpen(false)}
+                onConfirm={() => onDelete(hair.id_hair)}
+                description={t('hairSalon.moderationDeleteDesc')}
             />
 
             <InfoDialog

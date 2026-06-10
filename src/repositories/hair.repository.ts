@@ -114,6 +114,14 @@ export async function createHair(data: CreateHairData) {
     });
 }
 
+export interface UpdateHairData {
+    name?: string;
+    code?: string;
+    image_url?: string;
+    description?: string | null;
+    categoryIds?: number[];
+}
+
 export async function updateHair(id: number, data: UpdateHairData) {
     return prisma.hair.update({
         where: { id_hair: id },

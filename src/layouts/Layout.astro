@@ -61,12 +61,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         }
         return 'dark';
       })();
-    
+
       if (theme === 'light') {
         document.documentElement.classList.remove('dark');
       } else {
         document.documentElement.classList.add('dark');
       }
+
+      // Mark JS as available so .reveal animations activate
+      document.documentElement.classList.add('js-loaded');
     </script>
 
     <!-- ── Google Fonts Resource Hints -->
@@ -96,8 +99,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <script>
       import { i18nStore } from "../i18n/store";
 
+      // ── Resolve a localized object for the active language
+      function resolveLocalized(obj: Record<string, string>, lang: string): string {
+        return obj[lang] ?? obj['es'] ?? obj['en'] ?? obj['pt'] ?? '';
+      }
+
       function updateI18nElements() {
-        const { translations, isLoaded } = i18nStore.getState();
+        const { translations, isLoaded, language } = i18nStore.getState();
         if (!isLoaded || !translations) return;
 
         // ── Page Title
@@ -121,7 +129,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
           const keys = path.split('.');
           let value: any = translations;
-          
+
           for (const key of keys) {
             if (value && typeof value === 'object' && key in value) {
               value = value[key];
@@ -140,16 +148,63 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
             }
           }
         });
+
+        // ── data-localized: resolve LocalizedText objects from config
+        const lang = language ?? 'es';
+        document.querySelectorAll('[data-localized]').forEach((el) => {
+          const raw = el.getAttribute('data-localized');
+          if (!raw) return;
+          try {
+            const obj = JSON.parse(raw) as Record<string, string>;
+            const text = resolveLocalized(obj, lang);
+            if (text) el.textContent = text;
+          } catch {
+            // invalid JSON — leave as-is
+          }
+        });
       }
 
-      // Initial update
-      updateI18nElements();
+      // ── Scroll-Reveal IntersectionObserver ─────────────────────────────────
+      let revealObserver: IntersectionObserver | null = null;
 
+      function dmzObserveReveals() {
+        if (!revealObserver) {
+          revealObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('revealed');
+                  revealObserver!.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.15 }
+          );
+        }
+        document.querySelectorAll('.reveal:not(.revealed)').forEach((el) => {
+          revealObserver!.observe(el);
+        });
+      }
+
+      // Expose globally so components can trigger a re-scan
+      (window as any).dmzObserveReveals = dmzObserveReveals;
+
+      // ── Init
+      function init() {
+        updateI18nElements();
+        dmzObserveReveals();
+      }
+
+      init();
       i18nStore.subscribe(updateI18nElements);
 
       document.addEventListener('astro:page-load', () => {
-        updateI18nElements();
+        init();
         i18nStore.subscribe(updateI18nElements);
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        dmzObserveReveals();
       });
     </script>
   </body>

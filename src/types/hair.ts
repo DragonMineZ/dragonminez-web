@@ -29,4 +29,5 @@ export interface HairMeta {
     page: number;
     limit: number;
     totalPages: number;
+    canModerate?: boolean;
 }

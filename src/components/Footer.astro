@@ -8,111 +8,126 @@ import Tooltip from "./ui/Tooltip";
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="w-full bg-[#1c1b22] text-white py-16 px-6 md:px-8 border-t border-white/5">
-  <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-4">
-    
-    <!-- ── Marca -->
-    <div class="mb-2">
-      <a href="/" class="block transform transition-transform hover:scale-105 active:scale-95">
-        <Image 
-          src={logo} 
-          alt="DragonMineZ Logo" 
-          class="h-10 md:h-12 w-auto object-contain drop-shadow-logo"
+<footer class="w-full bg-[#0a0a0b] text-white pt-16 pb-10 px-6 md:px-8 border-t border-white/[0.06]">
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Top row: logo + nav links -->
+    <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-10">
+
+      <!-- Brand -->
+      <a href="/" class="block transform transition-transform hover:scale-105 active:scale-95 flex-shrink-0">
+        <Image
+          src={logo}
+          alt="DragonMineZ Logo"
+          class="h-9 md:h-11 w-auto object-contain drop-shadow-logo opacity-90 hover:opacity-100 transition-opacity"
         />
       </a>
+
+      <!-- Quick links -->
+      <nav class="flex flex-wrap justify-center md:justify-end gap-x-8 gap-y-3 text-sm text-white/50 font-medium">
+        <a href="/blog" class="hover:text-white/90 transition-colors" data-i18n="nav.blog">Blog</a>
+        <a href="/hairsalon" class="hover:text-white/90 transition-colors" data-i18n="nav.hairsalon">HairSalon</a>
+        <a href="https://trello.com/b/xewaqYee/dragonmine-z-trello" target="_blank" rel="noopener noreferrer" class="hover:text-white/90 transition-colors" data-i18n="nav.wiki">Wiki</a>
+        <a href="https://discord.com/servers/dragonmine-z-1216429657273012415" target="_blank" rel="noopener noreferrer" class="hover:text-white/90 transition-colors" data-i18n="nav.discord">Discord</a>
+      </nav>
     </div>
 
-    <!-- ── Información -->
-    <div class="flex flex-col gap-2">
-      <p class="text-base font-bold tracking-wide">
-        © {currentYear} <span data-i18n="footer.rights">DragonMineZ | Fair Use</span>
-      </p>
-      <p class="text-sm text-white/70 max-w-xl leading-relaxed" data-i18n="footer.description">
-        DragonMineZ es un proyecto hecho por fans para la comunidad de Minecraft y Dragon Ball Z.
-      </p>
-    </div>
+    <!-- Divider -->
+    <div class="w-full h-px bg-white/[0.07] rounded-full mb-8"></div>
 
-    <div class="w-2/3 max-w-[400px] h-px bg-white/20 rounded-full mt-2 mb-1"></div>
+    <!-- Bottom row: copyright + socials -->
+    <div class="flex flex-col-reverse sm:flex-row items-center justify-between gap-6">
 
-    <!-- ── Redes Sociales -->
-    <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 mt-1">
-      <Tooltip content="Discord">
-        <a 
-          href="https://discord.com/servers/dragonmine-z-1216429657273012415" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="Discord"
-        >
-          <i class="fa-brands fa-discord"></i>
-        </a>
-      </Tooltip>
-      <Tooltip content="GitHub">
-        <a 
-          href="https://github.com/DragonMineZ/dragonminez" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="GitHub"
-        >
-          <i class="fa-brands fa-github"></i>
-        </a>
-      </Tooltip>
-      <Tooltip content="X (Twitter)">
-        <a 
-          href="https://x.com/DragonMineZ" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="X (Twitter)"
-        >
-          <i class="fa-brands fa-x-twitter"></i>
-        </a>
-      </Tooltip>
-      <Tooltip content="YouTube">
-        <a 
-          href="https://www.youtube.com/@DragonMine-Z" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="YouTube"
-        >
-          <i class="fa-brands fa-youtube"></i>
-        </a>
-      </Tooltip>
-      <Tooltip content="TikTok">
-        <a 
-          href="https://www.tiktok.com/@dragonminez" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="TikTok"
-        >
-          <i class="fa-brands fa-tiktok"></i>
-        </a>
-      </Tooltip>
-      <Tooltip content="CurseForge">
-        <a 
-          href="https://www.curseforge.com/minecraft/mc-mods/dragonminez" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="CurseForge"
-        >
-          <span class="flex items-center justify-center" set:html={curseforgeIcon} />
-        </a>
-      </Tooltip>
-      <Tooltip content="Modrinth">
-        <a 
-          href="https://modrinth.com/mod/dragonminez" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xl sm:text-2xl flex items-center justify-center text-white hover:text-white/80 hover:-translate-y-1 transition-all duration-300"
-          aria-label="Modrinth"
-        >
-          <span class="flex items-center justify-center" set:html={modrinthIcon} />
-        </a>
-      </Tooltip>
+      <!-- Copyright -->
+      <div class="flex flex-col items-center sm:items-start gap-1 text-center sm:text-left">
+        <p class="text-sm font-semibold text-white/50 tracking-wide">
+          © {currentYear} <span data-i18n="footer.rights">DragonMineZ | Fair Use</span>
+        </p>
+        <p class="text-xs text-white/30 max-w-sm leading-relaxed" data-i18n="footer.description">
+          DragonMineZ es un proyecto hecho por fans para la comunidad de Minecraft y Dragon Ball Z.
+        </p>
+      </div>
+
+      <!-- Social icons -->
+      <div class="flex items-center gap-5">
+        <Tooltip content="Discord">
+          <a
+            href="https://discord.com/servers/dragonmine-z-1216429657273012415"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="Discord"
+          >
+            <i class="fa-brands fa-discord"></i>
+          </a>
+        </Tooltip>
+        <Tooltip content="GitHub">
+          <a
+            href="https://github.com/DragonMineZ/dragonminez"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="GitHub"
+          >
+            <i class="fa-brands fa-github"></i>
+          </a>
+        </Tooltip>
+        <Tooltip content="X (Twitter)">
+          <a
+            href="https://x.com/DragonMineZ"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="X (Twitter)"
+          >
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+        </Tooltip>
+        <Tooltip content="YouTube">
+          <a
+            href="https://www.youtube.com/@DragonMine-Z"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="YouTube"
+          >
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+        </Tooltip>
+        <Tooltip content="TikTok">
+          <a
+            href="https://www.tiktok.com/@dragonminez"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="TikTok"
+          >
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </Tooltip>
+        <Tooltip content="CurseForge">
+          <a
+            href="https://www.curseforge.com/minecraft/mc-mods/dragonminez"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg flex items-center justify-center text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="CurseForge"
+          >
+            <span class="flex items-center justify-center" set:html={curseforgeIcon} />
+          </a>
+        </Tooltip>
+        <Tooltip content="Modrinth">
+          <a
+            href="https://modrinth.com/mod/dragonminez"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg flex items-center justify-center text-white/40 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
+            aria-label="Modrinth"
+          >
+            <span class="flex items-center justify-center" set:html={modrinthIcon} />
+          </a>
+        </Tooltip>
+      </div>
     </div>
 
   </div>

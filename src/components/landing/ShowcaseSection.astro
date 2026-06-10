@@ -1,0 +1,139 @@
+---
+/**
+ * ShowcaseSection — renders one full-width alternating media+text showcase section.
+ * Media panel on alternating sides based on the `flip` prop.
+ * Supports .mp4/.webm (muted autoplay video) and any image format.
+ * Text fields use data-localized for i18n since they come from config (not the i18n store).
+ */
+import type { ShowcaseItem } from "../../config/landing";
+import { resolveText } from "../../config/landing";
+
+interface Props {
+  item: ShowcaseItem;
+  flip?: boolean;   // true = text left, media right
+  index?: number;
+}
+
+const { item, flip = false, index = 0 } = Astro.props;
+
+const lang = "es";
+const isVideo = /\.(mp4|webm)$/i.test(item.media);
+
+const eyebrowObj = typeof item.eyebrow === "string"
+  ? { es: item.eyebrow, en: item.eyebrow, pt: item.eyebrow }
+  : (item.eyebrow ?? null);
+
+const titleObj = typeof item.title === "string"
+  ? { es: item.title, en: item.title, pt: item.title }
+  : item.title;
+
+const subtitleObj = typeof item.subtitle === "string"
+  ? { es: item.subtitle, en: item.subtitle, pt: item.subtitle }
+  : item.subtitle;
+
+const descObj = item.description
+  ? (typeof item.description === "string"
+      ? { es: item.description, en: item.description, pt: item.description }
+      : item.description)
+  : null;
+
+const ctaLabelObj = item.cta
+  ? (typeof item.cta.label === "string"
+      ? { es: item.cta.label, en: item.cta.label, pt: item.cta.label }
+      : item.cta.label)
+  : null;
+
+const titleEs = resolveText(item.title, lang);
+const subtitleEs = resolveText(item.subtitle, lang);
+const eyebrowEs = item.eyebrow ? resolveText(item.eyebrow, lang) : "";
+const descEs = item.description ? resolveText(item.description, lang) : "";
+const ctaLabelEs = item.cta ? resolveText(item.cta.label, lang) : "";
+
+const mediaReveal = flip ? "reveal reveal-right" : "reveal reveal-left";
+const textReveal  = flip ? "reveal reveal-left"  : "reveal reveal-right";
+---
+
+<section class="relative py-24 md:py-36 overflow-hidden bg-background">
+  <!-- Subtle section separator line -->
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent"></div>
+
+  <div class="container-base">
+    <div class={`flex flex-col ${flip ? "lg:flex-row-reverse" : "lg:flex-row"} items-center gap-12 md:gap-20`}>
+
+      <!-- ── Media panel ───────────────────────────────────────────────────── -->
+      <div class={`${mediaReveal} w-full lg:w-1/2 flex-shrink-0`}>
+        <div class="relative group rounded-3xl overflow-hidden border border-white/8 gradient-border shadow-[0_0_60px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-white/15 hover:shadow-[0_0_80px_rgba(0,0,0,0.6)]">
+          {isVideo ? (
+            <video
+              class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+              src={item.media}
+              muted
+              autoplay
+              loop
+              playsinline
+              preload="metadata"
+            />
+          ) : (
+            <img
+              src={item.media}
+              alt={titleEs}
+              loading="lazy"
+              class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          )}
+          <!-- Subtle inner glow overlay on hover -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-30"></div>
+        </div>
+      </div>
+
+      <!-- ── Text panel ────────────────────────────────────────────────────── -->
+      <div class={`${textReveal} w-full lg:w-1/2 flex flex-col gap-6`}>
+
+        {eyebrowObj && (
+          <span
+            class="reveal reveal-up reveal-delay-1 inline-block text-xs font-bold tracking-[0.2em] uppercase text-white/50 border border-white/12 rounded-full px-4 py-1.5 w-fit backdrop-blur-sm bg-white/4"
+            data-localized={JSON.stringify(eyebrowObj)}
+          >
+            {eyebrowEs}
+          </span>
+        )}
+
+        <h2
+          class="reveal reveal-up reveal-delay-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white italic leading-[0.95] tracking-tighter uppercase"
+          data-localized={JSON.stringify(titleObj)}
+        >
+          {titleEs}
+        </h2>
+
+        <p
+          class="reveal reveal-up reveal-delay-3 text-lg text-white/65 leading-relaxed max-w-xl"
+          data-localized={JSON.stringify(subtitleObj)}
+        >
+          {subtitleEs}
+        </p>
+
+        {descObj && (
+          <p
+            class="reveal reveal-up reveal-delay-4 text-base text-white/50 leading-relaxed max-w-xl"
+            data-localized={JSON.stringify(descObj)}
+          >
+            {descEs}
+          </p>
+        )}
+
+        {item.cta && ctaLabelObj && (
+          <div class="reveal reveal-up reveal-delay-4 pt-2">
+            <a
+              href={item.cta.href}
+              class="inline-flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-full font-black text-sm tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-95"
+            >
+              <span data-localized={JSON.stringify(ctaLabelObj)}>{ctaLabelEs}</span>
+              <span class="material-symbols-rounded text-base">arrow_forward</span>
+            </a>
+          </div>
+        )}
+      </div>
+
+    </div>
+  </div>
+</section>

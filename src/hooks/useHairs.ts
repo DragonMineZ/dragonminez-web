@@ -18,7 +18,6 @@ export function useHairs(initialCategories: Category[] = []) {
         page: 1,
         limit: 10,
         totalPages: 0,
-        canModerate: false,
     });
     const [categories] = useState<Category[]>(initialCategories);
     const [loading, setLoading] = useState(true);
@@ -42,7 +41,7 @@ export function useHairs(initialCategories: Category[] = []) {
             if (!res.ok) throw new Error("Failed to fetch hairs");
             const { data, meta } = await res.json();
             setHairs(data);
-            setMeta({ ...meta, canModerate: meta.canModerate ?? false });
+            setMeta(meta);
         } catch (err) {
             console.error("Error loading hairs:", err);
             setError("Error al cargar el catálogo de cabellos.");

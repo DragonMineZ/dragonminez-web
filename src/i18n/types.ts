@@ -22,7 +22,6 @@ export interface Translations {
     wiki: string;
     login: string;
     logout: string;
-    blog: string;
     editor: string;
   };
   home: {
@@ -129,71 +128,6 @@ export interface Translations {
     updateError: string;
     openInEditor: string;
     createWithEditor: string;
-    moderationBadge: string;
-    moderationDeleteDesc: string;
-  };
-  blog: {
-    title: string;
-    subtitle: string;
-    allPosts: string;
-    latest: string;
-    searchPlaceholder: string;
-    noPosts: string;
-    loading: string;
-    categoriesLabel: string;
-    allCategories: string;
-    uncategorized: string;
-    readMore: string;
-    backToBlog: string;
-    by: string;
-    minuteRead: string;
-    draftBadge: string;
-    newPost: string;
-    editPost: string;
-    deletePost: string;
-    deleteConfirmTitle: string;
-    deleteConfirmDesc: string;
-    deleteSuccess: string;
-    deleteError: string;
-    signInRequired: string;
-    signInRequiredDesc: string;
-    authorRequired: string;
-    authorRequiredDesc: string;
-    form: {
-      createTitle: string;
-      editTitle: string;
-      createDesc: string;
-      editDesc: string;
-      title: string;
-      titlePlaceholder: string;
-      excerpt: string;
-      excerptPlaceholder: string;
-      content: string;
-      contentPlaceholder: string;
-      contentHint: string;
-      coverImage: string;
-      coverImagePlaceholder: string;
-      category: string;
-      subcategory: string;
-      noCategory: string;
-      selectCategory: string;
-      statusLabel: string;
-      statusPublished: string;
-      statusDraft: string;
-      publish: string;
-      publishing: string;
-      saveChanges: string;
-      updating: string;
-      preview: string;
-      write: string;
-      titleRequired: string;
-      contentRequired: string;
-      invalidFields: string;
-      createSuccess: string;
-      updateSuccess: string;
-      createError: string;
-      updateError: string;
-    };
   };
   editor: {
     title: string;
@@ -284,8 +218,6 @@ export interface Translations {
       badRequest: string;
       hairNotFound: string;
       notOwned: string;
-      forbidden: string;
-      postNotFound: string;
     };
   };
   viewer: {

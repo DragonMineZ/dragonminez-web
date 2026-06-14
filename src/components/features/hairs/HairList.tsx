@@ -201,7 +201,6 @@ export default function HairList({ initialCategories = [] }: { initialCategories
               key={hair.id_hair}
               hair={hair}
               isSignedIn={isSignedIn || false}
-              canModerate={meta.canModerate ?? false}
               onDelete={handleDelete}
               onUpdateSuccess={handleUpdateSuccess}
               onLikeToggle={handleLikeToggleLocally}

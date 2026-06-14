@@ -8,14 +8,13 @@ datasource db {
 }
 
 model User {
-  id_user    Int        @id @default(autoincrement())
-  clerk_id   String     @unique
-  username   String     @unique
-  email      String     @unique
+  id_user    Int    @id @default(autoincrement())
+  clerk_id   String @unique
+  username   String @unique
+  email      String @unique
   avatar_url String
   hairs      Hair[]
   likes      Like[]
-  blog_posts BlogPost[]
 }
 
 model Hair {
@@ -50,37 +49,4 @@ model Like {
   @@id([id_user, id_hair])
   @@index([id_hair])
   @@index([id_user])
-}
-
-model BlogCategory {
-  id_category Int            @id @default(autoincrement())
-  name        String
-  slug        String         @unique
-  description String?
-  parentId    Int?
-  parent      BlogCategory?  @relation("BlogCategoryTree", fields: [parentId], references: [id_category], onDelete: Cascade)
-  children    BlogCategory[] @relation("BlogCategoryTree")
-  posts       BlogPost[]
-
-  @@index([parentId])
-}
-
-model BlogPost {
-  id_post         Int           @id @default(autoincrement())
-  title           String
-  slug            String        @unique
-  excerpt         String?
-  content         String        @db.Text
-  cover_image_url String?
-  published       Boolean       @default(true)
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  authorId        Int
-  author          User          @relation(fields: [authorId], references: [id_user], onDelete: Cascade)
-  categoryId      Int?
-  category        BlogCategory? @relation(fields: [categoryId], references: [id_category], onDelete: SetNull)
-
-  @@index([created_at])
-  @@index([categoryId])
-  @@index([authorId])
 }

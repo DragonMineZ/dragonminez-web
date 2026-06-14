@@ -166,6 +166,7 @@ const pt: Translations = {
     physics: "Física",
     autoRotate: "Rotação automática",
     showBase: "Base do cabelo",
+    background: "Fundo",
     hairName: "Nome do cabelo",
     hairNamePlaceholder: "Escreva um nome...",
     fullCode: "Código completo",

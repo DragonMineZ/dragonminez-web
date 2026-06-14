@@ -15,6 +15,7 @@ import {
 } from "../../../lib/hair/model";
 import { useHairEditor } from "./useHairEditor";
 import EditorScene from "./EditorScene";
+import BackgroundControl from "./BackgroundControl";
 import StrandGrid from "./StrandGrid";
 import StrandControls from "./StrandControls";
 import CodePanel from "./CodePanel";
@@ -97,6 +98,7 @@ export default function HairEditorPage({ initialCode, isSignedIn = false }: Hair
         undo,
     } = editor;
 
+    const [bgColor, setBgColor] = useState("#0a0a0b");
     const [publishOpen, setPublishOpen] = useState(false);
     const [publishCode, setPublishCode] = useState("");
     const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
@@ -271,7 +273,7 @@ export default function HairEditorPage({ initialCode, isSignedIn = false }: Hair
                             dpr={[1, 2]}
                             className="!absolute inset-0"
                         >
-                            <color attach="background" args={["#0a0a0b"]} />
+                            <color attach="background" args={[bgColor]} />
                             <EditorScene
                                 hair={currentHair}
                                 selectedFace={selection.face}
@@ -318,6 +320,11 @@ export default function HairEditorPage({ initialCode, isSignedIn = false }: Hair
                             label={t("editor.showBase")}
                             active={toggles.showBase}
                             onClick={() => setToggle("showBase", !toggles.showBase)}
+                        />
+                        <BackgroundControl
+                            color={bgColor}
+                            onChange={setBgColor}
+                            label={t("editor.background")}
                         />
                     </div>
 

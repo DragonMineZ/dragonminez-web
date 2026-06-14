@@ -149,13 +149,25 @@ const slides = [img1, img2, img3, img4, img5];
         if (i === idx) {
           t.classList.add('border-white', 'opacity-100');
           t.classList.remove('border-transparent', 'opacity-50');
-          // Scroll thumb into view
-          t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         } else {
           t.classList.remove('border-white', 'opacity-100');
           t.classList.add('border-transparent', 'opacity-50');
         }
       });
+
+      // Keep the active thumbnail centered — but ONLY scroll the thumbnail
+      // strip itself, never the page. (scrollIntoView would scroll the whole
+      // document down to the gallery on load and on every auto-advance.)
+      centerActiveThumb(idx);
+    }
+
+    const thumbsContainer = document.getElementById('gallery-thumbs');
+    function centerActiveThumb(idx: number) {
+      const t = thumbs[idx];
+      if (!t || !thumbsContainer) return;
+      const target =
+        t.offsetLeft - (thumbsContainer.clientWidth - t.offsetWidth) / 2;
+      thumbsContainer.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
     }
 
     function goTo(idx: number, animate = true) {

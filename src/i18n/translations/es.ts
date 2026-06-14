@@ -166,6 +166,7 @@ const es: Translations = {
     physics: "Física",
     autoRotate: "Rotación automática",
     showBase: "Base de cabello",
+    background: "Fondo",
     hairName: "Nombre del cabello",
     hairNamePlaceholder: "Escribe un nombre...",
     fullCode: "Código completo",

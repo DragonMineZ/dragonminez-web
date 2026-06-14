@@ -73,6 +73,14 @@ const videoData = heroVideos.map((v) => ({
   <!-- Bottom bar -->
   <div class="absolute inset-x-0 bottom-0 h-[28rem] z-10 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none"></div>
 
+  <!-- Ambient aurora glow — warm ki energy drifting up from the base -->
+  <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+    <div
+      class="animate-aurora absolute -bottom-48 left-1/2 -translate-x-1/2 w-[130vw] h-[60vh] rounded-full blur-[150px]"
+      style="background: radial-gradient(closest-side, rgba(255,120,20,0.22), rgba(120,60,255,0.10) 55%, transparent 75%);"
+    ></div>
+  </div>
+
   <!-- ── Clip caption (videos only) ────────────────────────────────────── -->
   {hasVideos && (
     <div
@@ -142,7 +150,7 @@ const videoData = heroVideos.map((v) => ({
   )}
 
   <!-- ── Scroll hint ────────────────────────────────────────────────────── -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1">
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 animate-float">
     <span
       class="text-white/40 text-xs font-semibold tracking-widest uppercase"
       data-i18n="home.intro.scrollHint"

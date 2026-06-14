@@ -166,6 +166,7 @@ const en: Translations = {
     physics: "Physics",
     autoRotate: "Auto rotate",
     showBase: "Hair base",
+    background: "Background",
     hairName: "Hair name",
     hairNamePlaceholder: "Write a name...",
     fullCode: "Full code",

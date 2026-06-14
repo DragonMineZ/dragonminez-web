@@ -163,6 +163,65 @@ body {
   }
 }
 
+/* ── Ambient aurora glow — slow drifting radial light for hero/immersive depth */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate3d(-8%, -4%, 0) scale(1);    opacity: 0.55; }
+  50%      { transform: translate3d(8%, 4%, 0)  scale(1.25);  opacity: 0.85; }
+}
+.animate-aurora {
+  animation: aurora-drift 16s ease-in-out infinite;
+}
+
+/* ── Gentle float for accent elements (scroll hint, badges) */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float-soft 3.5s ease-in-out infinite;
+}
+
+/* ── Sheen sweep on hover for primary CTAs */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: btn-shine-sweep 0.9s ease;
+}
+@keyframes btn-shine-sweep {
+  to { transform: translateX(130%); }
+}
+
+/* ── Respect users who prefer less motion: kill all decorative loops ────────── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-pulse-subtle,
+  .animate-aurora,
+  .animate-float,
+  .animate-bounce {
+    animation: none !important;
+  }
+  .btn-shine:hover::after {
+    animation: none !important;
+  }
+}
+
 /* ── Ken Burns animation for static hero fallback */
 @keyframes ken-burns {
   0%   { transform: scale(1)    translateX(0)     translateY(0); }

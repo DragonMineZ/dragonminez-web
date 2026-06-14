@@ -166,6 +166,7 @@ export interface Translations {
     physics: string;
     autoRotate: string;
     showBase: string;
+    background: string;
     hairName: string;
     hairNamePlaceholder: string;
     fullCode: string;

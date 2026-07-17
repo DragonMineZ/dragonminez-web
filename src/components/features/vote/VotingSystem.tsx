@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../../i18n';
-import { useAuth } from "@clerk/astro/react";
+import { useAuth, SignInButton } from "@clerk/astro/react";
 import ConfirmDialog from '../../ui/ConfirmDialog';
 import SuccessAlert from '../../ui/SuccessAlert';
 import InfoDialog from '../../ui/InfoDialog';
@@ -11,8 +11,10 @@ import { Progress, ProgressLabel, ProgressValue } from '../../ui/Progress';
 import zamasuImage from '../../../assets/glind-race(zamasu).png';
 import moroImage from '../../../assets/goetian-race(moro).jpg';
 import tsufuruImage from '../../../assets/tsufuru-race(baby).jpg';
+import zamasuHead from '../../../assets/vote/zamasu-head.png';
+import moroHead from '../../../assets/vote/moro-head.png';
+import tsufuruHead from '../../../assets/vote/tsufuru-head.png';
 
-const START_TIME = new Date('2026-07-10T17:00:00-05:00').getTime();
 
 type RaceId = 'glind' | 'goetian' | 'tsufuru';
 
@@ -20,24 +22,30 @@ interface RaceOption {
   id: RaceId;
   name: string;
   image: string;
+  headImage: string;
   descKey: string;
 }
 
 const races: RaceOption[] = [
-  { id: 'glind', name: 'Glind (Zamasu)', image: zamasuImage.src, descKey: 'votepage.zamasu_desc' },
-  { id: 'goetian', name: 'Goetian (Moro)', image: moroImage.src, descKey: 'votepage.moro_desc' },
-  { id: 'tsufuru', name: 'Tsufuru (Baby)', image: tsufuruImage.src, descKey: 'votepage.tsufuru_desc' },
+  { id: 'glind', name: 'Glind (Zamasu)', image: zamasuImage.src, headImage: zamasuHead.src, descKey: 'votepage.zamasu_desc' },
+  { id: 'goetian', name: 'Goetian (Moro)', image: moroImage.src, headImage: moroHead.src, descKey: 'votepage.moro_desc' },
+  { id: 'tsufuru', name: 'Tsufuru (Baby)', image: tsufuruImage.src, headImage: tsufuruHead.src, descKey: 'votepage.tsufuru_desc' },
 ];
 
 interface VotingSystemProps {
-  initialResults: Record<string, number>;
+  initialResults: {
+    status: string;
+    winner: string | null;
+    results: Record<string, number>;
+  };
   initialVotedRace: RaceId | null;
 }
 
 export default function VotingSystem({ initialResults, initialVotedRace }: VotingSystemProps) {
   const { t } = useLanguage();
   const { isSignedIn } = useAuth();
-  const [hasStarted, setHasStarted] = useState(Date.now() >= START_TIME);
+  const [status, setStatus] = useState(initialResults.status);
+  const [winner, setWinner] = useState<RaceId | null>(initialResults.winner as RaceId | null);
   const [votedRace, setVotedRace] = useState<RaceId | null>(initialVotedRace);
   const [selectedRace, setSelectedRace] = useState<RaceId | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -47,24 +55,14 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
 
   // Results for statistics
   const [results, setResults] = useState<Record<string, number>>({
-    glind: initialResults?.glind ?? 0,
-    goetian: initialResults?.goetian ?? 0,
-    tsufuru: initialResults?.tsufuru ?? 0,
+    glind: initialResults.results?.glind ?? 0,
+    goetian: initialResults.results?.goetian ?? 0,
+    tsufuru: initialResults.results?.tsufuru ?? 0,
   });
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (Date.now() >= START_TIME) {
-        setHasStarted(true);
-        clearInterval(timer);
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Poll for live stats in the background
   useEffect(() => {
-    if (!hasStarted) return;
+    if (status === 'ended') return;
 
     const fetchStats = async () => {
       try {
@@ -72,6 +70,8 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
         if (res.ok) {
           const data = await res.json();
           setResults(data.results);
+          setStatus(data.status);
+          if (data.winner) setWinner(data.winner as RaceId);
           if (data.votedRace && data.votedRace !== votedRace) {
             setVotedRace(data.votedRace as RaceId);
           }
@@ -84,7 +84,7 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
     fetchStats();
     const interval = setInterval(fetchStats, 10000); // every 10s
     return () => clearInterval(interval);
-  }, [hasStarted, votedRace]);
+  }, [status, votedRace]);
 
   const handleVoteClick = (id: RaceId) => {
     if (!isSignedIn) {
@@ -129,7 +129,7 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
     }
   };
 
-  if (!hasStarted) {
+  if (status === 'upcoming') {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center gap-6">
         <h2 className="text-3xl md:text-5xl font-black text-foreground italic tracking-tight" data-i18n="votepage.before_start_title">
@@ -143,6 +143,41 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
             {t('votepage.schedule_text')}
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (status === 'ended' && winner) {
+    const winningRace = races.find(r => r.id === winner);
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center gap-8 w-full max-w-4xl mx-auto">
+        <div className="space-y-4 mb-8">
+          <h2 className="text-4xl md:text-6xl font-black text-primary italic tracking-tight drop-shadow-glow" data-i18n="votepage.ended_title">
+            {t('votepage.ended_title')}
+          </h2>
+          <p className="text-foreground/80 text-xl font-medium" data-i18n="votepage.winner_subtitle">
+            {t('votepage.winner_subtitle')}
+          </p>
+        </div>
+        
+        {winningRace && (
+          <div className="relative group overflow-hidden rounded-[2.5rem] border-2 border-primary shadow-glow-strong w-full max-w-md mx-auto">
+            <img 
+              src={winningRace.image} 
+              alt={winningRace.name} 
+              className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+            <div className="absolute bottom-0 inset-x-0 p-8 flex flex-col items-center text-center">
+              <span className="text-primary font-black text-4xl italic drop-shadow-hero uppercase tracking-widest">
+                {winningRace.name}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
       </div>
     );
   }
@@ -172,7 +207,7 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
               <div key={race.id} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={race.image} alt={race.name} className="w-10 h-10 rounded-full object-cover border border-glass" />
+                    <img src={race.headImage} alt={race.name} className="w-12 h-12 rounded-xl object-cover border border-glass" />
                     <ProgressLabel className="text-lg font-bold">{race.name}</ProgressLabel>
                   </div>
                   <ProgressValue value={percentage} className="text-lg font-black text-foreground" />
@@ -229,7 +264,11 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
         onClose={() => setIsAuthOpen(false)}
         title={t('hairSalon.authRequiredTitle')}
         description={t('hairSalon.authRequiredDesc')}
-      />
+      >
+        <SignInButton mode="modal" className="text-foreground hover:underline cursor-pointer text-lg font-bold bg-transparent border-none p-0">
+          <span data-i18n="hairSalon.loginToPublish">{t('hairSalon.loginToPublish')}</span>
+        </SignInButton>
+      </InfoDialog>
     </div>
   );
 }

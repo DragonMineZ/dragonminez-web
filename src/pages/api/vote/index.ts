@@ -8,14 +8,14 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const { userId } = locals.auth();
 
     try {
-        const results = await VoteService.getVoteStatistics();
+        const stats = await VoteService.getVoteStatistics();
         let votedRace: string | null = null;
         if (userId) {
             votedRace = await VoteService.getUserVote(userId);
         }
 
         return ok({
-            results,
+            ...stats,
             votedRace,
         });
     } catch (err) {

@@ -228,6 +228,8 @@ const es: Translations = {
   votepage: {
     title: "VOTACIÓN DE RAZAS",
     subtitle: "Cada raza tendrá una pasiva única, junto con nuevas transformaciones y su propia personalización.",
+    ended_title: "¡LA VOTACIÓN HA FINALIZADO!",
+    winner_subtitle: "La raza ganadora que será añadida en la próxima actualización es:",
     before_start_title: "LA VOTACIÓN AÚN NO HA COMENZADO",
     before_start_desc: "Prepárate para decidir el futuro de DragonMineZ.",
     schedule_text: "05:00 PM PE / 07:00 PM ARG",

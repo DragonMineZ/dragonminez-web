@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Modal from './Modal';
 import titleImage from '../../assets/dmz-title.png';
 import { useLanguage } from '../../i18n';
@@ -9,6 +9,7 @@ interface InfoDialogProps {
     title?: string;
     description?: string;
     buttonLabel?: string;
+    children?: ReactNode;
 }
 
 export default function InfoDialog({
@@ -16,7 +17,8 @@ export default function InfoDialog({
     onClose,
     title,
     description,
-    buttonLabel
+    buttonLabel,
+    children
 }: InfoDialogProps) {
     const { t } = useLanguage();
 
@@ -37,9 +39,15 @@ export default function InfoDialog({
                     {displayTitle}
                 </h2>
 
-                <p className="text-foreground/60 text-base md:text-lg mb-8 max-w-[90%] font-medium leading-relaxed">
+                <p className={`text-foreground/60 text-base md:text-lg max-w-[90%] font-medium leading-relaxed ${children ? 'mb-4' : 'mb-8'}`}>
                     {displayDescription}
                 </p>
+
+                {children && (
+                    <div className="mb-8 w-full flex justify-center">
+                        {children}
+                    </div>
+                )}
 
                 <div className="flex justify-center w-full px-4 sm:px-0">
                     <button

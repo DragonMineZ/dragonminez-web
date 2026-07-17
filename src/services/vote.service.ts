@@ -29,35 +29,49 @@ export async function castVote(clerkId: string, race: string) {
     return { data: newVote };
 }
 
+let statsPromise: Promise<{ winner: string | null, results: Record<string, number> }> | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 10000; // 10 seconds
+
 export async function getVoteStatistics(): Promise<{ status: string, winner: string | null, results: Record<string, number> }> {
-    const counts = await VoteRepo.getVoteCounts();
-    const stats: Record<string, number> = {
-        glind: 0,
-        goetian: 0,
-        tsufuru: 0,
-    };
-
-    let maxVotes = -1;
-    let winner: string | null = null;
-
-    counts.forEach((c) => {
-        if (c.race in stats) {
-            stats[c.race] = c._count.race;
-            if (c._count.race > maxVotes) {
-                maxVotes = c._count.race;
-                winner = c.race;
-            }
-        }
-    });
-
     const now = Date.now();
+
+    if (!statsPromise || now - lastCacheTime > CACHE_TTL) {
+        statsPromise = (async () => {
+            const counts = await VoteRepo.getVoteCounts();
+            const stats: Record<string, number> = {
+                glind: 0,
+                goetian: 0,
+                tsufuru: 0,
+            };
+
+            let maxVotes = -1;
+            let winner: string | null = null;
+
+            counts.forEach((c) => {
+                if (c.race in stats) {
+                    stats[c.race] = c._count.race;
+                    if (c._count.race > maxVotes) {
+                        maxVotes = c._count.race;
+                        winner = c.race;
+                    }
+                }
+            });
+
+            return { winner, results: stats };
+        })();
+        lastCacheTime = now;
+    }
+
+    const cachedData = await statsPromise;
+    
     let status = 'active';
     if (now < VOTE_START_TIME) status = 'upcoming';
     if (now > VOTE_END_TIME) status = 'ended';
 
     return {
         status,
-        winner: status === 'ended' ? winner : null,
-        results: stats
+        winner: status === 'ended' ? cachedData.winner : null,
+        results: cachedData.results
     };
 }

@@ -13,7 +13,7 @@ import tsufuruImage from '../../../assets/tsufuru-race(baby).jpg';
 // Event start time (Set to slightly in the future for testing or a fixed date)
 // For manual verification, we can set this to Date.now() + 5000 (5 seconds) if needed, 
 // but we'll use a fixed future date (e.g. tomorrow) as default, and the user can change it.
-const START_TIME = new Date('2026-07-18T17:00:00-05:00').getTime();
+const START_TIME = new Date('2026-07-10T17:00:00-05:00').getTime();
 
 type RaceId = 'zamasu' | 'moro' | 'tsufuru';
 

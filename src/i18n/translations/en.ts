@@ -81,7 +81,7 @@ const en: Translations = {
     },
     vote: {
       tag: "Special Event",
-      title: "VOTE FOR YOUR <br/>FAVORITE RACE",
+      title: "VOTE FOR YOUR FAVORITE RACE",
       description: "The fate of the next update is in your hands. Participate in the global voting and decide which new race will join DragonMineZ first.",
       cta: "Go Vote Now",
     },

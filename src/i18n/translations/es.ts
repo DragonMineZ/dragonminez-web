@@ -79,6 +79,12 @@ const es: Translations = {
       title: "Acción en Estado Puro",
       description: "Echa un vistazo a la fluidez del combate y los efectos visuales que hacen de DragonMineZ una experiencia inigualable.",
     },
+    vote: {
+      tag: "Evento Especial",
+      title: "VOTA POR TU <br/>RAZA FAVORITA",
+      description: "El destino de la próxima actualización está en tus manos. Participa en la votación global y decide qué nueva raza se unirá primero a DragonMineZ.",
+      cta: "Ir a Votar Ahora",
+    },
     gallery: {
       title: "Galería del Mundo",
       description: "Capturas directas desde el corazón de la aventura.",

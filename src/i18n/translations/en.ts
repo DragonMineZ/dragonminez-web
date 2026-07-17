@@ -79,6 +79,12 @@ const en: Translations = {
       title: "Pure Action",
       description: "Take a look at the fluid combat and visual effects that make DragonMineZ an unmatched experience.",
     },
+    vote: {
+      tag: "Special Event",
+      title: "VOTE FOR YOUR <br/>FAVORITE RACE",
+      description: "The fate of the next update is in your hands. Participate in the global voting and decide which new race will join DragonMineZ first.",
+      cta: "Go Vote Now",
+    },
     gallery: {
       title: "World Gallery",
       description: "Direct captures from the heart of the adventure.",

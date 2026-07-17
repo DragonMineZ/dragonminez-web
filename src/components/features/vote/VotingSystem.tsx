@@ -139,13 +139,13 @@ export default function VotingSystem() {
         {races.map((race) => (
           <div key={race.id} className="relative flex flex-col min-h-[28rem] rounded-[2rem] overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 group border border-glass">
             <img src={race.image} alt={race.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-0"></div>
 
             <div className="relative z-10 p-6 flex flex-col h-full justify-end gap-4 mt-auto">
-              <h3 className="text-3xl font-black text-foreground italic tracking-wide drop-shadow-md text-center">
+              <h3 className="text-3xl font-black text-white italic tracking-wide drop-shadow-md text-center">
                 {race.name}
               </h3>
-              <p className="text-foreground/90 leading-relaxed font-medium min-h-[80px]" data-i18n={race.descKey}>
+              <p className="text-white/90 leading-relaxed font-medium min-h-[80px]" data-i18n={race.descKey}>
                 {t(race.descKey as any)}
               </p>
               <Button variant="primary" size="lg" className="w-full shadow-glow mt-2" onClick={() => handleVoteClick(race.id)}>

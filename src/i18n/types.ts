@@ -46,6 +46,12 @@ export interface Translations {
       title: string;
       description: string;
     };
+    vote: {
+      tag: string;
+      title: string;
+      description: string;
+      cta: string;
+    };
     gallery: {
       title: string;
       description: string;

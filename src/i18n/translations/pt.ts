@@ -79,6 +79,12 @@ const pt: Translations = {
       title: "Ação Pura",
       description: "Dê uma olhada na fluidez do combate e nos efeitos visuais que fazem do DragonMineZ uma experiência incomparável.",
     },
+    vote: {
+      tag: "Evento Especial",
+      title: "VOTE NA SUA <br/>RAÇA FAVORITA",
+      description: "O destino da próxima atualização está nas suas mãos. Participe da votação global e decida qual nova raça se juntará primeiro ao DragonMineZ.",
+      cta: "Ir Votar Agora",
+    },
     gallery: {
       title: "Galeria Mundial",
       description: "Capturas diretas do coração da aventura.",

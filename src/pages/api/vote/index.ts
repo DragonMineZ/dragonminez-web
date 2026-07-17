@@ -6,11 +6,13 @@ import * as VoteService from "../../../services/vote.service";
 
 export const GET: APIRoute = async ({ request, locals }) => {
     const { userId } = locals.auth();
+    const url = new URL(request.url);
+    const excludeUserVote = url.searchParams.get("excludeUserVote") === "true";
 
     try {
         const stats = await VoteService.getVoteStatistics();
         let votedRace: string | null = null;
-        if (userId) {
+        if (userId && !excludeUserVote) {
             votedRace = await VoteService.getUserVote(userId);
         }
 

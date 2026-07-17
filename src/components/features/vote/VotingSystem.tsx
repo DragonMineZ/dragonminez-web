@@ -51,6 +51,8 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Results for statistics
@@ -66,7 +68,7 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
 
     const fetchStats = async () => {
       try {
-        const res = await fetch('/api/vote');
+        const res = await fetch('/api/vote?excludeUserVote=true');
         if (res.ok) {
           const data = await res.json();
           setResults(data.results);
@@ -112,17 +114,28 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
         setVotedRace(selectedRace);
         setIsInfoOpen(true);
         // Refresh results immediately
-        const statsRes = await fetch('/api/vote');
+        const statsRes = await fetch('/api/vote?excludeUserVote=true');
         if (statsRes.ok) {
           const data = await statsRes.json();
           setResults(data.results);
         }
       } else {
-        const errorData = await res.json();
-        console.error('Failed to vote:', errorData.error);
+        let errorMsg = t('common.connectionError') || 'Ocurrió un error inesperado';
+        try {
+          const errorData = await res.json();
+          if (errorData.error) {
+            errorMsg = typeof errorData.error === 'string' ? errorData.error : (errorData.error.message || errorMsg);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        setErrorMessage(errorMsg);
+        setIsErrorOpen(true);
       }
     } catch (err) {
       console.error('Error voting:', err);
+      setErrorMessage(t('common.connectionError') || 'Error de conexión con el servidor');
+      setIsErrorOpen(true);
     } finally {
       setLoading(false);
       setIsConfirmOpen(false);
@@ -267,6 +280,14 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
           <span data-i18n="hairSalon.loginToPublish">{t('hairSalon.loginToPublish')}</span>
         </SignInButton>
       </InfoDialog>
+
+      <InfoDialog
+        isOpen={isErrorOpen}
+        onClose={() => setIsErrorOpen(false)}
+        title={t('common.error') || 'Error'}
+        description={errorMessage}
+        buttonLabel={t('common.close') || 'Cerrar'}
+      />
     </div>
   );
 }

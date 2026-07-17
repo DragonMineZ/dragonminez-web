@@ -1,0 +1,19 @@
+---
+import Layout from "../layouts/Layout.astro";
+import VotingSystem from "../components/features/vote/VotingSystem";
+---
+
+<Layout>
+  <main class="min-h-screen bg-background pt-32 pb-24">
+    <div class="container-base">
+      <div class="flex flex-col items-center text-center gap-6 mb-16">
+        <span class="text-primary font-bold tracking-widest uppercase text-sm" data-i18n="home.vote.tag">Evento Especial</span>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-foreground italic tracking-tighter uppercase leading-[0.9]" data-i18n="votePage.title">
+          VOTACIÓN DE RAZAS
+        </h1>
+      </div>
+      
+      <VotingSystem client:load />
+    </div>
+  </main>
+</Layout>

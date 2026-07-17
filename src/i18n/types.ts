@@ -55,6 +55,12 @@ export interface Translations {
       description: string;
       cta: string;
     };
+    vote: {
+      tag: string;
+      title: string;
+      description: string;
+      cta: string;
+    };
   };
   hairSalon: {
     title: string;
@@ -185,6 +191,23 @@ export interface Translations {
     noCode: string;
     decodeError: string;
     parseError: string;
+  };
+  votePage: {
+    title: string;
+    beforeStartTitle: string;
+    beforeStartDesc: string;
+    scheduleText: string;
+    voteButton: string;
+    zamasuDesc: string;
+    moroDesc: string;
+    tsufuruDesc: string;
+    confirmTitle: string;
+    confirmDesc: string;
+    successTitle: string;
+    successDesc: string;
+    statsTitle: string;
+    statsDesc: string;
+    totalVotes: string;
   };
 }
 

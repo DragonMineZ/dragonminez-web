@@ -15,6 +15,7 @@ model User {
   avatar_url String
   hairs      Hair[]
   likes      Like[]
+  vote       Vote?
 }
 
 model Hair {
@@ -49,4 +50,14 @@ model Like {
   @@id([id_user, id_hair])
   @@index([id_hair])
   @@index([id_user]) 
+}
+
+model Vote {
+  id_vote    Int      @id @default(autoincrement())
+  id_user    Int      @unique
+  user       User     @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  race       String   // "glind" | "goetian" | "tsufuru"
+  created_at DateTime @default(now())
+
+  @@index([race])
 }

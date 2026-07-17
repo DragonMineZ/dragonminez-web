@@ -88,6 +88,12 @@ const es: Translations = {
       description: "Conéctate con miles de jugadores, encuentra grupos para incursiones y obtén soporte directo de los desarrolladores.",
       cta: "ENTRAR AL DISCORD",
     },
+    vote: {
+      tag: "Evento Especial",
+      title: "VOTA POR TU PROPIA RAZA",
+      description: "El destino de la próxima actualización está en tus manos. Participa en la votación global y decide qué nueva raza se unirá primero a DragonMineZ.",
+      cta: "Ir a Votar Ahora",
+    },
   },
   hairSalon: {
     title: "HairSalon",
@@ -218,6 +224,23 @@ const es: Translations = {
     noCode: "No se proporcionó código",
     decodeError: "Error al decodificar el código",
     parseError: "Error al procesar los datos",
+  },
+  votePage: {
+    title: "VOTACIÓN DE RAZAS",
+    beforeStartTitle: "LA VOTACIÓN AÚN NO HA COMENZADO",
+    beforeStartDesc: "Prepárate para decidir el futuro de DragonMineZ.",
+    scheduleText: "05:00 PM PE / 07:00 PM ARG",
+    voteButton: "Votar",
+    zamasuDesc: "La raza definitiva de los dioses. Poder divino y control absoluto del espacio-tiempo a tu disposición.",
+    moroDesc: "Una raza ancestral capaz de absorber la energía vital de los planetas para aumentar su poder mágico.",
+    tsufuruDesc: "Raza tecnológica con habilidades parasitarias capaces de controlar a los guerreros más poderosos.",
+    confirmTitle: "Confirmar Voto",
+    confirmDesc: "¿Estás seguro de que deseas votar por esta raza? Esta acción no se puede deshacer y representará tu única decisión en este evento.",
+    successTitle: "¡Voto Registrado!",
+    successDesc: "Tu voto ha sido registrado correctamente en la base de datos de DragonMineZ. ¡Gracias por participar!",
+    statsTitle: "RESULTADOS DE LA VOTACIÓN",
+    statsDesc: "Estos son los resultados actuales de la votación en vivo.",
+    totalVotes: "votos en total",
   },
 };
 

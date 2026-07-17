@@ -100,6 +100,37 @@ import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
 
     <div class="section-divider"></div>
 
+    <!-- ── Race Vote CTA -->
+    <section class="py-24 md:py-32 bg-section relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 via-background to-primary/5 dark:from-primary/20 dark:via-background dark:to-primary/10 z-0"></div>
+      
+      <div class="container-base relative z-10">
+        <div class="flex flex-col items-center text-center gap-8 max-w-4xl mx-auto">
+          <div class="space-y-4">
+            <span class="text-primary font-bold tracking-widest uppercase text-sm" data-i18n="home.vote.tag">Evento Especial</span>
+            <h2 class="text-4xl md:text-5xl lg:text-7xl font-black text-foreground italic tracking-tighter uppercase leading-[0.9]" data-i18n="home.vote.title">
+              VOTA POR TU <br/>RAZA FAVORITA
+            </h2>
+          </div>
+          
+          <p class="text-xl md:text-2xl text-foreground/80 leading-relaxed font-medium" data-i18n="home.vote.description">
+            El destino de la próxima actualización está en tus manos. Participa en la votación global y decide qué nueva raza se unirá primero a DragonMineZ.
+          </p>
+          
+          <div class="pt-6">
+            <a href="/vote">
+              <Button variant="primary" size="lg" className="gap-3 shadow-hero hover:shadow-glow-strong">
+                <span class="material-symbols-rounded text-2xl">how_to_vote</span>
+                <span data-i18n="home.vote.cta" class="text-lg">Ir a Votar Ahora</span>
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
     <!-- ── Hero Salon -->
     <section class="py-24 md:py-32 overflow-hidden bg-section">
 

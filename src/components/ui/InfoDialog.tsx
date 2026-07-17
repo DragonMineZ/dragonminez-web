@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import Modal from './Modal';
 import titleImage from '../../assets/dmz-title.png';
 import { useLanguage } from '../../i18n';

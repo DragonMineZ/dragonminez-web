@@ -3,8 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import { Image } from "astro:assets";
 import heroImage from "../assets/dmz-hero.png";
 import characters from "../assets/dmz-characters.png";
-import aurora from "../assets/updates/dmz-aurora.png";
-import auroraLogo from "../assets/updates/dmz-aurora-logo.png";
+import aurora from "../assets/updates/aurora/dmz-aurora.png";
+import endofzLogo from "../assets/updates/endofz/dmz-endofz-logo.png";
+import PatchNotesModal from "../components/features/updates/PatchNotesModal";
 import ImageCarousel from "../components/ImageCarousel.astro";
 import { Button } from "../components/ui/Button";
 import { DownloadDropdown } from "../components/ui/DownloadDropdown";
@@ -64,27 +65,22 @@ import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
           <div class="flex-1 space-y-8">
             <div class="space-y-6">
               <div class="space-y-3 animate-slide-in-soft">
-                <span class="text-foreground/60 font-bold tracking-widest uppercase text-xs" data-i18n="home.aurora.tag">Última Versión</span>
+                <span class="text-foreground/60 font-bold tracking-widest uppercase text-xs" data-i18n="home.endofz.tag">Última Versión</span>
                 <h2 class="relative inline-block leading-none">
-                  <span class="sr-only" data-i18n="home.aurora.title">AURORA UPDATE</span>
+                  <span class="sr-only" data-i18n="home.endofz.title">END OF Z UPDATE</span>
                   <Image 
-                    src={auroraLogo} 
-                    alt="Aurora Update Logo" 
+                    src={endofzLogo} 
+                    alt="End of Z Update Logo" 
                     class="h-24 md:h-32 w-auto object-contain drop-shadow-hero transition-transform duration-500 hover:scale-[1.02]"
                   />
                 </h2>
               </div>
             </div>
-            <p class="text-xl text-foreground/70 leading-relaxed max-w-xl" data-i18n="home.aurora.description">
-              Nuestra mayor actualización hasta la fecha. Hemos rediseñado por completo el sistema de renderizado para ofrecer efectos visuales impresionantes, nuevas transformaciones y una estabilidad sin precedentes.
+            <p class="text-xl text-foreground/70 leading-relaxed max-w-xl" data-i18n="home.endofz.description">
+              La batalla definitiva ha comenzado. Disfruta de un sistema de combate cuerpo a cuerpo renovado, una campaña de misiones completa por la saga Z, choques de Ki en tiempo real y clases RPG con pasivas únicas.
             </p>
             <div class="flex items-center gap-6">
-              <a href="#">
-                <Button variant="primary" size="lg" className="gap-3">
-                  <span class="material-symbols-rounded text-xl">article</span>
-                  <span data-i18n="home.aurora.cta">Ver Notas del Parche</span>
-                </Button>
-              </a>
+              <PatchNotesModal client:load />
             </div>
           </div>
           

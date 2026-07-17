@@ -29,11 +29,44 @@ const pt: Translations = {
       subtitle: "Viva a experiência do Dragon Ball e percorra a história junto a Goku.",
       cta: "Baixar Mod",
     },
-    aurora: {
+    endofz: {
       tag: "Última Versão",
-      title: "AURORA UPDATE",
-      description: "Nossa maior atualização até o momento. Redesenhamos completamente o sistema de renderização para oferecer efeitos visuais impressionantes, novas transformações e estabilidade sem precedentes.",
+      title: "END OF Z UPDATE",
+      description: "A batalha definitiva começou. Aproveite um sistema de combate corpo a corpo renovado, uma campanha de missões completa pela saga Z, choques de Ki em tempo real e classes RPG com passivas exclusivas.",
       cta: "Ver Notas do Patch",
+      patchNotes: {
+        title: "Notas de Atualização — v2.1 (End of Z)",
+        subtitle: "Uma de nossas maiores atualizações com melhorias massivas no combate, missões e sistemas de RPG.",
+        sections: {
+          combat: {
+            title: "Sistema de Combate Renovado",
+            bullet1: "Combos dinâmicos em ataques corpo a corpo com novas animações.",
+            bullet2: "Choque de Ki (Beam Clash) com um minijogo intenso de reação rápida.",
+            bullet3: "Níveis de técnicas de combate físico que aumentam o dano causado.",
+            bullet4: "Ataques de Ki teleguiados que perseguem alvos no ar."
+          },
+          rpg: {
+            title: "Sistemas de RPG & Classes",
+            bullet1: "Habilidades passivas de classe totalmente funcionais para todos os arquétipos.",
+            bullet2: "Crescimento dinâmico de atributos baseado no progresso do jogador.",
+            bullet3: "Redistribuição de atributos via comandos ou desejos do Shenlong."
+          },
+          content: {
+            title: "Novo Conteúdo & Exploração",
+            bullet1: "10 novos Mestres de treino para ensinar técnicas lendárias.",
+            bullet2: "Lançamento do Planeta Sagrado do Senhor Kaio como destino explorável.",
+            bullet3: "Dispositivo de gravidade fabricável para criar salas de treino personalizadas.",
+            bullet4: "Nova arma mítica: Espada Dimensional, uma katana que corta o espaço."
+          },
+          visuals: {
+            title: "Melhorias Visuais & Técnicas",
+            bullet1: "Animações de locomoção e combate refeitas do zero para maior fluidez.",
+            bullet2: "Melhorias nos renderizadores 3D e shaders para ataques de Ki e auras.",
+            bullet3: "Feridas de batalha dinâmicas que aparecem no personagem ao sofrer dano.",
+            bullet4: "Transformação Oozaru reformulada, ativando de forma natural com lua cheia."
+          }
+        }
+      }
     },
     salon: {
       tag: "Seu Guerreiro, Seu Estilo",

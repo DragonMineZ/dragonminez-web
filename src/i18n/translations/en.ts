@@ -29,11 +29,44 @@ const en: Translations = {
       subtitle: "Experience Dragon Ball and live the story alongside Goku.",
       cta: "Download Mod",
     },
-    aurora: {
+    endofz: {
       tag: "Latest Version",
-      title: "AURORA UPDATE",
-      description: "Our biggest update to date. We have completely redesigned the rendering system to offer stunning visuals, new transformations, and unprecedented stability.",
+      title: "END OF Z UPDATE",
+      description: "The ultimate battle has begun. Enjoy a revamped melee combat system, a complete story campaign across the Z saga, real-time Ki clashes, and RPG classes with unique passive abilities.",
       cta: "View Patch Notes",
+      patchNotes: {
+        title: "Update Patch Notes — v2.1 (End of Z)",
+        subtitle: "One of our biggest updates featuring massive improvements to combat, quests, and RPG systems.",
+        sections: {
+          combat: {
+            title: "Revamped Combat System",
+            bullet1: "Dynamic combo mechanics for melee attacks with new animations.",
+            bullet2: "Ki clashes (Beam Clash) featuring an intense, quick-reaction minigame.",
+            bullet3: "Melee strike levels that scale your damage as you invest in them.",
+            bullet4: "Homing Ki attacks that track targets in mid-air."
+          },
+          rpg: {
+            title: "RPG Systems & Classes",
+            bullet1: "Fully functional class passive abilities for every RPG archetype.",
+            bullet2: "Dynamic stat growth that adapts based on player progression.",
+            bullet3: "Stat point redistribution available via commands or Shenron wishes."
+          },
+          content: {
+            title: "New Content & Exploration",
+            bullet1: "10 new trainable Masters to teach you legendary, iconic techniques.",
+            bullet2: "Arrival of the Sacred Kai Planet as a brand-new explorable world.",
+            bullet3: "Craftable Gravity Device to set up custom high-gravity training rooms.",
+            bullet4: "New mythical weapon: Dimensional Sword, a katana capable of slicing space."
+          },
+          visuals: {
+            title: "Visual & Technical Polish",
+            bullet1: "Locomotion and combat animations completely rewritten from scratch for fluidity.",
+            bullet2: "Improved 3D renderers and shader support for Ki attacks and auras.",
+            bullet3: "Dynamic battle wounds appearing on characters as health decreases.",
+            bullet4: "Overhauled Oozaru transformation triggering naturally under full moon conditions."
+          }
+        }
+      }
     },
     salon: {
       tag: "Your Warrior, Your Style",

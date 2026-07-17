@@ -81,7 +81,7 @@ const es: Translations = {
     },
     vote: {
       tag: "Evento Especial",
-      title: "VOTA POR TU <br/>RAZA FAVORITA",
+      title: "VOTA POR TU RAZA FAVORITA",
       description: "El destino de la próxima actualización está en tus manos. Participa en la votación global y decide qué nueva raza se unirá primero a DragonMineZ.",
       cta: "Ir a Votar Ahora",
     },
@@ -93,12 +93,6 @@ const es: Translations = {
       title: "ÚNETE A LA PATRULLA DEL TIEMPO",
       description: "Conéctate con miles de jugadores, encuentra grupos para incursiones y obtén soporte directo de los desarrolladores.",
       cta: "ENTRAR AL DISCORD",
-    },
-    vote: {
-      tag: "Evento Especial",
-      title: "VOTA POR TU PROPIA RAZA",
-      description: "El destino de la próxima actualización está en tus manos. Participa en la votación global y decide qué nueva raza se unirá primero a DragonMineZ.",
-      cta: "Ir a Votar Ahora",
     },
   },
   hairSalon: {

@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../../i18n';
+import { useAuth } from "@clerk/astro/react";
 import ConfirmDialog from '../../ui/ConfirmDialog';
 import SuccessAlert from '../../ui/SuccessAlert';
+import InfoDialog from '../../ui/InfoDialog';
 import Button from '../../ui/Button';
 import { Progress, ProgressLabel, ProgressValue } from '../../ui/Progress';
 
+// Import assets
 import zamasuImage from '../../../assets/glind-race(zamasu).png';
 import moroImage from '../../../assets/goetian-race(moro).jpg';
 import tsufuruImage from '../../../assets/tsufuru-race(baby).jpg';
 
 const START_TIME = new Date('2026-07-10T17:00:00-05:00').getTime();
 
-type RaceId = 'zamasu' | 'moro' | 'tsufuru';
+type RaceId = 'glind' | 'goetian' | 'tsufuru';
 
 interface RaceOption {
   id: RaceId;
@@ -21,24 +24,32 @@ interface RaceOption {
 }
 
 const races: RaceOption[] = [
-  { id: 'zamasu', name: 'Glind (Zamasu)', image: zamasuImage.src, descKey: 'votepage.zamasu_desc' },
-  { id: 'moro', name: 'Goetian (Moro)', image: moroImage.src, descKey: 'votepage.moro_desc' },
+  { id: 'glind', name: 'Glind (Zamasu)', image: zamasuImage.src, descKey: 'votepage.zamasu_desc' },
+  { id: 'goetian', name: 'Goetian (Moro)', image: moroImage.src, descKey: 'votepage.moro_desc' },
   { id: 'tsufuru', name: 'Tsufuru (Baby)', image: tsufuruImage.src, descKey: 'votepage.tsufuru_desc' },
 ];
 
-export default function VotingSystem() {
+interface VotingSystemProps {
+  initialResults: Record<string, number>;
+  initialVotedRace: RaceId | null;
+}
+
+export default function VotingSystem({ initialResults, initialVotedRace }: VotingSystemProps) {
   const { t } = useLanguage();
+  const { isSignedIn } = useAuth();
   const [hasStarted, setHasStarted] = useState(Date.now() >= START_TIME);
-  const [votedRace, setVotedRace] = useState<RaceId | null>(null);
+  const [votedRace, setVotedRace] = useState<RaceId | null>(initialVotedRace);
   const [selectedRace, setSelectedRace] = useState<RaceId | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Mock results for statistics
-  const [results, setResults] = useState<Record<RaceId, number>>({
-    zamasu: 45,
-    moro: 30,
-    tsufuru: 25,
+  // Results for statistics
+  const [results, setResults] = useState<Record<string, number>>({
+    glind: initialResults?.glind ?? 0,
+    goetian: initialResults?.goetian ?? 0,
+    tsufuru: initialResults?.tsufuru ?? 0,
   });
 
   useEffect(() => {
@@ -51,20 +62,70 @@ export default function VotingSystem() {
     return () => clearInterval(timer);
   }, []);
 
+  // Poll for live stats in the background
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/vote');
+        if (res.ok) {
+          const data = await res.json();
+          setResults(data.results);
+          if (data.votedRace && data.votedRace !== votedRace) {
+            setVotedRace(data.votedRace as RaceId);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching vote statistics', err);
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 10000); // every 10s
+    return () => clearInterval(interval);
+  }, [hasStarted, votedRace]);
+
   const handleVoteClick = (id: RaceId) => {
+    if (!isSignedIn) {
+      setIsAuthOpen(true);
+      return;
+    }
     setSelectedRace(id);
     setIsConfirmOpen(true);
   };
 
-  const handleConfirmVote = () => {
-    if (selectedRace) {
-      // Add a mock vote to the results
-      setResults(prev => ({
-        ...prev,
-        [selectedRace]: prev[selectedRace] + 1
-      }));
-      setVotedRace(selectedRace);
-      setIsInfoOpen(true);
+  const handleConfirmVote = async () => {
+    if (!selectedRace) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ race: selectedRace }),
+      });
+
+      if (res.ok) {
+        setVotedRace(selectedRace);
+        setIsInfoOpen(true);
+        // Refresh results immediately
+        const statsRes = await fetch('/api/vote');
+        if (statsRes.ok) {
+          const data = await statsRes.json();
+          setResults(data.results);
+        }
+      } else {
+        const errorData = await res.json();
+        console.error('Failed to vote:', errorData.error);
+      }
+    } catch (err) {
+      console.error('Error voting:', err);
+    } finally {
+      setLoading(false);
+      setIsConfirmOpen(false);
     }
   };
 
@@ -105,7 +166,7 @@ export default function VotingSystem() {
 
         <div className="w-full space-y-8 bg-surface-elevated border border-glass rounded-[2rem] p-8 shadow-card">
           {races.map((race) => {
-            const votes = results[race.id];
+            const votes = results[race.id] ?? 0;
             const percentage = totalVotes === 0 ? 0 : (votes / totalVotes) * 100;
             return (
               <div key={race.id} className="space-y-3">
@@ -114,7 +175,7 @@ export default function VotingSystem() {
                     <img src={race.image} alt={race.name} className="w-10 h-10 rounded-full object-cover border border-glass" />
                     <ProgressLabel className="text-lg font-bold">{race.name}</ProgressLabel>
                   </div>
-                  <ProgressValue value={percentage} className="text-lg font-black text-primary" />
+                  <ProgressValue value={percentage} className="text-lg font-black text-foreground" />
                 </div>
                 <Progress value={percentage} className="h-3" />
               </div>
@@ -161,6 +222,13 @@ export default function VotingSystem() {
         onConfirm={handleConfirmVote}
         title={t('votepage.confirm_title')}
         description={t('votepage.confirm_desc')}
+      />
+
+      <InfoDialog
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        title={t('hairSalon.authRequiredTitle')}
+        description={t('hairSalon.authRequiredDesc')}
       />
     </div>
   );

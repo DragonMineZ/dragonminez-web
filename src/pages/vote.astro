@@ -1,6 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import VotingSystem from "../components/features/vote/VotingSystem";
+import { getVoteStatistics, getUserVote } from "../services/vote.service";
+
+const { userId } = Astro.locals.auth();
+const initialResults = await getVoteStatistics();
+const initialVotedRace = userId ? await getUserVote(userId) : null;
 ---
 
 <Layout>
@@ -13,7 +18,11 @@ import VotingSystem from "../components/features/vote/VotingSystem";
         </h1>
       </div>
       
-      <VotingSystem client:load />
+      <VotingSystem 
+        client:load 
+        initialResults={initialResults} 
+        initialVotedRace={initialVotedRace as any} 
+      />
     </div>
   </main>
 </Layout>

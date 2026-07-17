@@ -232,7 +232,7 @@ const pt: Translations = {
     winner_subtitle: "A raça vencedora que será adicionada na próxima atualização é:",
     before_start_title: "A VOTAÇÃO AINDA NÃO COMEÇOU",
     before_start_desc: "Prepare-se para decidir o futuro de DragonMineZ.",
-    schedule_text: "05:00 PM PE / 07:00 PM ARG",
+    schedule_text: "12:00 Horas (GMT-5)",
     vote_button: "Votar",
     zamasu_desc: "A raça definitiva dos deuses. Poder divino e controle absoluto do espaço-tempo à sua disposição.",
     moro_desc: "Uma raça ancestral capaz de absorver a energia vital dos planetas para aumentar seu poder mágico.",

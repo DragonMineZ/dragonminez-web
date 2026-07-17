@@ -227,6 +227,7 @@ const pt: Translations = {
   },
   votepage: {
     title: "VOTAÇÃO DE RAÇAS",
+    subtitle: "Cada raça terá uma passiva única, junto com novas transformações e sua própria personalização.",
     before_start_title: "A VOTAÇÃO AINDA NÃO COMEÇOU",
     before_start_desc: "Prepare-se para decidir o futuro de DragonMineZ.",
     schedule_text: "05:00 PM PE / 07:00 PM ARG",

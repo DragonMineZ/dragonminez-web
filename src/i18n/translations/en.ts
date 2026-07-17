@@ -227,6 +227,7 @@ const en: Translations = {
   },
   votepage: {
     title: "RACE VOTING",
+    subtitle: "Each race will have a unique passive, along with new transformations and its own customization.",
     before_start_title: "VOTING HAS NOT STARTED YET",
     before_start_desc: "Get ready to decide the future of DragonMineZ.",
     schedule_text: "05:00 PM PE / 07:00 PM ARG",

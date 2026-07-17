@@ -16,6 +16,9 @@ const initialVotedRace = userId ? await getUserVote(userId) : null;
         <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-foreground italic tracking-tighter uppercase leading-[0.9]" data-i18n="votepage.title">
           VOTACIÓN DE RAZAS
         </h1>
+        <p class="text-xl md:text-2xl text-foreground/80 leading-relaxed font-medium max-w-2xl" data-i18n="votepage.subtitle">
+          Cada raza tendrá una pasiva única, junto con nuevas transformaciones y su propia personalización.
+        </p>
       </div>
       
       <VotingSystem 

@@ -2,8 +2,8 @@ import * as VoteRepo from "../repositories/vote.repository";
 import * as UserRepo from "../repositories/user.repository";
 import { notFound, badRequest } from "../lib/api/response";
 
-export const VOTE_START_TIME = new Date("2026-07-17T11:00:00-05:00").getTime();
-export const VOTE_END_TIME = new Date("2026-07-17T11:55:00-05:00").getTime();
+export const VOTE_START_TIME = new Date("2026-07-17T12:00:00-05:00").getTime();
+export const VOTE_END_TIME = new Date("2026-07-24T16:00:00-05:00").getTime();
 
 
 export async function getUserVote(clerkId: string): Promise<string | null> {

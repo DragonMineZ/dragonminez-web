@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../../i18n';
 import ConfirmDialog from '../../ui/ConfirmDialog';
-import InfoDialog from '../../ui/InfoDialog';
+import SuccessAlert from '../../ui/SuccessAlert';
 import Button from '../../ui/Button';
 import { Progress, ProgressLabel, ProgressValue } from '../../ui/Progress';
 
@@ -122,12 +122,10 @@ export default function VotingSystem() {
           })}
         </div>
 
-        <InfoDialog
-          isOpen={isInfoOpen}
+        <SuccessAlert
+          show={isInfoOpen}
           onClose={() => setIsInfoOpen(false)}
-          title={t('votepage.success_title')}
-          description={t('votepage.success_desc')}
-          buttonLabel={t('common.close')}
+          message={t('votepage.success_title')}
         />
       </div>
     );

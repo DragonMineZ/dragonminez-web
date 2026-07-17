@@ -81,7 +81,7 @@ const pt: Translations = {
     },
     vote: {
       tag: "Evento Especial",
-      title: "VOTE NA SUA <br/>RAÇA FAVORITA",
+      title: "VOTE NA SUA RAÇA FAVORITA",
       description: "O destino da próxima atualização está nas suas mãos. Participe da votação global e decida qual nova raça se juntará primeiro ao DragonMineZ.",
       cta: "Ir Votar Agora",
     },

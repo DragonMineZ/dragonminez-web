@@ -4,6 +4,7 @@ import { Image } from "astro:assets";
 import heroImage from "../assets/dmz-hero.png";
 import characters from "../assets/dmz-characters.png";
 import endofzImage from "../assets/updates/endofz/dmz-endofz.png";
+import voteBackground from "../assets/dmz-vote.png";
 import endofzLogo from "../assets/updates/endofz/dmz-endofz-logo.png";
 import PatchNotesModal from "../components/features/updates/PatchNotesModal";
 import ImageCarousel from "../components/ImageCarousel.astro";
@@ -101,8 +102,17 @@ import modrinthIcon from "../assets/icons/social/modrinth.svg?raw";
     <div class="section-divider"></div>
 
     <!-- ── Race Vote CTA -->
-    <section class="py-24 md:py-32 bg-section">
-      <div class="container-base">
+    <section class="relative py-24 md:py-32 bg-section overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Image 
+          src={voteBackground} 
+          alt="Vote Background" 
+          class="w-full h-full object-cover opacity-5 pointer-events-none grayscale"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-section via-section/80 to-section"></div>
+      </div>
+
+      <div class="container-base relative z-10">
         <div class="flex flex-col items-center text-center gap-8 max-w-4xl mx-auto">
           <div class="space-y-4">
             <span class="text-primary font-bold tracking-widest uppercase text-sm" data-i18n="home.vote.tag">Evento Especial</span>

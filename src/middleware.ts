@@ -37,7 +37,7 @@ const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
 const withRateLimit: MiddlewareHandler = async (context, next) => {
     const url = new URL(context.request.url);
 
-    if (!url.pathname.startsWith("/api/")) return next();
+    if (!url.pathname.startsWith("/api/") && url.pathname !== "/vote") return next();
 
     if (url.pathname.startsWith("/api/webhooks/")) return next();
 

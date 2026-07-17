@@ -3,7 +3,7 @@ import * as UserRepo from "../repositories/user.repository";
 import { notFound, badRequest } from "../lib/api/response";
 
 export const VOTE_START_TIME = new Date("2026-07-17T11:00:00-05:00").getTime();
-export const VOTE_END_TIME = new Date("2026-07-17T11:45:00-05:00").getTime();
+export const VOTE_END_TIME = new Date("2026-07-17T11:47:00-05:00").getTime();
 
 
 export async function getUserVote(clerkId: string): Promise<string | null> {
@@ -36,10 +36,10 @@ export async function getVoteStatistics(): Promise<{ status: string, winner: str
         goetian: 0,
         tsufuru: 0,
     };
-    
+
     let maxVotes = -1;
     let winner: string | null = null;
-    
+
     counts.forEach((c) => {
         if (c.race in stats) {
             stats[c.race] = c._count.race;

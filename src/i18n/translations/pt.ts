@@ -219,7 +219,23 @@ const pt: Translations = {
     decodeError: "Erro ao decodificar o código",
     parseError: "Erro ao procesar os dados",
   },
+  votepage: {
+    title: "VOTAÇÃO DE RAÇAS",
+    before_start_title: "A VOTAÇÃO AINDA NÃO COMEÇOU",
+    before_start_desc: "Prepare-se para decidir o futuro de DragonMineZ.",
+    schedule_text: "05:00 PM PE / 07:00 PM ARG",
+    vote_button: "Votar",
+    zamasu_desc: "A raça definitiva dos deuses. Poder divino e controle absoluto do espaço-tempo à sua disposição.",
+    moro_desc: "Uma raça ancestral capaz de absorver a energia vital dos planetas para aumentar seu poder mágico.",
+    tsufuru_desc: "Raça tecnológica com habilidades parasitárias capazes de controlar os guerreiros mais poderosos.",
+    confirm_title: "Confirmar Voto",
+    confirm_desc: "Tem certeza que deseja votar nesta raça? Esta ação não pode ser desfeita e representará sua única decisão neste evento.",
+    success_title: "Voto Registrado!",
+    success_desc: "Seu voto foi registrado com sucesso no banco de dados do DragonMineZ. Obrigado por participar!",
+    stats_title: "RESULTADOS DA VOTAÇÃO",
+    stats_desc: "Estes são os resultados atuais da votação ao vivo.",
+    total_votes: "votos no total",
+  },
 };
-
 
 export default pt;

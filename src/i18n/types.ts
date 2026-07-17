@@ -192,22 +192,22 @@ export interface Translations {
     decodeError: string;
     parseError: string;
   };
-  votePage: {
+  votepage: {
     title: string;
-    beforeStartTitle: string;
-    beforeStartDesc: string;
-    scheduleText: string;
-    voteButton: string;
-    zamasuDesc: string;
-    moroDesc: string;
-    tsufuruDesc: string;
-    confirmTitle: string;
-    confirmDesc: string;
-    successTitle: string;
-    successDesc: string;
-    statsTitle: string;
-    statsDesc: string;
-    totalVotes: string;
+    before_start_title: string;
+    before_start_desc: string;
+    schedule_text: string;
+    vote_button: string;
+    zamasu_desc: string;
+    moro_desc: string;
+    tsufuru_desc: string;
+    confirm_title: string;
+    confirm_desc: string;
+    success_title: string;
+    success_desc: string;
+    stats_title: string;
+    stats_desc: string;
+    total_votes: string;
   };
 }
 

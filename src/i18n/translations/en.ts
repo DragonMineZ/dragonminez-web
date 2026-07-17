@@ -219,7 +219,23 @@ const en: Translations = {
     decodeError: "Failed to decode hair code",
     parseError: "Error parsing hair data",
   },
+  votepage: {
+    title: "RACE VOTING",
+    before_start_title: "VOTING HAS NOT STARTED YET",
+    before_start_desc: "Get ready to decide the future of DragonMineZ.",
+    schedule_text: "05:00 PM PE / 07:00 PM ARG",
+    vote_button: "Vote",
+    zamasu_desc: "The ultimate race of the gods. Divine power and absolute control over space-time at your disposal.",
+    moro_desc: "An ancient race capable of absorbing the life energy of planets to increase their magical power.",
+    tsufuru_desc: "Technological race with parasitic abilities capable of controlling the most powerful warriors.",
+    confirm_title: "Confirm Vote",
+    confirm_desc: "Are you sure you want to vote for this race? This action cannot be undone and will represent your only decision in this event.",
+    success_title: "Vote Registered!",
+    success_desc: "Your vote has been successfully registered in the DragonMineZ database. Thanks for participating!",
+    stats_title: "VOTING RESULTS",
+    stats_desc: "These are the current live voting results.",
+    total_votes: "total votes",
+  },
 };
-
 
 export default en;

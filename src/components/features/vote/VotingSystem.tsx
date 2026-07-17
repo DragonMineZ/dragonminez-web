@@ -178,9 +178,7 @@ export default function VotingSystem({ initialResults, initialVotedRace }: Votin
       </div>
     );
   }
-      </div>
-    );
-  }
+
 
   if (votedRace) {
     const totalVotes = Object.values(results).reduce((a, b) => a + b, 0);

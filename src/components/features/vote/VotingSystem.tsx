@@ -142,7 +142,7 @@ export default function VotingSystem() {
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-0"></div>
 
             <div className="relative z-10 p-6 flex flex-col h-full justify-end gap-4 mt-auto">
-              <h3 className="text-3xl font-black text-white italic tracking-wide drop-shadow-md text-center">
+              <h3 className="text-3xl font-black text-foreground italic tracking-wide drop-shadow-md text-center">
                 {race.name}
               </h3>
               <p className="text-foreground/90 leading-relaxed font-medium min-h-[80px]" data-i18n={race.descKey}>

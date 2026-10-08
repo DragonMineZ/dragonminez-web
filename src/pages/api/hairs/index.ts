@@ -91,13 +91,12 @@ export const POST = withAuth(async ({ request }, userId) => {
     const validation = validateBody(createHairSchema, body);
     if (!validation.success) return validation.error;
 
-    const { name, code, image_url, description, categoryIds } = validation.data;
+    const { name, code, description, categoryIds } = validation.data;
 
     try {
         const hair = await HairService.createHair({
             name,
             code,
-            image_url,
             description,
             clerkId: userId,
             categoryIds,

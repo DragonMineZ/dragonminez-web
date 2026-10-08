@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import type { Hair } from "../../../types/hair";
 import ActionButtons from "../../ui/ActionButtons";
 import Chip from "../../ui/Chip";
@@ -10,11 +10,12 @@ import ConfirmDialog from "../../ui/ConfirmDialog";
 import SuccessAlert from "../../ui/SuccessAlert";
 import InfoDialog from "../../ui/InfoDialog";
 import HairCategories from "./HairCategories";
-import notFoundImage from '../../../assets/hairsalon/not_found.svg';
+import HairPreview from "./HairPreview";
 
 import { useLike } from "../../../hooks/useLike";
 import { useClipboard } from "../../../hooks/useClipboard";
 import { useLanguage } from "../../../i18n";
+import { isCurrentCode, toCurrentCode } from "../../../lib/hair/codec";
 interface HairCardProps {
     hair: Hair;
     isSignedIn: boolean;
@@ -37,10 +38,20 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     const [alert, setAlert] = useState({ show: false, message: "" });
 
     const isOwner = hair.isOwner ?? false;
+    const [shareCode, setShareCode] = useState(hair.code);
+
+    useEffect(() => {
+        if (isCurrentCode(hair.code)) {
+            setShareCode(hair.code);
+            return;
+        }
+        const handle = window.setTimeout(() => setShareCode(toCurrentCode(hair.code)), 0);
+        return () => window.clearTimeout(handle);
+    }, [hair.code]);
 
     // ── Handlers
     const handleCopyCode = () => {
-        copy(hair.code, () => {
+        copy(toCurrentCode(shareCode), () => {
             setAlert({ show: true, message: t('hairSalon.copySuccess') });
         });
     };
@@ -72,17 +83,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
     // ── Render
     return (
         <div className="group/card relative bg-surface rounded-[32px] border border-glass p-4 md:p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:border-glass-strong hover:bg-surface-elevated">
-            <div className="relative w-full md:w-48 aspect-square shrink-0">
-                <img
-                    src={hair.image_url}
-                    alt={hair.name}
-                    className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover/card:scale-105"
-                    onError={(e) => {
-                        e.currentTarget.src = notFoundImage.src;
-                        e.currentTarget.onerror = null;
-                    }}
-                />
-            </div>
+            <HairPreview code={hair.code} name={hair.name} className="w-full md:w-56" />
 
             <div className="flex flex-col flex-1 min-w-0 py-2">
                 <div className="flex justify-between items-center mb-2">
@@ -91,7 +92,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                     </h3>
                     <div className="flex items-center gap-2">
                         <Chip
-                            href={`/viewer?code=${encodeURIComponent(hair.code)}&name=${encodeURIComponent(hair.name)}`}
+                            href={`/viewer?id=${hair.id_hair}&name=${encodeURIComponent(hair.name)}`}
                             icon="visibility"
                             variant="outline"
                             title={t('hairSalon.view3D')}
@@ -106,7 +107,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
                 <HairCategories categories={hair.categories} className="mb-3" />
 
-                <CodeClipboard code={hair.code} copied={copied} onCopy={handleCopyCode} />
+                <CodeClipboard code={shareCode} copied={copied} onCopy={handleCopyCode} />
 
                 <p className="text-sm text-foreground/70 line-clamp-3 leading-[1.6] mb-4 font-normal">
                     {hair.description || t('hairSalon.noDescription')}

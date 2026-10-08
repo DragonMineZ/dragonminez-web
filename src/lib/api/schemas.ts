@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { badRequest, unprocessableEntity } from "./response";
 
-const HAIR_CODE_REGEX = /^DMZF?[145]:[A-Za-z0-9_-]+$/i;
+const HAIR_CODE_REGEX = /^DMZF?(?:1|4|5|22):[A-Za-z0-9_-]+$/i;
 
 export const createHairSchema = z.object({
 
@@ -15,12 +15,8 @@ export const createHairSchema = z.object({
         .string({ required_error: "code is required", invalid_type_error: "code must be a string" })
         .regex(
             HAIR_CODE_REGEX,
-            "code must follow the DMZ format: DMZ[F][1|4|5]:<data> with no spaces (e.g. DMZ5:aB3xY...)"
+            "code must follow the DMZ format: DMZ[F][22|1|4|5]:<data> with no spaces (e.g. DMZF22:aB3xY...)"
         ),
-
-    image_url: z
-        .string({ required_error: "image_url is required", invalid_type_error: "image_url must be a string" })
-        .url("image_url must be a valid URL"),
 
     description: z
         .string({ invalid_type_error: "description must be a string" })

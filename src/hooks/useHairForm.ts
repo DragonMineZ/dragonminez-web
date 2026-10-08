@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/astro/react";
 import type { Category, Hair } from "../types/hair";
+import { fromCode, fromFullSetCode, isFullSetCode, toCurrentCode } from "../lib/hair/codec";
 
 export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
 // ── Estado
@@ -17,8 +18,7 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
 
     const [formData, setFormData] = useState({
         name: initialData?.name || "",
-        code: initialData?.code || "",
-        image_url: initialData?.image_url || "",
+        code: initialData ? toCurrentCode(initialData.code) : "",
         description: initialData?.description || "",
     });
 
@@ -96,31 +96,15 @@ export function useHairForm(initialData?: Hair, onSuccess?: () => void) {
         );
     };
 
-    const ALLOWED_IMAGE_PROVIDERS = [
-        'i.imgur.com',
-        'media.discordapp.net',
-        'cdn.discord.app',
-    ];
+    const isReadableCode = (code: string) =>
+        isFullSetCode(code) ? fromFullSetCode(code) !== null : fromCode(code) !== null;
 
     const validate = () => {
         const newErrors: Record<string, string> = {};
         if (!formData.name.trim()) newErrors.name = "formNameRequired";
         if (!formData.code.trim()) newErrors.code = "formCodeRequired";
-        if (!formData.image_url.trim()) {
-            newErrors.image_url = "formImageRequired";
-        } else {
-            try {
-                const url = new URL(formData.image_url);
-                const host = url.host.toLowerCase();
-                const isAllowed = ALLOWED_IMAGE_PROVIDERS.some(provider => host === provider || host.endsWith(`.${provider}`));
-                if (!isAllowed) {
-                    newErrors.image_url = "formImageInvalidProvider";
-                }
-            } catch {
-                newErrors.image_url = "formImageInvalidProvider";
-            }
-        }
-        
+        else if (!isReadableCode(formData.code.trim())) newErrors.code = "formCodeInvalid";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };

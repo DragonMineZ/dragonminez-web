@@ -169,11 +169,15 @@ export default function HairList({ initialCategories = [] }: { initialCategories
             {t("hairSalon.myCreations")}
           </Button>
         )}
-        <SignedIn>
-          <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center gap-3">
+          <Button variant="secondary" size="md" onClick={() => { window.location.href = "/viewer"; }} className="gap-2">
+            <span className="material-symbols-outlined text-[20px]">brush</span>
+            {t("hairSalon.createHair")}
+          </Button>
+          <SignedIn>
             <CreateHairTrigger onSuccess={handleCreateSuccess} />
-          </div>
-        </SignedIn>
+          </SignedIn>
+        </div>
       </div>
 
       {hairs.length === 0 ? (

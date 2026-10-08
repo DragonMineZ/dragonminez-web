@@ -2,6 +2,7 @@ import type { Hair } from "../../../types/hair";
 import Button from "../../ui/Button";
 import Field from "../../ui/Field";
 import ErrorAlert from "../../ui/ErrorAlert";
+import HairPreview from "./HairPreview";
 import { useHairForm } from "../../../hooks/useHairForm";
 import { useLanguage } from "../../../i18n";
 
@@ -71,7 +72,7 @@ export default function CreateHairForm({
                         value={formData.code}
                         error={errors.code ? t(`hairSalon.${errors.code}` as any) : undefined}
                         onChange={(e: any) => updateField('code', e.target.value)}
-                        maxLength={10000}
+                        maxLength={262144}
                         className="font-mono text-sm"
                     />
 
@@ -101,15 +102,18 @@ export default function CreateHairForm({
                         </div>
                     </div>
 
-                    <Field
-                        label={t('hairSalon.formImage')}
-                        type="url"
-                        required
-                        placeholder={t('hairSalon.formImagePlaceholder')}
-                        value={formData.image_url}
-                        error={errors.image_url ? t(`hairSalon.${errors.image_url}` as any) : undefined}
-                        onChange={(e: any) => updateField('image_url', e.target.value)}
-                    />
+                    <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-foreground/70 ml-1">
+                            {t('hairSalon.formPreview')}
+                        </label>
+                        {formData.code.trim() ? (
+                            <HairPreview code={formData.code} name={formData.name} className="w-full max-w-60" />
+                        ) : (
+                            <div className="flex w-full max-w-60 aspect-square items-center justify-center rounded-2xl border border-dashed border-glass-strong bg-glass p-6 text-center">
+                                <p className="text-xs text-muted italic">{t('hairSalon.formPreviewEmpty')}</p>
+                            </div>
+                        )}
+                    </div>
 
                     <Field
                         label={t('hairSalon.formDescription')}

@@ -23,7 +23,6 @@ export interface HairQueryParams {
 export interface CreateHairData {
     name: string;
     code: string;
-    image_url: string;
     description?: string | null;
     clerkId: string;
     categoryIds?: number[];
@@ -99,7 +98,6 @@ export async function createHair(data: CreateHairData) {
             name: data.name,
             code: data.code,
             code_hash: computeCodeHash(data.code),
-            image_url: data.image_url,
             description: data.description,
             artist: { connect: { clerk_id: data.clerkId } },
             categories: data.categoryIds
@@ -121,7 +119,6 @@ export async function updateHair(id: number, data: UpdateHairData) {
             name: data.name,
             code: data.code,
             code_hash: data.code ? computeCodeHash(data.code) : undefined,
-            image_url: data.image_url,
             description: data.description,
             categories: data.categoryIds
                 ? { set: data.categoryIds.map((id) => ({ id_category: id })) }

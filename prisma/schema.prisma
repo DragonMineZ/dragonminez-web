@@ -23,7 +23,7 @@ model Hair {
   name        String
   code        String     @db.Text
   code_hash   String     @unique
-  image_url   String
+  image_url   String?
   description String?
   created_at  DateTime   @default(now())
   artistId    Int

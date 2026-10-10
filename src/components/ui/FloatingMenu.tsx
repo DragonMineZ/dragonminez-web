@@ -4,6 +4,7 @@ import FloatingLanguageSelector from './FloatingLanguageSelector';
 import Tooltip from './Tooltip';
 import SuccessAlert from './SuccessAlert';
 import { useLanguage } from '../../i18n';
+import { THEME_COOKIE, readSharedPref, writeSharedPref } from '../../lib/sharedPrefs';
 
 export function FloatingMenu() {
     const { language, t, isLoaded: isI18nLoaded } = useLanguage();
@@ -15,7 +16,7 @@ export function FloatingMenu() {
 
     useEffect(() => {
         setIsMounted(true);
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = readSharedPref(THEME_COOKIE) ?? localStorage.getItem('theme');
         const theme = savedTheme ? savedTheme === 'dark' : true;
         setIsDark(theme);
         if (theme) {
@@ -34,6 +35,7 @@ export function FloatingMenu() {
         const newDark = !isDark;
         setIsDark(newDark);
         localStorage.setItem('theme', newDark ? 'dark' : 'light');
+        writeSharedPref(THEME_COOKIE, newDark ? 'dark' : 'light');
         if (newDark) {
             document.documentElement.classList.add('dark');
         } else {

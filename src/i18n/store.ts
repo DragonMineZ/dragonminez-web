@@ -1,4 +1,5 @@
 import type { Language, Translations } from './types';
+import { LANG_COOKIE, readSharedPref, writeSharedPref } from '../lib/sharedPrefs';
 
 export interface I18nState {
   language: Language;
@@ -32,7 +33,7 @@ class I18nStore {
   private getInitialLanguage(): Language {
     if (typeof window === 'undefined') return 'es';
     
-    const saved = localStorage.getItem(STORAGE_KEY) as Language;
+    const saved = (readSharedPref(LANG_COOKIE) ?? localStorage.getItem(STORAGE_KEY)) as Language;
     if (saved && ['es', 'en', 'pt'].includes(saved)) return saved;
 
     const browserLang = navigator.language.split('-')[0];
@@ -51,6 +52,7 @@ class I18nStore {
     this.state = { ...this.state, language: lang, isLoaded: false };
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, lang);
+      writeSharedPref(LANG_COOKIE, lang);
       document.documentElement.lang = lang;
       this.loadTranslations(lang);
     }

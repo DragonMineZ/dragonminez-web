@@ -56,6 +56,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <script is:inline>
       const theme = (() => {
+        const shared = document.cookie.match(/(?:^|;\s*)dmz_theme=(light|dark)/);
+        if (shared) {
+          return shared[1];
+        }
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
           return localStorage.getItem('theme');
         }

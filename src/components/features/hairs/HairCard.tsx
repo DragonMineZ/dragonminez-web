@@ -19,6 +19,7 @@ import { isCurrentCode, toCurrentCode } from "../../../lib/hair/codec";
 interface HairCardProps {
     hair: Hair;
     isSignedIn: boolean;
+    canModerate?: boolean;
     onDelete: (id: number) => void;
     onUpdateSuccess?: () => void;
     onLikeToggle?: (hairId: number, liked: boolean) => void;
@@ -26,7 +27,7 @@ interface HairCardProps {
 
 const CreateHairForm = lazy(() => import('./CreateHairForm'));
 
-export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
+export default function HairCard({ hair, isSignedIn, canModerate = false, onDelete, onUpdateSuccess, onLikeToggle }: HairCardProps) {
     const { t } = useLanguage();
 
     const { isLiked, toggleLike } = useLike(hair.id_hair, !!hair.is_liked_by_user, onLikeToggle);
@@ -34,6 +35,7 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isModerateModalOpen, setIsModerateModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: "" });
 
@@ -91,6 +93,14 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                         {hair.name}
                     </h3>
                     <div className="flex items-center gap-2">
+                        {canModerate && !isOwner && (
+                            <Chip
+                                icon="delete"
+                                variant="outline"
+                                title={t('hairSalon.moderatorDelete')}
+                                onClick={() => setIsModerateModalOpen(true)}
+                            />
+                        )}
                         <Chip
                             href={`/viewer?id=${hair.id_hair}&name=${encodeURIComponent(hair.name)}`}
                             icon="visibility"
@@ -144,6 +154,15 @@ export default function HairCard({ hair, isSignedIn, onDelete, onUpdateSuccess, 
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={() => onDelete(hair.id_hair)}
                 description={t('hairSalon.deleteConfirmDesc')}
+            />
+
+            <ConfirmDialog
+                isOpen={isModerateModalOpen}
+                onClose={() => setIsModerateModalOpen(false)}
+                onConfirm={() => onDelete(hair.id_hair)}
+                title={t('hairSalon.moderatorDeleteTitle')}
+                description={t('hairSalon.moderatorDeleteDesc')}
+                confirmLabel={t('hairSalon.moderatorDeleteConfirm')}
             />
 
             <InfoDialog

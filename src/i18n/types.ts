@@ -128,6 +128,10 @@ export interface Translations {
     usernameFallback: string;
     editDesign: string;
     deleteDesign: string;
+    moderatorDelete: string;
+    moderatorDeleteTitle: string;
+    moderatorDeleteDesc: string;
+    moderatorDeleteConfirm: string;
     copyCode: string;
     copied: string;
     like: string;

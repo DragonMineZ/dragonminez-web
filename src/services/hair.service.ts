@@ -63,13 +63,18 @@ export async function updateHair(
 
 export async function removeHair(
     hairId: number,
-    clerkId: string
+    clerkId: string,
+    canModerate: () => Promise<boolean> = async () => false
 ): Promise<ServiceResult<{ message: string }>> {
     const existing = await HairRepo.findHairWithArtist(hairId);
     if (!existing) return { error: notFound("errors.api.hairNotFound") };
-    if (existing.artist.clerk_id !== clerkId) {
+    const isOwner = existing.artist.clerk_id === clerkId;
+    if (!isOwner && !(await canModerate())) {
         return { error: forbidden("errors.api.notOwned") };
     }
     await HairRepo.deleteHair(hairId);
+    if (!isOwner) {
+        console.info(`[Moderation] Hair ${hairId} ("${existing.name}") by ${existing.artist.username} deleted by ${clerkId}`);
+    }
     return { data: { message: "Hair deleted successfully" } };
 }

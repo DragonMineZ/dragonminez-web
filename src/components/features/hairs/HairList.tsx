@@ -31,6 +31,26 @@ export default function HairList({ initialCategories = [] }: { initialCategories
     show: false,
     message: "",
   });
+  const [canModerate, setCanModerate] = useState(false);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setCanModerate(false);
+      return;
+    }
+    let active = true;
+    fetch("/api/users/permissions")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active) setCanModerate(!!data?.canModerate);
+      })
+      .catch(() => {
+        if (active) setCanModerate(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [isSignedIn]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -196,6 +216,7 @@ export default function HairList({ initialCategories = [] }: { initialCategories
               key={hair.id_hair}
               hair={hair}
               isSignedIn={isSignedIn || false}
+              canModerate={canModerate}
               onDelete={handleDelete}
               onUpdateSuccess={handleUpdateSuccess}
               onLikeToggle={handleLikeToggleLocally}

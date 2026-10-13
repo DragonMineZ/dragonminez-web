@@ -6,6 +6,7 @@ import { validateBody, updateHairSchema } from "../../../lib/api/schemas";
 import { handlePrismaError } from "../../../lib/api/errors";
 import { hairsCache } from "../../../lib/api/cache";
 import * as HairService from "../../../services/hair.service";
+import { canModerate } from "../../../lib/discord/moderation";
 
 const PUBLIC_CACHE = {
     "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
@@ -50,12 +51,12 @@ export const PATCH = withAuth(async ({ params, request }, userId) => {
     }
 });
 
-export const DELETE = withAuth(async ({ params }, userId) => {
+export const DELETE = withAuth(async ({ params, locals }, userId) => {
     const hairId = parseId(params.id);
     if (!hairId) return badRequest("Hair id must be a positive integer");
 
     try {
-        const result = await HairService.removeHair(hairId, userId);
+        const result = await HairService.removeHair(hairId, userId, () => canModerate(locals));
         if ("error" in result) return result.error;
         hairsCache.clear();
         return noContent();

@@ -12,8 +12,16 @@ export const openWhenLocked = (pathname: string): boolean => OPEN.some((rule) =>
 export const mayEnter = (user: { role: string; banned: boolean } | null | undefined): boolean =>
   !!user && !user.banned && (user.role === "mod" || user.role === "admin");
 
-/** Forum role from Discord: ids in ADMIN_DISCORD_IDS (comma list) are admins, site moderators (Discord staff roles) are mods. */
-export const roleOf = (discordId: string | null, moderator: boolean, adminIds = ""): "member" | "mod" | "admin" => {
-  const admins = adminIds.split(",").map((id) => id.trim()).filter(Boolean);
-  return discordId && admins.includes(discordId) ? "admin" : moderator ? "mod" : "member";
+/**
+ * Forum role from Discord: the server owner and anyone with the Administrator permission are admins, the staff roles
+ * (DISCORD_MODERATOR_ROLES) are mods. `extraAdminIds` (ADMIN_DISCORD_IDS, comma list) is an optional break-glass list.
+ */
+export const roleOf = (
+  discordId: string | null,
+  level: "admin" | "mod" | null,
+  extraAdminIds = "",
+): "member" | "mod" | "admin" => {
+  const extra = extraAdminIds.split(",").map((id) => id.trim()).filter(Boolean);
+  if (level === "admin" || (discordId && extra.includes(discordId))) return "admin";
+  return level === "mod" ? "mod" : "member";
 };

@@ -2,7 +2,7 @@
 // The forum never keeps its own session: Clerk says who is logged in, Discord decides who is staff.
 import type { APIContext } from "astro";
 import { prisma } from "../prisma";
-import { canModerate, discordIdOf } from "../discord/moderation";
+import { discordIdOf, discordLevel } from "../discord/moderation";
 import { roleOf } from "./access";
 
 export type ForumUser = {
@@ -57,7 +57,9 @@ export async function loadForumUser(context: Pick<APIContext, "locals" | "reques
       const web = await prisma.user.findUnique({ where: { clerk_id: userId }, select: { username: true, avatar_url: true } });
       const username = web?.username || clerkUser.username || clerkUser.firstName || `user_${userId.slice(-8)}`;
       const avatarUrl = web?.avatar_url || clerkUser.imageUrl || null;
-      const role = roleOf(discordId, await canModerate(context.locals), process.env.ADMIN_DISCORD_IDS);
+      const level = discordId ? await discordLevel(discordId) : null;
+      // Discord could not be asked: keep the role this person already had instead of demoting staff for a few minutes.
+      const role = level === undefined && row ? row.role : roleOf(discordId, level ?? null, process.env.ADMIN_DISCORD_IDS);
       row = await prisma.forumUser.upsert({
         where: { clerkId: userId },
         update: { discordId, username, avatarUrl, role, syncedAt: new Date() },

@@ -1,0 +1,86 @@
+---
+import Layout from "@/layouts/ForumLayout.astro";
+import MarkdownField from "@/components/forum/MarkdownField.astro";
+import { prisma } from "@/lib/prisma.ts";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { rateLimit, requireUser } from "@/lib/forum/guard.ts";
+import { serverSchema } from "@/lib/forum/schemas.ts";
+
+const lang = getLang(Astro.request);
+const user = requireUser(Astro);
+if (user instanceof Response) return user;
+
+let error = "";
+let values = { name: "", address: "", version: "", language: lang, description: "", discordInvite: "" };
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const str = (k: string) => String(form.get(k) ?? "");
+  values = { name: str("name"), address: str("address"), version: str("version"), language: str("language"), description: str("description"), discordInvite: str("discordInvite") };
+  const parsed = serverSchema.safeParse(values);
+  if (!parsed.success) {
+    error = t(lang, `servers.err.${parsed.error.issues[0].path[0]}`);
+  } else {
+    const owned = await prisma.server.count({ where: { ownerId: user.id, status: { not: "rejected" } } });
+    const category = await prisma.forumCategory.findFirst({ where: { kind: "servers" } });
+    if (owned >= 3) error = t(lang, "servers.err.limit");
+    else if (!category) return new Response("Not found", { status: 404 });
+    else if (!rateLimit(`server:${user.id}`, 3, 24 * 60 * 60_000)) error = t(lang, "servers.err.rate");
+    else {
+      const d = parsed.data;
+      const thread = await prisma.thread.create({
+        data: {
+          categoryId: category.id,
+          authorId: user.id,
+          title: d.name,
+          posts: { create: { authorId: user.id, body: d.description } },
+          server: {
+            create: { ownerId: user.id, name: d.name, address: d.address, version: d.version, language: d.language, description: d.description, discordInvite: d.discordInvite },
+          },
+        },
+        include: { server: true },
+      });
+      return Astro.redirect(`/forum/servers/${thread.server!.id}`, 303);
+    }
+  }
+}
+const field = "mt-1 w-full rounded-xl border border-white/10 bg-background px-3 py-2 text-foreground";
+---
+
+<Layout title={t(lang, "servers.new.title")} noindex>
+  <div class="container-base max-w-3xl space-y-4">
+    <nav class="text-sm text-muted flex gap-x-2">
+      <a href="/forum/servers" class="hover:text-foreground">{t(lang, "servers.title")}</a>
+    </nav>
+    <h1 class="text-2xl font-bold">{t(lang, "servers.new.title")}</h1>
+    <p class="text-muted">{t(lang, "servers.new.note")}</p>
+    <form method="post" class="rounded-2xl border border-white/10 bg-surface p-5 space-y-4">
+      {error && <p class="rounded-xl border border-error/40 bg-error-glass px-4 py-2 text-sm text-error" role="alert">{error}</p>}
+      <label class="block text-sm text-muted">
+        {t(lang, "servers.field.name")}
+        <input name="name" required minlength="3" maxlength="60" value={values.name} class={field} />
+      </label>
+      <label class="block text-sm text-muted">
+        {t(lang, "servers.field.address")}
+        <input name="address" required minlength="3" maxlength="120" value={values.address} placeholder="play.example.com:25565" class={`${field} font-mono`} />
+      </label>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block text-sm text-muted">
+          {t(lang, "servers.field.version")}
+          <input name="version" required maxlength="20" value={values.version} placeholder="1.20.1" class={field} />
+        </label>
+        <label class="block text-sm text-muted">
+          {t(lang, "servers.field.language")}
+          <select name="language" class={field}>
+            {["en", "es", "pt", "other"].map((l) => <option value={l} selected={l === values.language}>{t(lang, `servers.lang.${l}`)}</option>)}
+          </select>
+        </label>
+      </div>
+      <label class="block text-sm text-muted">
+        {t(lang, "servers.field.invite")}
+        <input name="discordInvite" maxlength="100" value={values.discordInvite} placeholder="https://discord.gg/..." class={field} />
+      </label>
+      <MarkdownField name="description" label={t(lang, "servers.field.description")} value={values.description} rows={8} />
+      <button class="rounded-xl bg-[#f97316] px-4 py-2 text-white font-semibold hover:brightness-110 transition">{t(lang, "servers.submit")}</button>
+    </form>
+  </div>
+</Layout>

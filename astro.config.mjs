@@ -24,6 +24,11 @@ export default defineConfig({
     react(),
     sitemap()
   ],
+  security: {
+    // Forum forms are POSTs: they must come from this site. Behind the TLS proxy, trust its X-Forwarded-* for these hosts so the check sees https.
+    checkOrigin: true,
+    allowedDomains: [{ hostname: 'dragonminez.com' }, { hostname: 'www.dragonminez.com' }],
+  },
   server: {
     allowedHosts: [
       'superthorough-stacey-psychiatric.ngrok-free.dev',

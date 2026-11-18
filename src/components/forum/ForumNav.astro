@@ -1,0 +1,82 @@
+---
+// The bar under the website header on every forum page: where you are, search, notifications, staff queue and the account.
+// Login and logout are the website's own Clerk buttons (Discord), so one login covers the whole site.
+import { SignInButton, SignOutButton } from "@clerk/astro/components";
+import { prisma } from "@/lib/prisma";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { isStaff } from "@/lib/forum/guard.ts";
+
+const { crumbs = [], minimal = false } = Astro.props as { crumbs?: { label: string; href: string }[]; minimal?: boolean };
+const lang = getLang(Astro.request);
+const user = Astro.locals.user;
+// One count for the bell badge. Pages that mark notifications read do it before the layout renders.
+const unread = user ? await prisma.notification.count({ where: { userId: user.id, readAt: null } }) : 0;
+// Staff see how much waits in the queue.
+const queue = isStaff(user) && !user?.banned
+  ? (await prisma.report.count({ where: { status: "open" } })) + (await prisma.server.count({ where: { status: "pending" } }))
+  : 0;
+const here = Astro.url.pathname + Astro.url.search;
+const link = "shrink-0 text-sm font-medium text-muted transition-colors hover:text-foreground";
+const badge = "rounded-full bg-[#f97316] px-1.5 text-xs font-bold text-white";
+---
+
+<div class="fixed top-20 z-40 w-full border-b border-white/10 bg-background/80 backdrop-blur-md">
+  <div class="container-base flex h-12 max-w-7xl items-center gap-4">
+    <a href="/forum" class="shrink-0 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/85 transition-colors hover:bg-white/10">
+      {t(lang, "nav.forum")}
+    </a>
+    {crumbs.map((c) => (
+      <>
+        <span class="hidden shrink-0 text-white/30 sm:inline">/</span>
+        <a href={c.href} class="hidden truncate text-[11px] font-bold uppercase tracking-widest text-white/60 transition-colors hover:text-white sm:inline">{c.label}</a>
+      </>
+    ))}
+    {!minimal && <a href="/forum/servers" class={`${link} hidden sm:inline`}>{t(lang, "nav.servers")}</a>}
+
+    <div class="ml-auto flex min-w-0 items-center gap-3">
+      {!minimal && <form method="get" action="/forum/search" role="search" class="relative hidden md:block">
+        <span class="material-symbols-rounded pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-lg text-muted" aria-hidden="true">search</span>
+        <input
+          type="search"
+          name="q"
+          maxlength="80"
+          placeholder={t(lang, "nav.search")}
+          aria-label={t(lang, "nav.search")}
+          class="h-9 w-44 rounded-full border border-white/10 bg-white/5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted"
+        />
+      </form>}
+      {user ? (
+        <>
+          {isStaff(user) && !user.banned && (
+            <a href="/forum/mod" class={`${link} flex items-center gap-1`}>
+              {t(lang, "mod.link")}
+              {queue > 0 && <span class={badge}>{queue > 99 ? "99+" : queue}</span>}
+            </a>
+          )}
+          <a href="/forum/notifications" class={`${link} relative flex items-center`} aria-label={t(lang, "nav.notifications")} title={t(lang, "nav.notifications")}>
+            <span class="material-symbols-rounded text-xl">notifications</span>
+            {unread > 0 && <span class={`${badge} absolute -right-2 -top-2`}>{unread > 9 ? "9+" : unread}</span>}
+          </a>
+          <a href={`/forum/u/${user.id}`} class="flex min-w-0 items-center gap-2 text-sm text-muted transition-colors hover:text-foreground">
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" width="28" height="28" class="size-7 rounded-full" referrerpolicy="no-referrer" />
+            ) : (
+              <span class="flex size-7 items-center justify-center rounded-full bg-[#f97316] text-sm font-bold text-white">{user.username.charAt(0).toUpperCase()}</span>
+            )}
+            <span class="hidden max-w-32 truncate sm:inline">{user.username}</span>
+          </a>
+          <SignOutButton class={`${link} flex cursor-pointer items-center`} aria-label={t(lang, "nav.logout")} title={t(lang, "nav.logout")}>
+            <span class="material-symbols-rounded text-xl">logout</span>
+          </SignOutButton>
+        </>
+      ) : (
+        <SignInButton mode="modal" forceRedirectUrl={here} class="cursor-pointer rounded-xl bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white transition hover:brightness-110">
+          {t(lang, "nav.login")}
+        </SignInButton>
+      )}
+    </div>
+  </div>
+  {user?.banned && (
+    <p class="border-t border-red-500/20 bg-red-500/15 px-4 py-1 text-center text-xs text-red-300">{t(lang, "auth.banned")}</p>
+  )}
+</div>

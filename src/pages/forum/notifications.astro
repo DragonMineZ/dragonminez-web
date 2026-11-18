@@ -1,0 +1,70 @@
+---
+import Layout from "@/layouts/ForumLayout.astro";
+import Pagination from "@/components/forum/Pagination.astro";
+import { prisma } from "@/lib/prisma.ts";
+import { getLang, t, timeAgo } from "@/lib/forum/i18n/index.ts";
+import { canSeeThread, requireUser } from "@/lib/forum/guard.ts";
+import { notificationHref, PAGE_SIZE, postPage } from "@/lib/forum/links.ts";
+
+const lang = getLang(Astro.request);
+const user = requireUser(Astro);
+if (user instanceof Response) return user;
+
+const where = { userId: user.id };
+const total = await prisma.notification.count({ where });
+const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+const page = Math.min(Math.max(1, Number(Astro.url.searchParams.get("page")) || 1), pages);
+const items = await prisma.notification.findMany({
+  where,
+  orderBy: { id: "desc" },
+  skip: (page - 1) * PAGE_SIZE,
+  take: PAGE_SIZE,
+  include: { actor: { select: { username: true } } },
+});
+
+// What each row points at: threads (if this user can see them), servers, and the page of the post.
+const threadIds = [...new Set(items.flatMap((n) => (n.threadId ? [n.threadId] : [])))];
+const serverIds = [...new Set(items.flatMap((n) => (n.serverId ? [n.serverId] : [])))];
+const threads = new Map(
+  (await prisma.thread.findMany({ where: { id: { in: threadIds } }, select: { id: true, title: true, server: true } })).map((th) => [th.id, th]),
+);
+const servers = new Map((await prisma.server.findMany({ where: { id: { in: serverIds } }, select: { id: true, name: true } })).map((s) => [s.id, s]));
+const rows = await Promise.all(
+  items.map(async (n) => {
+    const thread = n.threadId ? threads.get(n.threadId) : undefined;
+    const server = n.serverId ? servers.get(n.serverId) : undefined;
+    const isServerNote = n.type === "server_approved" || n.type === "server_rejected";
+    const visible = !!thread && canSeeThread(thread, user);
+    const post = n.postId && visible ? await prisma.post.findUnique({ where: { id: n.postId }, select: { threadId: true } }) : null;
+    const before = post ? await prisma.post.count({ where: { threadId: post.threadId, id: { lte: n.postId! } } }) : 1;
+    const href = notificationHref(
+      { ...n, postId: post ? n.postId : null },
+      { thread: visible, server: !!server, page: postPage(before, !!thread?.server) },
+    );
+    const title = isServerNote ? (server?.name ?? "") : (thread?.title ?? "");
+    const text = t(lang, `notif.${n.type}`, { name: n.actor?.username ?? t(lang, "notif.someone"), title: title || "…" });
+    return { n, href, text };
+  }),
+);
+
+// `rows` already knows which were unread. Mark them read and drop old rows before the layout renders,
+// so the header bell on this same response is consistent (0 once everything is read).
+await prisma.notification.updateMany({ where: { userId: user.id, readAt: null }, data: { readAt: new Date() } });
+await prisma.notification.deleteMany({ where: { userId: user.id, createdAt: { lt: new Date(Date.now() - 90 * 24 * 3600 * 1000) } } });
+---
+
+<Layout title={t(lang, "notif.title")} noindex>
+  <div class="container-base max-w-4xl space-y-4">
+    <h1 class="text-2xl font-bold">{t(lang, "notif.title")}</h1>
+    <ul class="rounded-2xl border border-white/10 bg-surface divide-y divide-white/10 overflow-hidden">
+      {rows.map(({ n, href, text }) => (
+        <li class={`flex items-center justify-between gap-4 px-5 py-3 ${n.readAt ? "" : "bg-[#f97316]/10"}`}>
+          {href ? <a href={href} class="min-w-0 break-words hover:underline">{text}</a> : <span class="min-w-0 break-words text-muted">{text}</span>}
+          <time class="shrink-0 text-sm text-muted" datetime={n.createdAt.toISOString()}>{timeAgo(lang, n.createdAt)}</time>
+        </li>
+      ))}
+      {rows.length === 0 && <li class="px-5 py-4 text-muted">{t(lang, "notif.empty")}</li>}
+    </ul>
+    <Pagination page={page} pages={pages} />
+  </div>
+</Layout>

@@ -1,0 +1,23 @@
+---
+// "Log in" target of the forum: the website's Clerk modal (Discord). Logged-in visitors go straight back to where they were.
+import { SignInButton } from "@clerk/astro/components";
+import ForumLayout from "@/layouts/ForumLayout.astro";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { safeNext } from "@/lib/forum/redirect.ts";
+
+const lang = getLang(Astro.request);
+const next = safeNext(Astro.url.searchParams.get("next"));
+if (Astro.locals.user) return Astro.redirect(next);
+---
+
+<ForumLayout title={t(lang, "nav.login")} noindex>
+  <div class="container-base max-w-md space-y-6 py-16 text-center">
+    <span class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#f97316] text-white shadow-lg shadow-[#f97316]/30">
+      <span class="material-symbols-rounded text-4xl">login</span>
+    </span>
+    <h1 class="text-3xl font-bold">{t(lang, "auth.required")}</h1>
+    <SignInButton mode="modal" forceRedirectUrl={next} class="cursor-pointer rounded-xl bg-[#f97316] px-6 py-3 font-semibold text-white transition hover:brightness-110">
+      {t(lang, "nav.login")}
+    </SignInButton>
+  </div>
+</ForumLayout>

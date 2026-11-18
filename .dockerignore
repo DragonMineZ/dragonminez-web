@@ -23,6 +23,3 @@ dist/
 # Docker
 Dockerfile
 .dockerignore
-
-# Forum (separate app in forum/)
-forum/

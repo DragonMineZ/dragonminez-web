@@ -7,7 +7,8 @@
     "build": "bun astro build",
     "preview": "bun astro preview",
     "start": "bun ./dist/server/entry.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "test:forum": "node --test \"tests/forum/**/*.test.ts\""
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
@@ -29,13 +30,15 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "three": "0.183.2",
-    "zod": "3.25.76"
+    "zod": "3.25.76",
+    "markdown-it": "^14.1.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.18",
     "@types/pako": "2.0.4",
     "@types/three": "0.183.1",
     "prisma": "7.4.1",
-    "tailwindcss": "4.1.18"
+    "tailwindcss": "4.1.18",
+    "@types/markdown-it": "^14.1.2"
   }
 }

@@ -3,12 +3,18 @@ import { sequence } from "astro:middleware";
 import type { MiddlewareHandler } from "astro";
 import { tooManyRequests } from "./lib/api/response";
 import { readLimiter, writeLimiter, likeLimiter } from "./lib/api/cache";
+import { loadForumUser } from "./lib/forum/auth";
+import { forumLocked, mayEnter, openWhenLocked } from "./lib/forum/access";
 
 const isProtectedRoute = createRouteMatcher(["/createhair"]);
 
 // ── Security
-const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
+const withSecurityHeaders: MiddlewareHandler = async (context, next) => {
     const response = await next();
+
+    // The forum shows pictures members link from anywhere (announcement banners, posts), so its pages may load https images.
+    const { pathname } = new URL(context.request.url);
+    const forum = pathname.startsWith("/forum");
 
     // Clerk Production Domains
     const clerkApiUrl = "https://clerk.dragonminez.com";
@@ -19,7 +25,7 @@ const withSecurityHeaders: MiddlewareHandler = async (_context, next) => {
         `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkApiUrl} ${clerkAccountsUrl} https://challenges.cloudflare.com https://static.cloudflareinsights.com`,
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com`,
         `font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com`,
-        `img-src 'self' https://img.clerk.com https://images.clerk.dev https://media.discordapp.net https://cdn.discord.app https://flagcdn.com https://i.imgur.com`,
+        `img-src 'self' https://img.clerk.com https://images.clerk.dev https://media.discordapp.net https://cdn.discord.app https://flagcdn.com https://i.imgur.com${forum ? " https: data:" : ""}`,
         `frame-src 'self' https://challenges.cloudflare.com https://www.youtube.com`,
         `connect-src 'self' ${clerkApiUrl} ${clerkAccountsUrl}`,
         "worker-src 'self' blob:",
@@ -172,4 +178,23 @@ const withClerkAuth: MiddlewareHandler = (context, next) => {
     return clerk(context, next);
 };
 
-export const onRequest = sequence(withSecurityHeaders, withRateLimit, withClerkAuth);
+// ── Forum (/forum)
+// Who is asking (Clerk login mapped to a forum user) and, until FORUM_PUBLIC=1, the staff-only lock.
+const withForum: MiddlewareHandler = async (context, next) => {
+    const { pathname } = context.url;
+    if (!pathname.startsWith("/forum") && !pathname.startsWith("/api/forum/")) return next();
+
+    context.locals.user = await loadForumUser(context);
+
+    const locked = forumLocked(process.env.FORUM_PUBLIC);
+    if (locked && !mayEnter(context.locals.user) && !openWhenLocked(pathname)) {
+        if (pathname.startsWith("/api/")) return new Response("Forbidden", { status: 403 });
+        return context.rewrite("/forum/locked");
+    }
+
+    const response = await next();
+    if (locked) response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return response;
+};
+
+export const onRequest = sequence(withSecurityHeaders, withRateLimit, withClerkAuth, withForum);

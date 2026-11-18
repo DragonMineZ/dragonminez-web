@@ -61,3 +61,176 @@ model Vote {
 
   @@index([race])
 }
+
+// ── Forum (embedded in the website: /forum). Tables are prefixed forum_; identity comes from Clerk.
+model ForumUser {
+  id             Int            @id @default(autoincrement())
+  clerkId        String         @unique
+  discordId      String?
+  syncedAt       DateTime       @default(now())
+  username       String
+  avatarUrl      String?
+  role           String         @default("member") // member | mod | admin
+  bannedAt       DateTime?
+  createdAt      DateTime       @default(now())
+  threads        Thread[]
+  posts          Post[]
+  likes          ForumLike[]
+  notifications  Notification[] @relation("NotificationReceiver")
+  actions        Notification[] @relation("NotificationActor")
+  reports        Report[]       @relation("ReportReporter")
+  handledReports Report[]       @relation("ReportHandler")
+  servers        Server[]
+  roles          UserRole[]
+
+  @@map("forum_user")
+}
+
+model ForumCategory {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  position  Int
+  postRole  String   @default("member") // who can start threads: member | staff | admin
+  kind      String   @default("discussion") // discussion | servers | suggestions | bugs
+  threads   Thread[]
+
+  @@map("forum_category")
+}
+
+model Thread {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  authorId   Int
+  title      String
+  subtitle   String? // announcements: blog look
+  cover      String? // announcements: banner image (https)
+  image      String? // announcements: second image under the text (https)
+  status     String   @default("open") // suggestions and bugs: see src/lib/status.ts
+  votes      Int      @default(0) // likes on the opening post (suggestions are sorted by it)
+  pinned     Boolean  @default(false)
+  locked     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  lastPostAt DateTime @default(now())
+  replyCount Int      @default(0)
+  category   ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author     ForumUser     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  posts      Post[]
+  server     Server?
+
+  @@index([categoryId, pinned, lastPostAt])
+  @@index([authorId])
+
+  @@map("forum_thread")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  threadId  Int
+  authorId  Int
+  body      String
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+  deletedAt DateTime?
+  thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author    ForumUser      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes     ForumLike[]
+  reports   Report[]
+
+  @@index([threadId, createdAt])
+  @@index([authorId])
+
+  @@map("forum_post")
+}
+
+model ForumLike {
+  userId Int
+  postId Int
+  user   ForumUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@index([postId])
+
+  @@map("forum_like")
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  actorId   Int?
+  type      String // reply | like | server_approved | server_rejected
+  threadId  Int?
+  postId    Int?
+  serverId  Int?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      ForumUser      @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
+  actor     ForumUser?     @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+
+  @@map("forum_notification")
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  reporterId  Int
+  postId      Int
+  reason      String
+  status      String   @default("open") // open | resolved | dismissed
+  handledById Int?
+  createdAt   DateTime @default(now())
+  reporter    ForumUser     @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  handledBy   ForumUser?    @relation("ReportHandler", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@unique([reporterId, postId])
+  @@index([status, createdAt])
+
+  @@map("forum_report")
+}
+
+model Server {
+  id            Int      @id @default(autoincrement())
+  ownerId       Int
+  threadId      Int      @unique
+  name          String
+  address       String
+  version       String
+  language      String // en | es | pt | other
+  description   String
+  discordInvite String?
+  status        String   @default("pending") // pending | approved | rejected
+  rejectReason  String?
+  createdAt     DateTime @default(now())
+  owner         ForumUser     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  thread        Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([ownerId])
+
+  @@map("forum_server")
+}
+
+// Cosmetic roles admins create and give to members (name + color, like Discord). Not permissions: those are ForumUser.role.
+model CommunityRole {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  color     String // #rrggbb
+  createdAt DateTime   @default(now())
+  users     UserRole[]
+
+  @@map("forum_role")
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   ForumUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   CommunityRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+
+  @@map("forum_user_role")
+}

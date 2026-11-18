@@ -1,0 +1,29 @@
+---
+// Page shell of every forum page: the website's own layout (header, footer, theme, language menu) plus the forum bar.
+import Layout from "./Layout.astro";
+import ForumNav from "@/components/forum/ForumNav.astro";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  /** Announcement post: its banner starts right under the header, so the page adds no top padding. */
+  blog?: boolean;
+  /** Path shown after "Forum" in the forum bar, e.g. the category of an announcement. */
+  crumbs?: { label: string; href: string }[];
+  /** Holding page while locked: the bar shows only the account, no links into the forum. */
+  minimal?: boolean;
+}
+
+const lang = getLang(Astro.request);
+const { title, description = t(lang, "site.description"), noindex = false, blog = false, crumbs = [], minimal = false } = Astro.props;
+const siteName = t(lang, "site.name");
+---
+
+<Layout title={title ? `${title} | ${siteName}` : siteName} description={description} noindex={noindex}>
+  <ForumNav crumbs={crumbs} minimal={minimal} />
+  <main class:list={["min-h-screen pb-12", !blog && "pt-36"]}>
+    <slot />
+  </main>
+</Layout>

@@ -1,0 +1,35 @@
+---
+// Holding page while the forum is staff-only (see lib/forum/access.ts). The middleware rewrites every other forum URL here for non-staff.
+import { SignInButton, SignOutButton } from "@clerk/astro/components";
+import Layout from "@/layouts/ForumLayout.astro";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { mayEnter } from "@/lib/forum/access.ts";
+
+const lang = getLang(Astro.request);
+const user = Astro.locals.user;
+// Staff have no reason to be here.
+if (mayEnter(user)) return Astro.redirect("/forum");
+Astro.response.status = 403;
+---
+
+<Layout title={t(lang, "locked.title")} noindex minimal>
+  <div class="container-base max-w-xl py-24 text-center space-y-6">
+    <span class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#f97316] text-white shadow-lg shadow-[#f97316]/30">
+      <span class="material-symbols-rounded text-4xl">lock</span>
+    </span>
+    <h1 class="text-4xl font-bold">{t(lang, "locked.title")}</h1>
+    <p class="text-muted">{t(lang, "locked.text")}</p>
+    {user ? (
+      <>
+        <p class="rounded-2xl border border-white/10 bg-surface p-4 text-sm text-muted">{t(lang, "locked.notStaff", { name: user.username })}</p>
+        <SignOutButton class="cursor-pointer rounded-xl border border-white/10 px-5 py-2.5 font-semibold transition-colors hover:bg-white/10">
+          {t(lang, "nav.logout")}
+        </SignOutButton>
+      </>
+    ) : (
+      <SignInButton mode="modal" forceRedirectUrl="/forum" class="cursor-pointer rounded-xl bg-[#f97316] px-6 py-3 font-semibold text-white transition hover:brightness-110">
+        {t(lang, "locked.login")}
+      </SignInButton>
+    )}
+  </div>
+</Layout>

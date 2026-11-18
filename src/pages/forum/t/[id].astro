@@ -1,0 +1,118 @@
+---
+import Layout from "@/layouts/ForumLayout.astro";
+import PostList from "@/components/forum/PostList.astro";
+import AnnouncementPost from "@/components/forum/AnnouncementPost.astro";
+import { prisma } from "@/lib/prisma.ts";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { canSeeThread, isAdmin, isStaff } from "@/lib/forum/guard.ts";
+import { renderMarkdown } from "@/lib/forum/text.ts";
+import { STATUSES, STATUS_STYLE } from "@/lib/forum/status.ts";
+
+const lang = getLang(Astro.request);
+const user = Astro.locals.user;
+const id = /^\d{1,9}$/.test(Astro.params.id ?? "") ? Number(Astro.params.id) : 0;
+const thread = id
+  ? await prisma.thread.findUnique({
+      where: { id },
+      include: { category: true, author: { select: { id: true, username: true } }, server: true },
+    })
+  : null;
+if (!thread || !canSeeThread(thread, user)) {
+  return Astro.rewrite("/404");
+}
+// A server's thread lives on its listing page.
+if (thread.server) return Astro.redirect(`/forum/servers/${thread.server.id}${Astro.url.search}`);
+const page = Number(Astro.url.searchParams.get("page")) || 1;
+const staff = isStaff(user);
+const catHref = thread.category.kind === "servers" ? "/forum/servers" : `/forum/c/${thread.category.slug}`;
+const back = Astro.url.pathname + Astro.url.search;
+const statuses = STATUSES[thread.category.kind] ?? [];
+const btn = "rounded-xl border border-white/10 bg-surface px-3 py-1.5 text-sm hover:bg-white/5 transition-colors";
+// Announcements read like a blog post: banner, one big box with title, text and a second image, comments below.
+const blog = thread.category.slug === "announcements";
+const opening = blog ? await prisma.post.findFirst({ where: { threadId: thread.id }, orderBy: { id: "asc" } }) : null;
+const date = thread.createdAt.toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const controls = [
+  { action: "pin", value: thread.pinned ? "0" : "1", label: thread.pinned ? "forum.unpin" : "forum.pin" },
+  { action: "lock", value: thread.locked ? "0" : "1", label: thread.locked ? "forum.unlock" : "forum.lock" },
+];
+---
+
+<Layout title={thread.title} description={thread.subtitle ?? thread.title} blog={blog && !!opening} crumbs={blog ? [{ label: t(lang, `cat.${thread.category.slug}.name`), href: catHref }] : []}>
+  {blog && opening && (
+    <AnnouncementPost
+      title={thread.title}
+      subtitle={thread.subtitle}
+      cover={thread.cover}
+      image={thread.image}
+      html={renderMarkdown(opening.body)}
+      date={date}
+      author={thread.author.username}
+    >
+    </AnnouncementPost>
+  )}
+  <div class:list={["container-base max-w-4xl space-y-4", blog && opening && "mt-6"]}>
+    {!(blog && opening) && (
+      <>
+        <nav class="text-sm text-muted flex flex-wrap gap-x-2">
+          <a href="/forum" class="hover:text-foreground">{t(lang, "nav.forum")}</a>
+          <span>/</span>
+          <a href={catHref} class="hover:text-foreground">{t(lang, `cat.${thread.category.slug}.name`)}</a>
+        </nav>
+        <div class="flex flex-wrap items-center gap-3">
+          <h1 class="text-2xl font-bold break-words min-w-0">{thread.title}</h1>
+          {thread.pinned && (
+            <span class="flex items-center gap-1 rounded-md bg-[#f97316]/15 px-2 py-0.5 text-xs font-semibold text-[#f97316]">
+              <span class="material-symbols-rounded text-base">push_pin</span>{t(lang, "forum.pinned")}
+            </span>
+          )}
+          {thread.locked && (
+            <span class="flex items-center gap-1 rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold text-muted">
+              <span class="material-symbols-rounded text-base">lock</span>{t(lang, "forum.locked")}
+            </span>
+          )}
+          {statuses.length > 0 && (
+            <span class={`rounded-md px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[thread.status] ?? STATUS_STYLE.open}`}>{t(lang, `status.${thread.status}`)}</span>
+          )}
+          {thread.category.kind === "suggestions" && (
+            <span class="flex items-center gap-1 rounded-md bg-[#f97316]/15 px-2 py-0.5 text-xs font-semibold text-[#f97316]">
+              <span class="material-symbols-rounded text-base">arrow_drop_up</span>{t(lang, thread.votes === 1 ? "forum.vote1" : "forum.votes", { count: thread.votes })}
+            </span>
+          )}
+        </div>
+      </>
+    )}
+
+    {staff && (
+      <div class="flex flex-wrap gap-2">
+        {blog && isAdmin(user) && <a href={`/forum/t/${thread.id}/edit`} class={btn}>{t(lang, "forum.edit")}</a>}
+        {statuses.length > 0 && (
+          <form method="post" action="/forum/act/status" class="flex items-center gap-2">
+            <input type="hidden" name="threadId" value={thread.id} />
+            <input type="hidden" name="back" value={back} />
+            <select name="value" aria-label={t(lang, "status.label")} class="rounded-xl border border-white/10 bg-surface px-3 py-1.5 text-sm">
+              {statuses.map((s) => <option value={s} selected={s === thread.status}>{t(lang, `status.${s}`)}</option>)}
+            </select>
+            <button class={btn}>{t(lang, "status.set")}</button>
+          </form>
+        )}
+        {controls.map((c) => (
+          <form method="post" action={`/forum/act/${c.action}`}>
+            <input type="hidden" name="threadId" value={thread.id} />
+            <input type="hidden" name="value" value={c.value} />
+            <input type="hidden" name="back" value={back} />
+            <button class={btn}>{t(lang, c.label)}</button>
+          </form>
+        ))}
+        <form method="post" action="/forum/act/delete-thread" onsubmit={`return confirm(${JSON.stringify(t(lang, "forum.deleteThread.confirm"))})`}>
+          <input type="hidden" name="threadId" value={thread.id} />
+          <input type="hidden" name="back" value={back} />
+          <button class={`${btn} text-error`}>{t(lang, "forum.deleteThread")}</button>
+        </form>
+      </div>
+    )}
+
+    {blog && opening && <h2 class="pt-4 text-xl font-bold">{t(lang, "news.comments")}</h2>}
+    <PostList thread={{ id: thread.id, locked: thread.locked }} page={page} skipFirst={blog && !!opening} />
+  </div>
+</Layout>

@@ -1,0 +1,25 @@
+---
+import { t, getLang } from "@/lib/forum/i18n/index.ts";
+
+// `page` is 1-based; links keep the current path and query and only change `page`.
+const { page, pages } = Astro.props as { page: number; pages: number };
+const lang = getLang(Astro.request);
+const href = (p: number) => {
+  const url = new URL(Astro.url);
+  if (p <= 1) url.searchParams.delete("page");
+  else url.searchParams.set("page", String(p));
+  url.searchParams.delete("edit");
+  url.searchParams.delete("err");
+  url.searchParams.delete("msg");
+  return url.pathname + url.search;
+};
+const link = "rounded-xl border border-white/10 bg-surface px-4 py-2 text-sm hover:bg-white/5 transition-colors";
+---
+
+{pages > 1 && (
+  <nav class="flex items-center justify-between gap-4 my-6" aria-label="Pagination">
+    {page > 1 ? <a href={href(page - 1)} class={link}>{t(lang, "forum.prev")}</a> : <span />}
+    <span class="text-sm text-muted">{t(lang, "forum.page", { page, pages })}</span>
+    {page < pages ? <a href={href(page + 1)} class={link}>{t(lang, "forum.next")}</a> : <span />}
+  </nav>
+)}

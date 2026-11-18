@@ -1,0 +1,69 @@
+---
+// Admins edit an announcement: title, text, subtitle, banner and second image.
+import Layout from "@/layouts/ForumLayout.astro";
+import ThreadForm from "@/components/forum/ThreadForm.astro";
+import { prisma } from "@/lib/prisma.ts";
+import { getLang, t } from "@/lib/forum/i18n/index.ts";
+import { isAdmin, rateLimit, requireUser } from "@/lib/forum/guard.ts";
+import { announcementSchema } from "@/lib/forum/schemas.ts";
+
+const lang = getLang(Astro.request);
+const id = /^\d{1,9}$/.test(Astro.params.id ?? "") ? Number(Astro.params.id) : 0;
+const thread = id
+  ? await prisma.thread.findUnique({ where: { id }, include: { category: true, posts: { orderBy: { id: "asc" }, take: 1 } } })
+  : null;
+if (!thread || thread.category.slug !== "announcements" || !thread.posts[0]) return Astro.rewrite("/404");
+
+const user = requireUser(Astro);
+if (user instanceof Response) return user;
+if (!isAdmin(user)) return new Response("Forbidden", { status: 403 });
+
+const opening = thread.posts[0];
+let error = "";
+let values = {
+  title: thread.title,
+  body: opening.body,
+  subtitle: thread.subtitle ?? "",
+  cover: thread.cover ?? "",
+  image: thread.image ?? "",
+};
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  for (const k of Object.keys(values)) values[k as keyof typeof values] = String(form.get(k) ?? "");
+  const parsed = announcementSchema.safeParse(values);
+  if (!parsed.success) {
+    const bad = String(parsed.error.issues[0].path[0]);
+    error = t(lang, bad === "title" ? "forum.err.title" : bad === "body" ? "forum.err.body" : `forum.err.${bad}`);
+  } else if (!rateLimit(`announce-edit:${user.id}`, 10, 60_000)) {
+    error = t(lang, "forum.err.rate");
+  } else {
+    const { title, subtitle, cover, image, body } = parsed.data;
+    await prisma.$transaction([
+      // undefined would leave a field alone; blank fields must be cleared
+      prisma.thread.update({ where: { id: thread.id }, data: { title, subtitle: subtitle ?? null, cover: cover ?? null, image: image ?? null } }),
+      prisma.post.update({ where: { id: opening.id }, data: { body, editedAt: new Date() } }),
+    ]);
+    return Astro.redirect(`/forum/t/${thread.id}`, 303);
+  }
+}
+---
+
+<Layout title={t(lang, "compose.edit.title")} noindex>
+  <div class="container-base max-w-6xl space-y-4">
+    <nav class="text-sm text-muted flex gap-x-2">
+      <a href="/forum" class="hover:text-foreground">{t(lang, "nav.forum")}</a><span>/</span>
+      <a href="/forum/c/announcements" class="hover:text-foreground">{t(lang, "cat.announcements.name")}</a>
+    </nav>
+    <ThreadForm
+      heading={t(lang, "compose.edit.title")}
+      sub={t(lang, "compose.sub.news")}
+      icon="campaign"
+      blog
+      values={values}
+      error={error}
+      submit={t(lang, "forum.save")}
+      cancel={`/forum/t/${thread.id}`}
+      previewAction="/forum/c/announcements/preview"
+    />
+  </div>
+</Layout>

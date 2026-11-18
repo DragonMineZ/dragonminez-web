@@ -50,7 +50,7 @@ Dokploy can also schedule backups of that database from its own dashboard.
 
 ## Deploy
 
-How the site is built and deployed (GitHub Actions, the image on GHCR, the Dokploy Compose app, the variables, rollback) is in [deploy.md](deploy.md). For the forum:
+How the site is built and deployed (GitHub Actions, the image on GHCR, the SSH deploy to the VPS, the variables, rollback) is in [deploy.md](deploy.md). For the forum:
 
 1. Merge the pull request and let the site deploy. The forum migration runs when the container starts.
 2. Check, logged in as an admin: `/forum` opens, `/forum/c/announcements/new` works, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".

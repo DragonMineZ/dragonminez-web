@@ -1,67 +1,133 @@
 # Deploy
 
-Merging to `main` deploys the website. Nobody has to click anything.
+Merging to `main` deploys the website. Nobody has to click anything and no one needs a Dokploy login.
 
 ```
 push to main -> GitHub Actions builds the image -> ghcr.io/dragonminez/dragonminez-web
-             -> the workflow calls the Dokploy webhook -> Dokploy redeploys the Compose app
-             -> the container runs `prisma migrate deploy` and starts
+             -> the deploy job connects to the VPS over SSH (the key can run one script and nothing else)
+             -> the script fetches docker-compose.yml from main, pulls the image, restarts the container
+             -> the container runs `prisma migrate deploy` and starts; Traefik routes dragonminez.com to it
 ```
 
-Everything that decides how the site runs is in this repository: `Dockerfile`, `docker-compose.yml` and `.github/workflows/deploy.yml`. Anyone who can merge can change it. The only things outside the repo are the variables (in Dokploy) and the one webhook secret (in GitHub).
+Everything that decides how the site runs is in this repository: `Dockerfile`, `docker-compose.yml`, `deploy/vps-deploy.sh` and `.github/workflows/deploy.yml`. Anyone who can merge can change it, so protect `main` (pull request and one review) like production.
 
-## GitHub secrets the workflow uses
+## Where things live
 
-| Secret | Notes |
+| What | Where |
 |---|---|
-| `PUBLIC_CLERK_PUBLISHABLE_KEY`, `PUBLIC_APP_URL` | Public values, baked into the build. Already set. |
-| `DOKPLOY_WEBHOOK_URL` | The Compose app's "Deploy Webhook" URL from Dokploy. Optional: without it the image is built but nothing redeploys. |
+| Image | `ghcr.io/dragonminez/dragonminez-web` (public, built with the built-in `GITHUB_TOKEN`, no personal tokens) |
+| GitHub variables | `DMZ_VPS_HOST` and `DMZ_VPS_PORT`: org-level variables the mod repo already uses, available here as they are |
+| GitHub secrets | `DMZ_VPS_KNOWN_HOSTS` (the org secret the mod repo already uses), `WEB_DEPLOY_KEY` (new, in the `production` environment) |
+| GitHub environment | `production`, limited to the `main` branch, holds `WEB_DEPLOY_KEY` |
+| VPS user | `dmzweb`, in the `docker` group, its SSH key can only run the deploy script |
+| VPS folder | `/opt/dragonminez-web/` with `.env` (the secrets, not in git) and `docker-compose.yml` (fetched from main on every deploy) |
+| VPS script | `/usr/local/sbin/dmz-web-deploy` (a copy of `deploy/vps-deploy.sh`, owned by root) |
 
-The image is pushed with the built-in `GITHUB_TOKEN`, so no Docker Hub account or personal token is needed. `CLERK_SECRET_KEY` and `DATABASE_URL` are not needed to build and are not in the image.
+## Variables in `/opt/dragonminez-web/.env`
 
-## Variables in Dokploy
-
-Set them in the Compose app's Environment tab. `docker-compose.yml` passes them to the container and refuses to start if a required one is missing.
+`docker-compose.yml` refuses to start if a required one is missing.
 
 | Variable | Required | Notes |
 |---|---|---|
-| `DATABASE_URL` | yes | The website's Postgres (the Dokploy Postgres service). |
+| `DATABASE_URL` | yes | The website's Postgres (the Dokploy Postgres service, host `dragonminez-7x11e5`). |
 | `PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SIGNING_SECRET`, `PUBLIC_APP_URL` | yes | Same values the site already uses. |
-| `DISCORD_TOKEN` | for staff | Bot token. Without it nobody counts as staff and the locked forum stays closed to everyone except `ADMIN_DISCORD_IDS`. |
+| `DISCORD_TOKEN` | for staff | Bot token. Without it nobody counts as staff and the locked forum stays closed except to `ADMIN_DISCORD_IDS`. |
 | `DISCORD_GUILD_ID` | no | Defaults to the DragonMineZ server. |
 | `DISCORD_MODERATOR_ROLES` | no | Defaults to `Moderator`. Comma list of role names or ids. |
 | `ADMIN_DISCORD_IDS` | no | Break-glass admins by Discord user id. |
-| `FORUM_PUBLIC` | no | Leave empty to keep the forum staff-only; `1` opens it. |
+| `FORUM_PUBLIC` | no | Leave unset to keep the forum staff-only; `1` opens it. |
 | `WEB_IMAGE` | no | Pin an exact build, for example `ghcr.io/dragonminez/dragonminez-web:<commit sha>`. Unset follows `main`. |
+| `WEB_HOST` | no | Only for a first start that must not take traffic (see below). Defaults to `dragonminez.com`. |
 
-## One-time setup in Dokploy
+## One-time setup on the VPS (as root)
 
-1. Merge the pull request. The workflow builds `ghcr.io/dragonminez/dragonminez-web:latest`. If Dokploy cannot pull it, open the package on GitHub (organization, Packages) and make it public (the image holds no secrets), or add the GitHub registry credentials in Dokploy (the wiki app may already use them).
-2. In Dokploy create a service of type **Compose** next to the old website app: source **Git**, repository `https://github.com/DragonMineZ/dragonminez-web`, branch `main`, compose path `./docker-compose.yml`, type **Docker Compose**.
-3. Environment tab: add the variables above. Copy the values from the old website app (its Environment tab).
-4. Do not add the domain yet. Deploy and open the Logs tab. You want to see `All migrations have been successfully applied` and the server listening on 4321. The migration only adds the `forum_*` tables, so the old site keeps working meanwhile.
-5. Cut over: in the old app note its domain settings (host, HTTPS, certificate type) and remove the domain, then in the new Compose app open Domains and add the same host with service `web`, port `4321`, HTTPS on. Deploy. The gap is a minute or two.
-6. Check the site, the HairSalon, login, and `/forum` as an admin (and logged out, which must show "The forum isn't open yet").
-7. Auto deploy: in the Compose app open the Deployments tab, turn on Autodeploy, copy the Deploy Webhook URL, and add it to GitHub as the `DOKPLOY_WEBHOOK_URL` secret. The next merge to `main` deploys by itself.
-8. Keep the old app stopped (not deleted) for a few days as the way back, then delete it.
+1. The deploy user and folder:
+   ```bash
+   adduser --disabled-password --gecos "" dmzweb
+   usermod -aG docker dmzweb
+   install -d -m 750 -o dmzweb -g dmzweb /opt/dragonminez-web
+   ```
+2. The `.env`, copied from the running site so the secrets never leave the server:
+   ```bash
+   docker inspect $(docker ps -q -f ancestor=bennndev/dragonminez-web:latest) --format '{{range .Config.Env}}{{println .}}{{end}}' | grep -E '^(DATABASE_URL|PUBLIC_CLERK_PUBLISHABLE_KEY|CLERK_SECRET_KEY|CLERK_WEBHOOK_SIGNING_SECRET|PUBLIC_APP_URL|DISCORD_TOKEN|DISCORD_GUILD_ID)=' > /opt/dragonminez-web/.env
+   echo 'ADMIN_DISCORD_IDS=YOUR_DISCORD_USER_ID' >> /opt/dragonminez-web/.env
+   echo 'WEB_HOST=localhost.invalid' >> /opt/dragonminez-web/.env
+   chown root:dmzweb /opt/dragonminez-web/.env && chmod 640 /opt/dragonminez-web/.env
+   ```
+   Add `DISCORD_MODERATOR_ROLES=...` if your staff role is not called `Moderator`. `WEB_HOST=localhost.invalid` keeps the first start away from real traffic; the cutover removes it.
+3. The deploy script:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/DragonMineZ/dragonminez-web/main/deploy/vps-deploy.sh -o /usr/local/sbin/dmz-web-deploy
+   chown root:root /usr/local/sbin/dmz-web-deploy && chmod 755 /usr/local/sbin/dmz-web-deploy
+   ```
+4. The deploy key, locked to that script:
+   ```bash
+   ssh-keygen -t ed25519 -N "" -C "github actions dragonminez-web" -f /root/dmz_web_deploy
+   install -d -m 700 -o dmzweb -g dmzweb /home/dmzweb/.ssh
+   echo 'command="/usr/local/sbin/dmz-web-deploy",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' "$(cat /root/dmz_web_deploy.pub)" > /home/dmzweb/.ssh/authorized_keys
+   chown dmzweb:dmzweb /home/dmzweb/.ssh/authorized_keys && chmod 600 /home/dmzweb/.ssh/authorized_keys
+   cat /root/dmz_web_deploy
+   ```
+   Copy the whole private key (including the BEGIN and END lines) into the GitHub secret in the next section, then delete both files: `shred -u /root/dmz_web_deploy /root/dmz_web_deploy.pub`.
+
+## One-time setup on GitHub
+
+In the repository: Settings, Secrets and variables, Actions.
+1. `DMZ_VPS_HOST` and `DMZ_VPS_PORT` are org-level variables the mod repo already uses; this repo sees them without any setup.
+2. Settings, Environments, `production` (it already exists and only the `main` branch can deploy to it): add the secret `WEB_DEPLOY_KEY` with the private key from step 4.
+3. `DMZ_VPS_KNOWN_HOSTS` is the org secret the mod repo already uses and is already available here.
+
+## First start, without taking traffic
+
+Run the script by hand (the first merge to `main` after this does the same thing):
+
+```bash
+sudo -u dmzweb /usr/local/sbin/dmz-web-deploy
+cd /opt/dragonminez-web && sudo -u dmzweb docker compose logs web | tail -30
+sudo -u dmzweb docker compose exec web wget -qO- http://127.0.0.1:4321/ | head -c 300
+```
+
+You want `All migrations have been successfully applied` in the logs and HTML from the last command. The migration only adds the `forum_*` tables, so the live site is unaffected. The old site keeps serving because this container answers only to `localhost.invalid`.
+
+## Cutover (a minute or two without the site)
+
+```bash
+# 1. stop the old Dokploy app and take its route out of Traefik
+docker service scale dragonminezweb-v7b1ac=0
+mkdir -p /etc/dokploy/traefik/disabled
+mv /etc/dokploy/traefik/dynamic/dragonminezweb-v7b1ac.yml /etc/dokploy/traefik/disabled/
+# 2. let the new container answer to the real host
+sed -i '/^WEB_HOST=/d' /opt/dragonminez-web/.env
+cd /opt/dragonminez-web && sudo -u dmzweb docker compose up -d
+```
+
+Then check the site, the HairSalon, login and the vote page, and `/forum` as an admin. Logged out, `/forum` must show "The forum isn't open yet". Traefik already holds the certificate for `dragonminez.com`, so HTTPS keeps working.
+
+Do not deploy the old app from Dokploy again; that would write its route back.
 
 ## Rolling back
 
-- A bad release: in Dokploy set `WEB_IMAGE` to the previous commit's image (`ghcr.io/dragonminez/dragonminez-web:<sha>`, the sha is on the GitHub commit) and redeploy. Remove the variable to follow `main` again.
-- The whole move: remove the domain from the new app, add it back to the old app and start it.
+- A bad release: set `WEB_IMAGE=ghcr.io/dragonminez/dragonminez-web:<previous commit sha>` in `/opt/dragonminez-web/.env` and run `sudo -u dmzweb /usr/local/sbin/dmz-web-deploy`. Remove the line to follow `main` again.
+- The whole move:
+  ```bash
+  cd /opt/dragonminez-web && sudo -u dmzweb docker compose down
+  mv /etc/dokploy/traefik/disabled/dragonminezweb-v7b1ac.yml /etc/dokploy/traefik/dynamic/
+  docker service scale dragonminezweb-v7b1ac=1
+  ```
 - The migrations only add tables, so going back never needs a database restore. Keep the dump taken before the first deploy anyway.
 
 ## Troubleshooting
 
-- The workflow's last step fails with a 4xx: Autodeploy is off in Dokploy, or the app's branch is not `main`.
-- Dokploy cannot pull the image: the package is private (see step 1).
-- The domain answers 404 or 502: the service must be `web`, port `4321`, and the app must be on `dokploy-network` (already set in the compose file).
-- The container exits at start: Logs tab. A missing required variable says which one; a migration error means `DATABASE_URL` is wrong.
+- The deploy job fails with `Permission denied (publickey)`: the public key is not in `/home/dmzweb/.ssh/authorized_keys`, or `WEB_DEPLOY_KEY` is not the matching private key.
+- It fails with `Host key verification failed`: `DMZ_VPS_KNOWN_HOSTS` does not contain this host and port.
+- `config -q` fails in the log: a required variable is missing from `.env`, and the message names which one. The running container is left alone.
+- The domain answers 404 or 502: check `docker compose ps` (the container must be healthy) and that the old route file is out of `/etc/dokploy/traefik/dynamic/`.
+- Updating the deploy script itself: copy `deploy/vps-deploy.sh` to `/usr/local/sbin/dmz-web-deploy` again as root.
 
 ## Backups
 
-Schedule backups of the Postgres service from Dokploy's dashboard (database, Backups) to an off-server bucket. A manual dump:
+The database is the Postgres service Dokploy runs, so Dokploy's own backups need a Dokploy login. Without one, dump it yourself and copy the dump off the server:
 
 ```bash
-docker exec $(docker ps -q -f ancestor=postgres:18) pg_dump -U dragon_admin -Fc dragonminez_prod > dragonminez_prod_$(date +%F).dump
+docker exec $(docker ps -q -f ancestor=postgres:18) pg_dump -U dragon_admin -Fc dragonminez_prod > /root/backups/dragonminez_prod_$(date +%F).dump
 ```

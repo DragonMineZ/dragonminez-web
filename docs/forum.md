@@ -50,13 +50,10 @@ Dokploy can also schedule backups of that database from its own dashboard.
 
 ## Deploy
 
-The website image is built by `.github/workflows/deploy.yml` on every push to `main` and pushed to Docker Hub as `bennndev/dragonminez-web:latest`. Dokploy runs that image, so a new image only goes live when Dokploy redeploys it. The variables live in Dokploy (application, Environment tab); GitHub's secrets are only used to build the image.
+How the site is built and deployed (GitHub Actions, the image on GHCR, the Dokploy Compose app, the variables, rollback) is in [deploy.md](deploy.md). For the forum:
 
-1. Open a pull request from the `forum` branch to `main` and merge it. The forum is staff-only by default, so merging does not open it to the public.
-2. Wait for the "Build & Push Docker Image" workflow to finish.
-3. In Dokploy, open the website application, Environment tab, and make sure these exist, then save: `DATABASE_URL`, `DISCORD_TOKEN`, `DISCORD_MODERATOR_ROLES` (the staff role you created, by name or id) and `ADMIN_DISCORD_IDS` (your own Discord user id, so you can always get in). Leave `FORUM_PUBLIC` out.
-4. Press Deploy (redeploy) so Dokploy pulls the new `latest` image. The migration runs when the container starts. If something goes wrong, Dokploy's deployment history lets you go back to the previous deployment.
-5. Check, logged in as an admin: `/forum` opens, `/forum/c/announcements/new` works, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".
+1. Merge the pull request and let the site deploy. The forum migration runs when the container starts.
+2. Check, logged in as an admin: `/forum` opens, `/forum/c/announcements/new` works, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".
 
 ## Opening the forum
 

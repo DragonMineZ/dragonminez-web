@@ -1,34 +1,67 @@
-name: Build & Push Docker Image
+name: Build & Deploy
 
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/dragonminez/dragonminez-web
+  # Optional: the "Deploy Webhook" URL of the Dokploy compose app (see docs/deploy.md).
+  DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Build and push the image
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          tags: bennndev/dragonminez-web:latest
           platforms: linux/amd64
-          no-cache: true
+          push: true
+          # Every build is tagged with its commit; only main moves "latest".
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ github.ref == 'refs/heads/main' && format('{0}:latest', env.IMAGE) || '' }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          # Only public values are baked in; secrets are read at runtime from Dokploy.
           build-args: |
             PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
             PUBLIC_APP_URL=${{ secrets.PUBLIC_APP_URL }}
-            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trigger Dokploy redeploy
+        if: ${{ github.ref == 'refs/heads/main' && env.DOKPLOY_WEBHOOK_URL != '' }}
+        run: |
+          status=$(curl -sS -o dokploy.txt -w '%{http_code}' -X POST "$DOKPLOY_WEBHOOK_URL"             -H 'Content-Type: application/json' -H 'X-GitHub-Event: push'             --data-binary @"$GITHUB_EVENT_PATH")
+          cat dokploy.txt; echo
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "::error::Dokploy answered $status. Check that Autodeploy is on for the website app and that its branch is main."
+            exit 1
+          fi

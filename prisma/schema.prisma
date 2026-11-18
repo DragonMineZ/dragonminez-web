@@ -196,8 +196,8 @@ model Server {
   threadId      Int      @unique
   name          String
   address       String
-  version       String
   language      String // en | es | pt | other
+  languageOther String? // the language name when language is "other"
   description   String
   discordInvite String?
   status        String   @default("pending") // pending | approved | rejected

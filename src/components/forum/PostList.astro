@@ -1,7 +1,8 @@
 ---
 // Posts of a thread (20 per page), pagination and the reply form. Reused by the server detail page.
 // Props: thread = { id, locked }, page = 1-based page number, skipFirst = hide the opening post (the server page shows it
-// as its description). Forms post to /forum/* and come back to this URL.
+// as its description), replies = false shows only the opening post and no reply form. Forms post to /forum/* and come
+// back to this URL.
 import { prisma } from "@/lib/prisma.ts";
 import { getLang, t, timeAgo } from "@/lib/forum/i18n/index.ts";
 import { isStaff } from "@/lib/forum/guard.ts";
@@ -14,17 +15,18 @@ import { chips, nameColor } from "@/lib/forum/communityRoles.ts";
 const PAGE_SIZE = 20;
 const EDIT_WINDOW_MS = 30 * 60 * 1000;
 
-const { thread, page: wanted, skipFirst = false } = Astro.props as {
+const { thread, page: wanted, skipFirst = false, replies = true } = Astro.props as {
   thread: { id: number; locked: boolean };
   page: number;
   skipFirst?: boolean;
+  replies?: boolean;
 };
 const lang = getLang(Astro.request);
 const user = Astro.locals.user;
 const staff = isStaff(user);
 
 const first = await prisma.post.findFirst({ where: { threadId: thread.id }, orderBy: { id: "asc" }, select: { id: true } });
-const where = { threadId: thread.id, ...(skipFirst && first && { id: { not: first.id } }) };
+const where = { threadId: thread.id, ...(skipFirst && first && { id: { not: first.id } }), ...(!replies && { id: first?.id ?? 0 }) };
 const total = await prisma.post.count({ where });
 const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 const page = Math.min(Math.max(1, wanted), pages);
@@ -154,7 +156,7 @@ const canReply = user && !user.banned && (!thread.locked || staff);
 
   <Pagination page={page} pages={pages} />
 
-  <section id="reply" class="scroll-mt-24 rounded-2xl border border-white/10 bg-surface p-5">
+  {replies && <section id="reply" class="scroll-mt-24 rounded-2xl border border-white/10 bg-surface p-5">
     <h2 class="text-lg font-bold mb-3">{t(lang, "forum.replyTitle")}</h2>
     {!user ? (
       <a href={`/forum/login?next=${encodeURIComponent(back)}`} class={button + " inline-block"}>{t(lang, "forum.loginToReply")}</a>
@@ -170,7 +172,7 @@ const canReply = user && !user.banned && (!thread.locked || staff);
         <button class={button}>{t(lang, "forum.reply")}</button>
       </form>
     )}
-  </section>
+  </section>}
 </div>
 
 <script>

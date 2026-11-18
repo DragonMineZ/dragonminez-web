@@ -106,7 +106,7 @@ const confirmJs = (key: string, vars = {}) => `return confirm(${JSON.stringify(t
               <span class="ml-2 text-sm text-muted">{t(lang, "forum.by")} <a href={`/forum/u/${s.owner.id}`} class="hover:text-foreground">{s.owner.username}</a></span>
             </p>
             <p class="text-sm text-muted">
-              <code class="font-mono">{s.address}</code> · {t(lang, "servers.version", { version: s.version })} · {t(lang, `servers.lang.${s.language}`)}
+              <code class="font-mono">{s.address}</code> · {s.languageOther ?? t(lang, `servers.lang.${s.language}`)}
             </p>
             <p class="text-sm text-muted">{excerpt(s.description, 200)}</p>
             <div class="flex flex-wrap gap-2">

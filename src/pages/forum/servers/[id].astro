@@ -58,8 +58,7 @@ const lockLabel = server.thread.locked ? "forum.unlock" : "forum.lock";
       )}
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
         <CopyAddress address={server.address} />
-        <span>{t(lang, "servers.version", { version: server.version })}</span>
-        <span>{t(lang, `servers.lang.${server.language}`)}</span>
+        <span>{server.languageOther ?? t(lang, `servers.lang.${server.language}`)}</span>
         <span>{t(lang, "forum.by")} <a href={`/forum/u/${server.owner.id}`} class="hover:text-foreground">{server.owner.username}</a></span>
         {server.discordInvite && (
           <a href={server.discordInvite} rel="nofollow ugc noopener" target="_blank" class="text-[#f97316] hover:underline">{t(lang, "servers.invite")}</a>

@@ -4,7 +4,7 @@ import PostList from "@/components/forum/PostList.astro";
 import AnnouncementPost from "@/components/forum/AnnouncementPost.astro";
 import { prisma } from "@/lib/prisma.ts";
 import { getLang, t } from "@/lib/forum/i18n/index.ts";
-import { canSeeThread, isAdmin, isStaff } from "@/lib/forum/guard.ts";
+import { allowsReplies, canSeeThread, isAdmin, isStaff } from "@/lib/forum/guard.ts";
 import { renderMarkdown } from "@/lib/forum/text.ts";
 import { STATUSES, STATUS_STYLE } from "@/lib/forum/status.ts";
 
@@ -30,6 +30,7 @@ const statuses = STATUSES[thread.category.kind] ?? [];
 const btn = "rounded-xl border border-white/10 bg-surface px-3 py-1.5 text-sm hover:bg-white/5 transition-colors";
 // Announcements read like a blog post: banner, one big box with title, text and a second image, comments below.
 const blog = thread.category.slug === "announcements";
+const replies = allowsReplies(thread.category);
 const opening = blog ? await prisma.post.findFirst({ where: { threadId: thread.id }, orderBy: { id: "asc" } }) : null;
 const date = thread.createdAt.toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const controls = [
@@ -112,7 +113,9 @@ const controls = [
       </div>
     )}
 
-    {blog && opening && <h2 class="pt-4 text-xl font-bold">{t(lang, "news.comments")}</h2>}
-    <PostList thread={{ id: thread.id, locked: thread.locked }} page={page} skipFirst={blog && !!opening} />
+    {replies && blog && opening && <h2 class="pt-4 text-xl font-bold">{t(lang, "news.comments")}</h2>}
+    {(replies || !(blog && opening)) && (
+      <PostList thread={{ id: thread.id, locked: thread.locked }} page={page} skipFirst={blog && !!opening} replies={replies} />
+    )}
   </div>
 </Layout>

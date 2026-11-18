@@ -1,6 +1,6 @@
 // POST handlers for posts and thread controls. Every form carries `back` (the page it came from).
 import type { APIRoute } from "astro";
-import { canSeeThread, isStaff, rateLimit, requireUser } from "@/lib/forum/guard.ts";
+import { allowsReplies, canSeeThread, isStaff, rateLimit, requireUser } from "@/lib/forum/guard.ts";
 import { notify } from "@/lib/forum/notify.ts";
 import { prisma } from "@/lib/prisma.ts";
 import { replySchema, reportSchema } from "@/lib/forum/schemas.ts";
@@ -57,8 +57,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   if (action === "reply") {
-    const thread = await prisma.thread.findUnique({ where: { id: id("threadId") }, include: { server: true } });
+    const thread = await prisma.thread.findUnique({ where: { id: id("threadId") }, include: { server: true, category: true } });
     if (!thread || !canSeeThread(thread, user)) return new Response("Not found", { status: 404 });
+    if (!allowsReplies(thread.category)) return forbidden();
     if (thread.locked && !staff) return to({ err: "locked" }, "#reply");
     const parsed = replySchema.safeParse({ body: str("body") });
     if (!parsed.success) return to({ err: "body" }, "#reply");

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { serverSchema, rejectSchema } from "../../src/lib/forum/schemas.ts";
 
-const base = { name: "Capsule SMP", address: "play.example.com", version: "1.20.1", language: "en", description: "A friendly survival server with quests." };
+const base = { name: "Capsule SMP", address: "play.example.com", language: "en", description: "A friendly survival server with quests." };
 const ok = (over: Record<string, unknown>) => serverSchema.safeParse({ ...base, ...over }).success;
 
 test("good server passes, empty invite becomes undefined", () => {
@@ -11,12 +11,12 @@ test("good server passes, empty invite becomes undefined", () => {
   assert.ok(ok({}));
 });
 
-test("addresses: host, host:port and IPv4 pass", () => {
-  for (const a of ["play.example.com", "mc.example.com:25565", "localhost", "192.168.0.1:25570", "A-b.example.org"]) assert.ok(ok({ address: a }), a);
+test("addresses: domain, domain:port and IPv4 pass", () => {
+  for (const a of ["play.example.com", "mc.example.com:25565", "192.168.0.1:25570", "8.8.8.8", "A-b.example.org"]) assert.ok(ok({ address: a }), a);
 });
 
 test("addresses: scheme, path, spaces, odd ports and junk fail", () => {
-  for (const a of ["http://x", "http://example.com", "a b", "host/path", "javascript:alert(1)", "ex.com:99999", "ex.com:", "-bad.com", "bad-.com", "a..b", "ex.com:80:80", "ab"]) {
+  for (const a of ["http://x", "http://example.com", "a b", "host/path", "javascript:alert(1)", "ex.com:99999", "ex.com:", "-bad.com", "bad-.com", "a..b", "ex.com:80:80", "ab", "localhost", "server ip address", "256.1.1.1", "1.2.3", "1.2.3.4.5", "example.c0m"]) {
     assert.ok(!ok({ address: a }), a);
   }
 });
@@ -31,12 +31,16 @@ test("discord invites: only https discord.gg and discord.com/invite", () => {
 test("length limits and language", () => {
   assert.ok(!ok({ name: "ab" }));
   assert.ok(!ok({ name: "x".repeat(61) }));
-  assert.ok(!ok({ version: "" }));
-  assert.ok(!ok({ version: "x".repeat(21) }));
   assert.ok(!ok({ description: "too short" }));
-  assert.ok(!ok({ description: "x".repeat(2001) }));
+  assert.ok(!ok({ description: "x".repeat(5001) }));
   assert.ok(!ok({ language: "fr" }));
-  assert.ok(ok({ language: "other" }));
+});
+
+test("language other needs a language name, and only keeps it for other", () => {
+  assert.ok(!ok({ language: "other" }));
+  assert.ok(!ok({ language: "other", languageOther: "1" }));
+  assert.equal(serverSchema.parse({ ...base, language: "other", languageOther: "Français" }).languageOther, "Français");
+  assert.equal(serverSchema.parse({ ...base, language: "en", languageOther: "Français" }).languageOther, undefined);
 });
 
 test("reject reason is 5-300", () => {

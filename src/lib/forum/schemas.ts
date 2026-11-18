@@ -28,14 +28,16 @@ export const replySchema = z.object({ body });
 
 export const reportSchema = z.object({ reason: z.string().trim().min(5).max(300) });
 
-// host[:port]: hostname labels or an IPv4 address, no scheme, path or spaces.
-const label = "[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?";
+// host[:port]: a domain with a letter TLD (play.example.com) or an IPv4 address, no scheme, path or spaces.
+// Also used as the input's `pattern` attribute, so it avoids flags and stays valid in the browser's `v` mode.
+const label = String.raw`[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?`;
+const octet = String.raw`(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`;
+export const ADDRESS_PATTERN = String.raw`(?:${octet}(?:\.${octet}){3}|(?:${label}\.)+[a-zA-Z]{2,63})(?::\d{1,5})?`;
 const address = z
   .string()
   .trim()
-  .min(3)
   .max(120)
-  .regex(new RegExp(String.raw`^${label}(?:\.${label})*(?::\d{1,5})?$`, "i"))
+  .regex(new RegExp(`^${ADDRESS_PATTERN}$`))
   .refine((v) => !v.includes(":") || Number(v.split(":")[1]) <= 65535);
 
 const invite = z
@@ -46,14 +48,22 @@ const invite = z
   .optional()
   .transform((v) => v || undefined);
 
-export const serverSchema = z.object({
-  name: z.string().trim().min(3).max(60),
-  address,
-  version: z.string().trim().min(1).max(20),
-  language: z.enum(["en", "es", "pt", "other"]),
-  description: z.string().trim().min(20).max(2000),
-  discordInvite: invite,
-});
+export const serverSchema = z
+  .object({
+    name: z.string().trim().min(3).max(60),
+    address,
+    language: z.enum(["en", "es", "pt", "other"]),
+    // Only kept when language is "other": a language name (letters, spaces, hyphens).
+    languageOther: z.string().trim().max(40).optional(),
+    description: z.string().trim().min(20).max(5000),
+    discordInvite: invite,
+  })
+  .superRefine((v, ctx) => {
+    if (v.language === "other" && !/^\p{L}[\p{L} \-]{1,39}$/u.test(v.languageOther ?? "")) {
+      ctx.addIssue({ code: "custom", path: ["languageOther"] });
+    }
+  })
+  .transform((v) => ({ ...v, languageOther: v.language === "other" ? v.languageOther : undefined }));
 
 export const rejectSchema = z.object({ reason: z.string().trim().min(5).max(300) });
 

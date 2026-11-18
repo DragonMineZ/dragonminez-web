@@ -77,7 +77,7 @@ const card = "rounded-2xl border border-white/10 bg-surface divide-y divide-whit
         {servers.map((s) => (
           <li class="flex items-center justify-between gap-4 px-5 py-3 hover:bg-white/5 transition-colors">
             <a href={`/forum/servers/${s.id}`} class="font-medium truncate">{s.name}</a>
-            <span class="shrink-0 text-sm text-muted">{t(lang, `servers.lang.${s.language}`)} · {t(lang, "servers.version", { version: s.version })}</span>
+            <span class="shrink-0 text-sm text-muted">{s.languageOther ?? t(lang, `servers.lang.${s.language}`)}</span>
           </li>
         ))}
         {servers.length === 0 && <li class="px-5 py-4 text-muted">{t(lang, "profile.noServers")}</li>}

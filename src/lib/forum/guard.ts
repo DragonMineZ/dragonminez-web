@@ -13,6 +13,9 @@ export const isAdmin = (user: { role: string } | null | undefined): boolean => u
 export const canStartThread = (category: { postRole: string }, user: { role: string } | null | undefined): boolean =>
   category.postRole === "admin" ? isAdmin(user) : category.postRole === "staff" ? isStaff(user) : true;
 
+/** Announcements and guides are read-only posts: no comments. */
+export const allowsReplies = (category: { slug: string }): boolean => !["announcements", "guides"].includes(category.slug);
+
 /**
  * The logged-in, not banned user, or the Response to return instead:
  * logged out = redirect to login (GET) or 401; banned = 403.

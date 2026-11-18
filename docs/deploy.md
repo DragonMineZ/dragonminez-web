@@ -16,7 +16,7 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
 | What | Where |
 |---|---|
 | Image | `ghcr.io/dragonminez/dragonminez-web` (public, built with the built-in `GITHUB_TOKEN`, no personal tokens) |
-| GitHub variables | `DMZ_VPS_HOST` (and `DMZ_VPS_PORT` if not 22), same values as in the mod repo |
+| GitHub variables | `DMZ_VPS_HOST` and `DMZ_VPS_PORT`: org-level variables the mod repo already uses, available here as they are |
 | GitHub secrets | `DMZ_VPS_KNOWN_HOSTS` (the org secret the mod repo already uses), `WEB_DEPLOY_KEY` (new, in the `production` environment) |
 | GitHub environment | `production`, limited to the `main` branch, holds `WEB_DEPLOY_KEY` |
 | VPS user | `dmzweb`, in the `docker` group, its SSH key can only run the deploy script |
@@ -73,8 +73,8 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
 ## One-time setup on GitHub
 
 In the repository: Settings, Secrets and variables, Actions.
-1. Variables: add `DMZ_VPS_HOST` (and `DMZ_VPS_PORT` if it is not 22) with the same values as in the mod repo.
-2. Settings, Environments: create `production`, set Deployment branches to `main` only, and add the secret `WEB_DEPLOY_KEY` (the private key from step 4).
+1. `DMZ_VPS_HOST` and `DMZ_VPS_PORT` are org-level variables the mod repo already uses; this repo sees them without any setup.
+2. Settings, Environments, `production` (it already exists and only the `main` branch can deploy to it): add the secret `WEB_DEPLOY_KEY` with the private key from step 4.
 3. `DMZ_VPS_KNOWN_HOSTS` is the org secret the mod repo already uses and is already available here.
 
 ## First start, without taking traffic

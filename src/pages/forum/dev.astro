@@ -1,0 +1,16 @@
+---
+// Fake login for local development (no Clerk keys needed): /forum/dev?as=member|mod|admin sets the cookie lib/forum/auth.ts reads.
+// A production build answers 404: `import.meta.env.DEV` is false there.
+import { safeNext } from "@/lib/forum/redirect.ts";
+
+if (!(import.meta.env.DEV && process.env.FORUM_DEV_LOGIN === "1")) {
+  return new Response("Not found", { status: 404 });
+}
+const as = Astro.url.searchParams.get("as") ?? "";
+if (as === "off") {
+  Astro.cookies.delete("forum_dev", { path: "/" });
+} else if (["member", "mod", "admin"].includes(as)) {
+  Astro.cookies.set("forum_dev", as, { path: "/", httpOnly: true, sameSite: "lax" });
+}
+return Astro.redirect(safeNext(Astro.url.searchParams.get("next")));
+---

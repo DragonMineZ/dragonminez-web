@@ -1,0 +1,159 @@
+---
+import { t, getLang } from "@/lib/forum/i18n/index.ts";
+
+// Markdown textarea with a formatting toolbar and Write / Preview tabs. Used by every post, reply and comment box.
+// Works without JS (tabs and toolbar stay hidden and the form posts normally).
+const { name = "body", value = "", rows = 8, label, required = true } = Astro.props as {
+  name?: string;
+  value?: string;
+  rows?: number;
+  label?: string;
+  required?: boolean;
+};
+const lang = getLang(Astro.request);
+const tab = "rounded-lg px-3 py-1 text-sm font-medium text-muted hover:text-foreground data-[active]:bg-[#f97316] data-[active]:text-white";
+// [action, icon, shortcut key]; actions are applied by the script below.
+const tools: [string, string, string?][][] = [
+  [["undo", "undo"], ["redo", "redo"]],
+  [["heading", "title"], ["bold", "format_bold", "b"], ["italic", "format_italic", "i"], ["strike", "strikethrough_s"]],
+  [["quote", "format_quote"], ["code", "code"], ["ul", "format_list_bulleted"], ["ol", "format_list_numbered"]],
+  [["link", "link", "k"], ["image", "image"]],
+];
+---
+
+<div data-md data-empty={t(lang, "forum.previewEmpty")} data-failed={t(lang, "forum.previewFailed")} data-image-url={t(lang, "md.imageUrl")} data-link-url={t(lang, "md.linkUrl")}>
+  {label && (
+    <span class="block text-sm text-muted mb-1">
+      {label} {required && <span class="text-[#f97316]" aria-hidden="true">*</span>}
+    </span>
+  )}
+  <div class="hidden flex-wrap items-center gap-2 mb-2" data-md-bar>
+    <div class="flex w-fit gap-1 rounded-xl bg-background p-1">
+      <button type="button" class={tab} data-md-tab="write" data-active>{t(lang, "forum.write")}</button>
+      <button type="button" class={tab} data-md-tab="preview">{t(lang, "forum.preview")}</button>
+    </div>
+    <div class="flex flex-wrap items-center rounded-xl bg-background p-1" role="toolbar" data-md-tools>
+      {tools.map((group, gi) => (
+        <>
+          {gi > 0 && <span class="mx-1 h-5 w-px bg-white/10" aria-hidden="true" />}
+          {group.map(([action, icon, key]) => (
+            <button
+              type="button"
+              data-md-do={action}
+              title={t(lang, `md.${action}`) + (key ? ` (Ctrl+${key.toUpperCase()})` : "")}
+              aria-label={t(lang, `md.${action}`)}
+              class="grid size-8 place-items-center rounded-lg text-muted hover:bg-white/10 hover:text-foreground"
+            >
+              <span class="material-symbols-rounded text-xl" aria-hidden="true">{icon}</span>
+            </button>
+          ))}
+        </>
+      ))}
+    </div>
+  </div>
+  <textarea
+    name={name}
+    rows={rows}
+    required={required}
+    maxlength="5000"
+    aria-label={label}
+    class="w-full rounded-xl border border-white/10 bg-background px-4 py-3 text-foreground outline-none transition-colors focus:border-[#f97316] resize-y"
+    data-md-input>{value}</textarea>
+  <div class="hidden rounded-xl border border-white/10 bg-background px-4 py-3 min-h-24 prose-forum" data-md-out></div>
+  <p class="mt-1 text-xs text-muted">{t(lang, "md.hint")}</p>
+</div>
+
+<script>
+  // Insert through execCommand so Ctrl+Z / the undo button can step back; setRangeText if the browser lacks it.
+  function insert(input: HTMLTextAreaElement, text: string, selStart: number, selEnd: number) {
+    input.focus();
+    const from = input.selectionStart;
+    if (!document.execCommand("insertText", false, text)) {
+      input.setRangeText(text, input.selectionStart, input.selectionEnd, "end");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    input.setSelectionRange(from + selStart, from + selEnd);
+  }
+
+  // Wrap the selection (or a placeholder word) in `before` / `after` and keep the inner text selected.
+  function wrap(input: HTMLTextAreaElement, before: string, after = before, placeholder = "text") {
+    const picked = input.value.slice(input.selectionStart, input.selectionEnd) || placeholder;
+    insert(input, before + picked + after, before.length, before.length + picked.length);
+  }
+
+  // Prefix every selected line (quote, lists, heading). Numbered lists count up.
+  function prefix(input: HTMLTextAreaElement, mark: (i: number) => string) {
+    const start = input.value.lastIndexOf("\n", input.selectionStart - 1) + 1;
+    const nl = input.value.indexOf("\n", input.selectionEnd);
+    const end = nl === -1 ? input.value.length : nl;
+    input.setSelectionRange(start, end);
+    const text = input.value.slice(start, end).split("\n").map((line, i) => mark(i) + line).join("\n");
+    insert(input, text, text.length, text.length);
+  }
+
+  // `[label](url)`: asks for the link (or uses a selected URL) and leaves the label selected to type over.
+  function linkish(input: HTMLTextAreaElement, bang: string, placeholder: string, ask: string) {
+    const picked = input.value.slice(input.selectionStart, input.selectionEnd);
+    const isUrl = /^https?:\/\/\S+$/.test(picked);
+    const url = isUrl ? picked : (window.prompt(ask, "https://") ?? "").trim();
+    if (!url || url === "https://") return input.focus();
+    const label = isUrl ? placeholder : picked || placeholder;
+    insert(input, `${bang}[${label}](${url})`, bang.length + 1, bang.length + 1 + label.length);
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-md]").forEach((box) => {
+    const input = box.querySelector<HTMLTextAreaElement>("[data-md-input]")!;
+    const out = box.querySelector<HTMLElement>("[data-md-out]")!;
+    const bar = box.querySelector<HTMLElement>("[data-md-bar]")!;
+    const tools = box.querySelector<HTMLElement>("[data-md-tools]")!;
+    bar.classList.replace("hidden", "flex");
+    const selected = () => input.value.slice(input.selectionStart, input.selectionEnd);
+    const actions: Record<string, () => void> = {
+      undo: () => (input.focus(), document.execCommand("undo")),
+      redo: () => (input.focus(), document.execCommand("redo")),
+      heading: () => prefix(input, () => "## "),
+      bold: () => wrap(input, "**"),
+      italic: () => wrap(input, "*"),
+      strike: () => wrap(input, "~~"),
+      code: () => (selected().includes("\n") ? wrap(input, "```\n", "\n```", "code") : wrap(input, "`", "`", "code")),
+      quote: () => prefix(input, () => "> "),
+      ul: () => prefix(input, () => "- "),
+      ol: () => prefix(input, (i) => `${i + 1}. `),
+      link: () => linkish(input, "", "text", box.dataset.linkUrl ?? ""),
+      image: () => linkish(input, "!", "image", box.dataset.imageUrl ?? ""),
+    };
+    tools.addEventListener("click", (e) => {
+      const action = (e.target as HTMLElement).closest<HTMLElement>("[data-md-do]")?.dataset.mdDo;
+      if (action) actions[action]?.();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey) return;
+      const action = ({ b: "bold", i: "italic", k: "link" } as Record<string, string>)[e.key.toLowerCase()];
+      if (!action) return;
+      e.preventDefault();
+      actions[action]();
+    });
+
+    // The server renders the preview, so what you see is what gets stored and shown.
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>("[data-md-tab]")];
+    const show = async (mode: string) => {
+      buttons.forEach((b) => b.toggleAttribute("data-active", b.dataset.mdTab === mode));
+      const preview = mode === "preview";
+      input.classList.toggle("hidden", preview);
+      tools.classList.toggle("invisible", preview);
+      out.classList.toggle("hidden", !preview);
+      if (!preview) return;
+      if (!input.value.trim()) {
+        out.textContent = box.dataset.empty ?? "";
+        return;
+      }
+      try {
+        const res = await fetch("/api/forum/preview", { method: "POST", body: input.value });
+        out.innerHTML = res.ok ? await res.text() : (box.dataset.failed ?? "");
+      } catch {
+        out.textContent = box.dataset.failed ?? "";
+      }
+    };
+    buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.mdTab ?? "write")));
+  });
+</script>

@@ -1,0 +1,171 @@
+---
+import Layout from "@/layouts/ForumLayout.astro";
+import { prisma } from "@/lib/prisma.ts";
+import { getLang, t, timeAgo } from "@/lib/forum/i18n/index.ts";
+import { isAdmin, isStaff } from "@/lib/forum/guard.ts";
+import { postPage } from "@/lib/forum/links.ts";
+import { excerpt } from "@/lib/forum/text.ts";
+
+const lang = getLang(Astro.request);
+const user = Astro.locals.user;
+if (!user || user.banned || !isStaff(user)) return Astro.rewrite("/404");
+
+const flash = (kind: "err" | "msg") => {
+  const v = Astro.url.searchParams.get(kind) ?? "";
+  const key = `mod.${kind}.${v}`;
+  return /^[a-z]{1,12}$/.test(v) && t(lang, key) !== key ? t(lang, key) : "";
+};
+const err = flash("err");
+const msg = flash("msg");
+
+const reports = await prisma.report.findMany({
+  where: { status: "open" },
+  orderBy: { createdAt: "asc" },
+  take: 50,
+  include: { reporter: { select: { id: true, username: true } }, post: { include: { thread: { select: { server: { select: { id: true } } } } } } },
+});
+// Page of the post inside its thread (posts are listed by id, 20 per page).
+const rows = await Promise.all(
+  reports.map(async (r) => {
+    const before = await prisma.post.count({ where: { threadId: r.post.threadId, id: { lte: r.postId } } });
+    const first = await prisma.post.findFirst({ where: { threadId: r.post.threadId }, orderBy: { id: "asc" }, select: { id: true } });
+    return { r, page: postPage(before, !!r.post.thread.server), isFirst: first?.id === r.postId };
+  }),
+);
+const pending = await prisma.server.findMany({
+  where: { status: "pending" },
+  orderBy: { createdAt: "asc" },
+  include: { owner: { select: { id: true, username: true } } },
+});
+const banned = await prisma.forumUser.findMany({ where: { bannedAt: { not: null } }, orderBy: { bannedAt: "desc" }, take: 100 });
+const wanted = /^\d{1,9}$/.test(Astro.url.searchParams.get("user") ?? "") ? Number(Astro.url.searchParams.get("user")) : 0;
+const target = wanted ? await prisma.forumUser.findUnique({ where: { id: wanted } }) : null;
+
+const card = "rounded-2xl border border-white/10 bg-surface divide-y divide-white/10 overflow-hidden";
+const btn = "rounded-xl border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5 transition-colors";
+const input = "rounded-xl border border-white/10 bg-background px-3 py-1.5 text-sm";
+const confirmJs = (key: string, vars = {}) => `return confirm(${JSON.stringify(t(lang, key, vars))})`;
+---
+
+<Layout title={t(lang, "mod.title")} noindex>
+  <div class="container-base max-w-4xl space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-2xl font-bold">{t(lang, "mod.title")}</h1>
+      {isAdmin(user) && (
+        <a href="/forum/mod/roles" class="flex items-center gap-1 rounded-xl border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5 transition-colors">
+          <span class="material-symbols-rounded text-lg text-[#f97316]">palette</span>{t(lang, "roles.manage")}
+        </a>
+      )}
+    </div>
+    {err && <p class="rounded-xl border border-error/40 bg-error-glass px-4 py-2 text-sm text-error" role="alert">{err}</p>}
+    {msg && <p class="rounded-xl border border-white/10 bg-surface px-4 py-2 text-sm">{msg}</p>}
+
+    <section class="space-y-3">
+      <h2 class="text-lg font-bold">{t(lang, "mod.reports")} ({rows.length})</h2>
+      <ul class={card}>
+        {rows.map(({ r, page, isFirst }) => (
+          <li class="p-5 space-y-2">
+            <p class="text-sm text-muted">
+              {t(lang, "mod.reportedBy", { name: r.reporter.username })} · {timeAgo(lang, r.createdAt)}
+            </p>
+            <p>{t(lang, "mod.reasonLine", { reason: r.reason })}</p>
+            <p class="rounded-xl bg-background px-3 py-2 text-sm text-muted">
+              {r.post.deletedAt ? t(lang, "mod.postDeleted") : excerpt(r.post.body, 200)}
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <a href={`/forum/t/${r.post.threadId}?page=${page}#post-${r.postId}`} class={btn}>{t(lang, "mod.viewPost")}</a>
+              {[
+                ...(isFirst
+                  ? [{ a: "report-delete-thread", label: "mod.deleteThread", warn: "mod.deleteThread.confirm" }]
+                  : r.post.deletedAt
+                    ? []
+                    : [{ a: "report-delete-post", label: "mod.deletePost", warn: "forum.deletePost" }]),
+                { a: "report-resolve", label: "mod.resolve" },
+                { a: "report-dismiss", label: "mod.dismiss" },
+              ].map((b) => (
+                <form method="post" action={`/forum/mod/${b.a}`} onsubmit={b.warn ? confirmJs(b.warn) : undefined}>
+                  <input type="hidden" name="reportId" value={r.id} />
+                  <input type="hidden" name="back" value="/forum/mod" />
+                  <button class={`${btn} ${b.warn ? "text-error" : ""}`}>{t(lang, b.label)}</button>
+                </form>
+              ))}
+            </div>
+          </li>
+        ))}
+        {rows.length === 0 && <li class="px-5 py-4 text-muted">{t(lang, "mod.reports.empty")}</li>}
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-lg font-bold">{t(lang, "mod.servers")} ({pending.length})</h2>
+      <ul class={card}>
+        {pending.map((s) => (
+          <li class="p-5 space-y-2">
+            <p>
+              <a href={`/forum/servers/${s.id}`} class="font-semibold hover:underline">{s.name}</a>
+              <span class="ml-2 text-sm text-muted">{t(lang, "forum.by")} <a href={`/forum/u/${s.owner.id}`} class="hover:text-foreground">{s.owner.username}</a></span>
+            </p>
+            <p class="text-sm text-muted">
+              <code class="font-mono">{s.address}</code> · {s.languageOther ?? t(lang, `servers.lang.${s.language}`)}
+            </p>
+            <p class="text-sm text-muted">{excerpt(s.description, 200)}</p>
+            <div class="flex flex-wrap gap-2">
+              <form method="post" action="/forum/mod/approve">
+                <input type="hidden" name="serverId" value={s.id} />
+                <input type="hidden" name="back" value="/forum/mod" />
+                <button class={`${btn} text-[#f97316]`}>{t(lang, "servers.approve")}</button>
+              </form>
+              <form method="post" action="/forum/mod/reject" class="flex flex-wrap gap-2">
+                <input type="hidden" name="serverId" value={s.id} />
+                <input type="hidden" name="back" value="/forum/mod" />
+                <input name="reason" required minlength="5" maxlength="300" placeholder={t(lang, "servers.rejectPlaceholder")} aria-label={t(lang, "servers.rejectPlaceholder")} class={`${input} min-w-64`} />
+                <button class={btn}>{t(lang, "servers.reject")}</button>
+              </form>
+            </div>
+          </li>
+        ))}
+        {pending.length === 0 && <li class="px-5 py-4 text-muted">{t(lang, "mod.servers.empty")}</li>}
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-lg font-bold">{t(lang, "mod.bans")} ({banned.length})</h2>
+      <ul class={card}>
+        {banned.map((u) => (
+          <li class="flex items-center justify-between gap-4 px-5 py-3">
+            <span>
+              <a href={`/forum/u/${u.id}`} class="font-medium hover:underline">{u.username}</a>
+              <span class="ml-2 text-sm text-muted">{t(lang, "mod.bannedSince", { time: timeAgo(lang, u.bannedAt!) })}</span>
+            </span>
+            <form method="post" action="/forum/mod/unban">
+              <input type="hidden" name="userId" value={u.id} />
+              <input type="hidden" name="back" value="/forum/mod" />
+              <button class={btn}>{t(lang, "mod.unban")}</button>
+            </form>
+          </li>
+        ))}
+        {banned.length === 0 && <li class="px-5 py-4 text-muted">{t(lang, "mod.bans.empty")}</li>}
+      </ul>
+
+      <form method="post" action="/forum/mod/ban" class="flex flex-wrap items-end gap-3 rounded-2xl border border-white/10 bg-surface p-5" onsubmit={target ? confirmJs("mod.ban.confirm", { name: target.username }) : undefined}>
+        <h3 class="w-full font-semibold">{t(lang, "mod.ban.title")}</h3>
+        <input type="hidden" name="back" value="/forum/mod" />
+        {target ? (
+          <>
+            <input type="hidden" name="userId" value={target.id} />
+            <p class="py-1.5">{target.username}</p>
+            <button class={`${btn} text-error`}>{t(lang, "mod.ban.confirm", { name: target.username })}</button>
+          </>
+        ) : (
+          <>
+            <label class="text-sm text-muted">
+              {t(lang, "mod.ban.id")}
+              <input name="userId" required inputmode="numeric" pattern="[0-9]{1,9}" class={`${input} mt-1 block`} />
+            </label>
+            <button class={`${btn} text-error`}>{t(lang, "mod.ban")}</button>
+          </>
+        )}
+      </form>
+    </section>
+  </div>
+</Layout>

@@ -30,6 +30,7 @@ DragonMineZ Web is the official web platform for [DragonMineZ](https://github.co
 - **3D Viewer** — Preview any hair design in real-time with multiple angles
 - **Design Creator** — Publish your own hair designs to the community
 - **Favorites** — Save your favorite designs for quick access
+- **Forum** — Community forum at `/forum` with announcements, community servers, guides, suggestions and bug reports. Setup: [docs/forum.md](docs/forum.md). How the site is deployed: [docs/deploy.md](docs/deploy.md)
 - **Multi-language** — Interface available in Spanish, English and Portuguese
 
 ## Authors

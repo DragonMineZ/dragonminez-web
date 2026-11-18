@@ -72,24 +72,45 @@ export function discordIdOf(user: User | null): string | null {
     return /^\d+$/.test(id) ? id : null;
 }
 
-async function lookup(discordId: string): Promise<boolean | null> {
+export type StaffLevel = "admin" | "mod";
+
+/**
+ * Staff level of a Discord member: "admin" for the server owner or any role with the Administrator permission,
+ * "mod" for a role named in DISCORD_MODERATOR_ROLES (by name or id), else null. Pure, so tests can import it.
+ */
+export function levelOf(
+    discordId: string,
+    memberRoleIds: string[],
+    guild: GuildInfo,
+    modRoles: string[]
+): StaffLevel | null {
+    if (guild.ownerId === discordId) return "admin";
+    let level: StaffLevel | null = null;
+    for (const id of memberRoleIds) {
+        const role = guild.roles.get(String(id));
+        if (!role) continue;
+        if ((role.permissions & ADMINISTRATOR) !== 0n) return "admin";
+        if (modRoles.includes(role.name) || modRoles.includes(String(id))) level = "mod";
+    }
+    return level;
+}
+
+/** `null` when the lookup itself failed (Discord unreachable), so callers can keep what they knew. */
+async function lookup(discordId: string): Promise<{ level: StaffLevel | null } | null> {
     const { token, guildId, roles } = settings();
-    if (!token || !guildId) return false;
+    if (!token || !guildId) return { level: null };
     const member = await discord(`/guilds/${guildId}/members/${discordId}`, token);
-    if (member.status === 404) return false;
+    if (member.status === 404) return { level: null };
     if (!member.data) return null;
     const guild = await guildInfo(guildId, token);
     if (!guild) return null;
-    if (guild.ownerId === discordId) return true;
-    return (member.data.roles ?? []).some((id: string) => {
-        const role = guild.roles.get(String(id));
-        if (!role) return false;
-        return (
-            (role.permissions & ADMINISTRATOR) !== 0n ||
-            roles.includes(role.name) ||
-            roles.includes(String(id))
-        );
-    });
+    return { level: levelOf(discordId, (member.data.roles ?? []).map(String), guild, roles) };
+}
+
+/** Staff level of a Discord user (the forum uses it for admins and moderators); `undefined` when Discord could not be asked. */
+export async function discordLevel(discordId: string): Promise<StaffLevel | null | undefined> {
+    const found = await lookup(discordId);
+    return found === null ? undefined : found.level;
 }
 
 export async function canModerate(locals: APIContext["locals"]): Promise<boolean> {
@@ -100,8 +121,9 @@ export async function canModerate(locals: APIContext["locals"]): Promise<boolean
     if (cached && cached.expires > Date.now()) return cached.value;
 
     const discordId = discordIdOf(await locals.currentUser());
-    const value = discordId ? await lookup(discordId) : false;
-    if (value === null) return false;
+    const found = discordId ? await lookup(discordId) : { level: null };
+    if (found === null) return false;
+    const value = found.level !== null;
 
     if (memberCache.size > 1000) {
         const now = Date.now();

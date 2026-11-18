@@ -54,6 +54,11 @@ class I18nStore {
       localStorage.setItem(STORAGE_KEY, lang);
       writeSharedPref(LANG_COOKIE, lang);
       document.documentElement.lang = lang;
+      // Forum pages are rendered on the server in the chosen language, so they reload instead of swapping text.
+      if (window.location.pathname.startsWith('/forum')) {
+        window.location.reload();
+        return;
+      }
       this.loadTranslations(lang);
     }
     this.notify();

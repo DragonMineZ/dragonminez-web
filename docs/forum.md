@@ -19,7 +19,7 @@ The forum needs no new Discord app and no new login keys: it uses the ones the w
 | `DISCORD_TOKEN` | staff check | Bot token of the bot that is in the DragonMineZ server. Already used by the HairSalon moderation. Runtime variable. |
 | `DISCORD_GUILD_ID` | staff check | Optional: defaults to the DragonMineZ server. |
 | `DISCORD_MODERATOR_ROLES` | staff check | Comma list of Discord role names or ids that count as forum moderators, for example `Helper,Moderator`. This is the same list the HairSalon uses for moderation. |
-| `ADMIN_DISCORD_IDS` | break-glass | Optional. Comma list of Discord user ids that are always forum admins, even if Discord cannot be reached. Not needed day to day. |
+| `ADMIN_DISCORD_IDS` | break-glass | Comma list of Discord user ids that are always forum admins, even if Discord cannot be reached or `DISCORD_TOKEN` is missing. Set it to your own id for the first deploy. |
 | `FORUM_PUBLIC` | opening the forum | New. Leave it unset (or anything but `1`) while the forum is staff-only. Set it to `1` to open the forum to everyone. |
 | `FORUM_DEV_LOGIN` | local development | Never set it on the server. It only works under `astro dev` and is ignored in production builds. |
 
@@ -31,42 +31,31 @@ Discord and Clerk: the Discord login is the "Discord" connection in the Clerk da
 
 ## Database
 
-The forum tables are created by the migration `prisma/migrations/20261118000000_forum`. It only adds the `forum_*` tables and the five categories and never touches the hair tables. The website's container already runs `prisma migrate deploy` when it starts, so deploying is enough.
+The forum uses the website's own database: the Postgres service that Dokploy runs next to the website app. The forum tables are created by the migration `prisma/migrations/20261118000000_forum`. It only adds the `forum_*` tables and the five categories and never touches the hair tables. The website's container runs `prisma migrate deploy` when it starts, so deploying is enough.
 
-If the website's database does not exist yet, create it on the VPS Postgres (separate from the bot's):
+See which database the website points at, without showing the password (run on the VPS; the service name is the one in `docker ps`, minus the `.1.xxxx` suffix):
 
 ```bash
-sudo -u postgres psql -c "CREATE USER dmz_web WITH PASSWORD 'change-me';"
-sudo -u postgres psql -c "CREATE DATABASE dragonminez_web OWNER dmz_web;"
-# DATABASE_URL=postgresql://dmz_web:change-me@HOST:5432/dragonminez_web
+docker service inspect dragonminezweb-v7blac --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}'   | sed -E 's#^(DATABASE_URL=postgres(ql)?://[^:]+:)[^@]*@#***@#; s#^([A-Z_]*(TOKEN|SECRET|KEY)[A-Z_]*)=.*#=<hidden>#'
 ```
 
-Back up before the first deploy: `pg_dump -Fc dragonminez_web > dragonminez_web.dump`.
+Back up before the first deploy. Take the user and database name from that `DATABASE_URL`:
+
+```bash
+docker exec $(docker ps -q -f name=dragonminez-7x11e5) pg_dump -U USER -Fc DBNAME > dragonminez_web_$(date +%F).dump
+```
+
+Dokploy can also schedule backups of that database from its own dashboard.
 
 ## Deploy
 
-The website image is built by `.github/workflows/deploy.yml` on every push to `main` and pushed to Docker Hub. The forum rides on that image.
+The website image is built by `.github/workflows/deploy.yml` on every push to `main` and pushed to Docker Hub as `bennndev/dragonminez-web:latest`. Dokploy runs that image, so a new image only goes live when Dokploy redeploys it. The variables live in Dokploy (application, Environment tab); GitHub's secrets are only used to build the image.
 
 1. Open a pull request from the `forum` branch to `main` and merge it. The forum is staff-only by default, so merging does not open it to the public.
-2. Let the workflow build, then redeploy the website container the way you normally do. The migration runs on start.
-3. Make sure the container's runtime environment (the host's, not GitHub's) has `DATABASE_URL`, `DISCORD_TOKEN` and `DISCORD_MODERATOR_ROLES` (the role you created), then restart. GitHub secrets only feed the image build; the running container reads its own environment.
-4. Check, logged in as a staff member: `/forum` opens, `/forum/c/announcements/new` works for an admin, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".
-
-If you can deploy the website by hand on the VPS and want to skip the pipeline, build the same image yourself from the branch and swap the container (keep the old one so you can switch back):
-
-```bash
-git clone --branch forum https://github.com/DragonMineZ/dragonminez-web.git && cd dragonminez-web
-docker build -t dragonminez-web:forum \
-  --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY=... --build-arg PUBLIC_APP_URL=https://dragonminez.com \
-  --build-arg CLERK_SECRET_KEY=... --build-arg DATABASE_URL=... .
-docker stop dmz-web && docker rename dmz-web dmz-web-old
-docker run -d --name dmz-web --restart unless-stopped -p 4321:4321 \
-  -e DATABASE_URL=... -e PUBLIC_CLERK_PUBLISHABLE_KEY=... -e CLERK_SECRET_KEY=... -e PUBLIC_APP_URL=https://dragonminez.com \
-  -e DISCORD_TOKEN=... -e DISCORD_MODERATOR_ROLES=... dragonminez-web:forum
-# back out: docker stop dmz-web && docker rm dmz-web && docker rename dmz-web-old dmz-web && docker start dmz-web
-```
-
-Use the container name, port and variables your website container already has (`docker inspect dmz-web`). Clerk production keys only work on `dragonminez.com`, so a copy on another address cannot log in.
+2. Wait for the "Build & Push Docker Image" workflow to finish.
+3. In Dokploy, open the website application, Environment tab, and make sure these exist, then save: `DATABASE_URL`, `DISCORD_TOKEN`, `DISCORD_MODERATOR_ROLES` (the staff role you created, by name or id) and `ADMIN_DISCORD_IDS` (your own Discord user id, so you can always get in). Leave `FORUM_PUBLIC` out.
+4. Press Deploy (redeploy) so Dokploy pulls the new `latest` image. The migration runs when the container starts. If something goes wrong, Dokploy's deployment history lets you go back to the previous deployment.
+5. Check, logged in as an admin: `/forum` opens, `/forum/c/announcements/new` works, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".
 
 ## Opening the forum
 

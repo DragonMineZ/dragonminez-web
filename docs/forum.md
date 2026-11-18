@@ -33,17 +33,17 @@ Discord and Clerk: the Discord login is the "Discord" connection in the Clerk da
 
 The forum uses the website's own database: the Postgres service that Dokploy runs next to the website app. The forum tables are created by the migration `prisma/migrations/20261118000000_forum`. It only adds the `forum_*` tables and the five categories and never touches the hair tables. The website's container runs `prisma migrate deploy` when it starts, so deploying is enough.
 
-See which database the website points at, without showing the password (run on the VPS; the service name is the one in `docker ps`, minus the `.1.xxxx` suffix):
+See which database the website points at, without showing the password. Run on the VPS; it finds the container by its image, so there is no name to type:
 
 ```bash
-docker service inspect dragonminezweb-v7blac --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' \
+docker inspect $(docker ps -q -f ancestor=bennndev/dragonminez-web:latest) --format '{{range .Config.Env}}{{println .}}{{end}}' \
   | sed -E 's#^(DATABASE_URL=postgres(ql)?://[^:]+:)[^@]*@#\1***@#; s#^([A-Z_]*(TOKEN|SECRET|KEY)[A-Z_]*)=.*#\1=<hidden>#'
 ```
 
 Back up before the first deploy. Take the user and database name from that `DATABASE_URL`:
 
 ```bash
-docker exec $(docker ps -q -f name=dragonminez-7x11e5) pg_dump -U USER -Fc DBNAME > dragonminez_web_$(date +%F).dump
+docker exec $(docker ps -q -f ancestor=postgres:18) pg_dump -U USER -Fc DBNAME > dragonminez_web_$(date +%F).dump
 ```
 
 Dokploy can also schedule backups of that database from its own dashboard.

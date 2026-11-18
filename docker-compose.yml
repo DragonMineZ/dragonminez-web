@@ -1,6 +1,9 @@
-# The website, run by Dokploy as a "Compose" application whose source is this file (Git provider, branch main).
-# Dokploy pulls the image that GitHub Actions builds (.github/workflows/deploy.yml) and passes its Environment tab to the
-# container. Nothing secret lives here. Setup and rollback: docs/deploy.md.
+# The website on the VPS: plain Docker Compose behind the Traefik that already runs there (it also serves the wiki).
+# GitHub Actions connects over SSH and runs deploy/vps-deploy.sh, which fetches this file from main, pulls the image
+# the build pushed to GHCR and restarts the container. Secrets live in /opt/dragonminez-web/.env on the VPS, never in git.
+# Setup, cutover and rollback: docs/deploy.md.
+name: dragonminez-web
+
 services:
   web:
     # WEB_IMAGE pins a specific build (a commit sha tag) for rollbacks and tests; unset, it follows main.
@@ -8,7 +11,7 @@ services:
     pull_policy: always
     restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in the Dokploy Environment tab}
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in /opt/dragonminez-web/.env}
       PUBLIC_CLERK_PUBLISHABLE_KEY: ${PUBLIC_CLERK_PUBLISHABLE_KEY:?set PUBLIC_CLERK_PUBLISHABLE_KEY}
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:?set CLERK_SECRET_KEY}
       CLERK_WEBHOOK_SIGNING_SECRET: ${CLERK_WEBHOOK_SIGNING_SECRET:?set CLERK_WEBHOOK_SIGNING_SECRET}
@@ -26,6 +29,22 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
+    # Traefik (the one Dokploy installed) finds this container through these labels: same host, entry points and
+    # certificate resolver as the old Dokploy route. WEB_HOST lets a first start run without taking real traffic.
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: dokploy-network
+      traefik.http.routers.dmzweb-http.rule: Host(`${WEB_HOST:-dragonminez.com}`)
+      traefik.http.routers.dmzweb-http.entrypoints: web
+      traefik.http.routers.dmzweb-http.middlewares: dmzweb-https
+      traefik.http.middlewares.dmzweb-https.redirectscheme.scheme: https
+      traefik.http.middlewares.dmzweb-https.redirectscheme.permanent: "true"
+      traefik.http.routers.dmzweb.rule: Host(`${WEB_HOST:-dragonminez.com}`)
+      traefik.http.routers.dmzweb.entrypoints: websecure
+      traefik.http.routers.dmzweb.tls.certresolver: letsencrypt
+      traefik.http.routers.dmzweb.service: dmzweb
+      traefik.http.services.dmzweb.loadbalancer.server.port: "4321"
+    # The Postgres service and Traefik live on this network.
     networks:
       - dokploy-network
 

@@ -12,14 +12,13 @@ permissions:
   contents: read
   packages: write
 
+# One run per branch. A newer pull request build replaces an older one; a deploy on main is never cut off halfway.
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   IMAGE: ghcr.io/dragonminez/dragonminez-web
-  # Optional: the "Deploy Webhook" URL of the Dokploy compose app (see docs/deploy.md).
-  DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
 
 jobs:
   build:
@@ -53,19 +52,45 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-          # Only public values are baked in; secrets are read at runtime from Dokploy.
+          # Only public values are baked in; secrets are read at runtime from the VPS.
           build-args: |
             PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
             PUBLIC_APP_URL=${{ secrets.PUBLIC_APP_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Trigger Dokploy redeploy
-        if: ${{ github.ref == 'refs/heads/main' && env.DOKPLOY_WEBHOOK_URL != '' }}
+  deploy:
+    name: Deploy to the VPS
+    needs: build
+    # Only main deploys. The "production" environment (Settings, Environments) holds the deploy key and is limited to main.
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        env:
+          DMZ_VPS_HOST: ${{ vars.DMZ_VPS_HOST }}
+          DMZ_VPS_PORT: ${{ vars.DMZ_VPS_PORT }}
+          WEB_DEPLOY_KEY: ${{ secrets.WEB_DEPLOY_KEY }}
+          DMZ_VPS_KNOWN_HOSTS: ${{ secrets.DMZ_VPS_KNOWN_HOSTS }}
         run: |
-          status=$(curl -sS -o dokploy.txt -w '%{http_code}' -X POST "$DOKPLOY_WEBHOOK_URL"             -H 'Content-Type: application/json' -H 'X-GitHub-Event: push'             --data-binary @"$GITHUB_EVENT_PATH")
-          cat dokploy.txt; echo
-          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
-            echo "::error::Dokploy answered $status. Check that Autodeploy is on for the website app and that its branch is main."
+          : "${DMZ_VPS_HOST:?DMZ_VPS_HOST variable is required}"
+          : "${WEB_DEPLOY_KEY:?WEB_DEPLOY_KEY secret is required (environment production)}"
+          : "${DMZ_VPS_KNOWN_HOSTS:?DMZ_VPS_KNOWN_HOSTS secret is required}"
+          port="${DMZ_VPS_PORT:-22}"
+          if [[ ! "$port" =~ ^[0-9]+$ ]]; then
+            echo "::error::DMZ_VPS_PORT must be numeric."
             exit 1
           fi
+          if [[ ! "$DMZ_VPS_HOST" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "::error::DMZ_VPS_HOST must be a DNS name or IPv4 address without a protocol."
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          echo "$WEB_DEPLOY_KEY" > ~/.ssh/web_deploy_key
+          chmod 600 ~/.ssh/web_deploy_key
+          echo "$DMZ_VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          # The key is locked to one command on the server (deploy/vps-deploy.sh); the word after the host is ignored.
+          ssh -i ~/.ssh/web_deploy_key -p "$port" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes dmzweb@"$DMZ_VPS_HOST" deploy

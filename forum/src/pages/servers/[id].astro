@@ -1,0 +1,104 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PostList from "../../components/PostList.astro";
+import CopyAddress from "../../components/CopyAddress.astro";
+import { prisma } from "../../lib/prisma";
+import { getLang, t } from "../../i18n";
+import { canSeeThread, isStaff, requireUser } from "../../lib/guard";
+import { renderMarkdown } from "../../lib/text";
+
+const lang = getLang(Astro.request);
+const user = Astro.locals.user;
+const id = /^\d{1,9}$/.test(Astro.params.id ?? "") ? Number(Astro.params.id) : 0;
+const server = id
+  ? await prisma.server.findUnique({ where: { id }, include: { owner: { select: { id: true, username: true } }, thread: { include: { server: true } } } })
+  : null;
+if (!server || !canSeeThread(server.thread, user)) return Astro.rewrite("/404");
+const staff = isStaff(user);
+const mine = user?.id === server.ownerId;
+
+// The owner (or staff) deletes the listing; its thread goes with it and the server cascades.
+if (Astro.request.method === "POST") {
+  const actor = requireUser(Astro);
+  if (actor instanceof Response) return actor;
+  if (!mine && !staff) return new Response("Forbidden", { status: 403 });
+  await prisma.thread.delete({ where: { id: server.threadId } });
+  return Astro.redirect("/servers", 303);
+}
+
+const page = Number(Astro.url.searchParams.get("page")) || 1;
+const back = Astro.url.pathname;
+const btn = "rounded-xl border border-white/10 bg-surface px-3 py-1.5 text-sm hover:bg-white/5 transition-colors";
+const lockLabel = server.thread.locked ? "forum.unlock" : "forum.lock";
+---
+
+<Layout title={server.name} description={server.name}>
+  <div class="container-base max-w-4xl space-y-4">
+    <nav class="text-sm text-muted">
+      <a href="/servers" class="hover:text-foreground">{t(lang, "servers.all")}</a>
+    </nav>
+
+    <section class="rounded-2xl border border-white/10 bg-surface p-5 space-y-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-2xl font-bold break-words min-w-0">{server.name}</h1>
+        {server.status !== "approved" && (
+          <span class={`rounded-md px-2 py-0.5 text-xs font-semibold ${server.status === "rejected" ? "bg-error-glass text-error" : "bg-[#f97316]/15 text-[#f97316]"}`}>
+            {t(lang, `servers.status.${server.status}`)}
+          </span>
+        )}
+        {server.thread.locked && (
+          <span class="flex items-center gap-1 rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold text-muted">
+            <span class="material-symbols-rounded text-base">lock</span>{t(lang, "forum.locked")}
+          </span>
+        )}
+      </div>
+      {server.status === "pending" && <p class="rounded-xl border border-white/10 bg-background px-4 py-2 text-sm">{t(lang, "servers.pendingNote")}</p>}
+      {server.status === "rejected" && server.rejectReason && (
+        <p class="rounded-xl border border-error/40 bg-error-glass px-4 py-2 text-sm text-error">{t(lang, "servers.rejectReason", { reason: server.rejectReason })}</p>
+      )}
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+        <CopyAddress address={server.address} />
+        <span>{t(lang, "servers.version", { version: server.version })}</span>
+        <span>{t(lang, `servers.lang.${server.language}`)}</span>
+        <span>{t(lang, "forum.by")} <a href={`/u/${server.owner.id}`} class="hover:text-foreground">{server.owner.username}</a></span>
+        {server.discordInvite && (
+          <a href={server.discordInvite} rel="nofollow ugc noopener" target="_blank" class="text-[#f97316] hover:underline">{t(lang, "servers.invite")}</a>
+        )}
+      </div>
+      <div class="prose-forum" set:html={renderMarkdown(server.description)} />
+
+      {(staff || mine) && (
+        <div class="flex flex-wrap gap-2 border-t border-white/10 pt-4">
+          {staff && server.status === "pending" && (
+            <>
+              <form method="post" action="/mod/approve">
+                <input type="hidden" name="serverId" value={server.id} />
+                <input type="hidden" name="back" value={back} />
+                <button class={`${btn} text-[#f97316]`}>{t(lang, "servers.approve")}</button>
+              </form>
+              <form method="post" action="/mod/reject" class="flex flex-wrap gap-2">
+                <input type="hidden" name="serverId" value={server.id} />
+                <input type="hidden" name="back" value={back} />
+                <input name="reason" required minlength="5" maxlength="300" placeholder={t(lang, "servers.rejectPlaceholder")} aria-label={t(lang, "servers.rejectPlaceholder")} class="min-w-64 rounded-xl border border-white/10 bg-background px-3 py-1.5 text-sm" />
+                <button class={btn}>{t(lang, "servers.reject")}</button>
+              </form>
+            </>
+          )}
+          {staff && (
+            <form method="post" action="/forum/lock">
+              <input type="hidden" name="threadId" value={server.threadId} />
+              <input type="hidden" name="value" value={server.thread.locked ? "0" : "1"} />
+              <input type="hidden" name="back" value={back} />
+              <button class={btn}>{t(lang, lockLabel)}</button>
+            </form>
+          )}
+          <form method="post" onsubmit={`return confirm(${JSON.stringify(t(lang, "servers.delete.confirm"))})`}>
+            <button class={`${btn} text-error`}>{t(lang, "servers.delete")}</button>
+          </form>
+        </div>
+      )}
+    </section>
+
+    <PostList thread={{ id: server.threadId, locked: server.thread.locked }} page={page} skipFirst />
+  </div>
+</Layout>

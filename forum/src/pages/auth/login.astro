@@ -1,0 +1,39 @@
+---
+import { randomBytes } from "node:crypto";
+import Layout from "../../layouts/Layout.astro";
+import { getLang, t } from "../../i18n";
+import { appUrl, safeNext } from "../../lib/session";
+
+const lang = getLang(Astro.request);
+const next = safeNext(Astro.url.searchParams.get("next"));
+const clientId = process.env.DISCORD_CLIENT_ID;
+
+if (clientId) {
+  const base = appUrl(Astro.url);
+  const cookie = { path: "/auth", httpOnly: true, sameSite: "lax", secure: base.startsWith("https:"), maxAge: 600 } as const;
+  const state = randomBytes(32).toString("hex");
+  Astro.cookies.set("dmz_forum_state", state, cookie);
+  if (next === "/") Astro.cookies.delete("dmz_forum_next", { path: "/auth" });
+  else Astro.cookies.set("dmz_forum_next", next, cookie);
+  const query = new URLSearchParams({
+    response_type: "code",
+    client_id: clientId,
+    scope: "identify",
+    redirect_uri: `${base}/auth/callback`,
+    state,
+  });
+  return Astro.redirect(`https://discord.com/oauth2/authorize?${query}`);
+}
+if (import.meta.env.DEV && process.env.DEV_LOGIN === "1") {
+  return Astro.redirect(`/auth/dev?next=${encodeURIComponent(next)}`);
+}
+Astro.response.status = 503;
+---
+
+<Layout title={t(lang, "auth.unavailable.title")} noindex>
+  <div class="container-base text-center py-24">
+    <h1 class="text-4xl font-bold mb-3">{t(lang, "auth.unavailable.title")}</h1>
+    <p class="text-muted mb-8">{t(lang, "auth.unavailable.text")}</p>
+    <a href="/" class="rounded-xl bg-[#f97316] px-5 py-2.5 text-white font-semibold">{t(lang, "error.home")}</a>
+  </div>
+</Layout>

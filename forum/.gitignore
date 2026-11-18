@@ -1,0 +1,13 @@
+dist/
+.astro/
+node_modules/
+*.log
+.env*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+scratch/
+/src/generated/
+/.pgdata/

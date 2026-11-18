@@ -1,0 +1,33 @@
+---
+import { getLang, t } from "../i18n";
+
+// A server address in monospace with a copy button. Without JS the button stays hidden and the address can still be selected.
+const { address } = Astro.props as { address: string };
+const lang = getLang(Astro.request);
+---
+
+<span class="inline-flex max-w-full items-center gap-2">
+  <code class="truncate rounded-lg bg-background px-2 py-1 text-sm font-mono">{address}</code>
+  <button
+    type="button"
+    hidden
+    data-copy={address}
+    data-done={t(lang, "servers.copied")}
+    class="rounded-lg border border-white/10 px-2 py-1 text-xs text-muted hover:text-foreground hover:bg-white/5 transition-colors"
+  >{t(lang, "servers.copy")}</button>
+</span>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("button[data-copy]").forEach((b) => {
+    if (!navigator.clipboard) return;
+    b.hidden = false;
+    const label = b.textContent;
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy ?? "");
+        b.textContent = b.dataset.done ?? "";
+        setTimeout(() => (b.textContent = label), 1500);
+      } catch {}
+    });
+  });
+</script>

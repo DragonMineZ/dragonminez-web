@@ -3,6 +3,9 @@ name: Build & Deploy
 on:
   push:
     branches: ["main"]
+  # A pull request builds the image and pushes only its commit tag (never "latest", never a deploy), so a change can be checked before it is merged.
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -41,7 +44,8 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
-          push: true
+          # Pull requests from forks get no registry access.
+          push: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
           # Every build is tagged with its commit; only main moves "latest".
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}

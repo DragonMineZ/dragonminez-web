@@ -36,7 +36,8 @@ The forum uses the website's own database: the Postgres service that Dokploy run
 See which database the website points at, without showing the password (run on the VPS; the service name is the one in `docker ps`, minus the `.1.xxxx` suffix):
 
 ```bash
-docker service inspect dragonminezweb-v7blac --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}'   | sed -E 's#^(DATABASE_URL=postgres(ql)?://[^:]+:)[^@]*@#***@#; s#^([A-Z_]*(TOKEN|SECRET|KEY)[A-Z_]*)=.*#=<hidden>#'
+docker service inspect dragonminezweb-v7blac --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' \
+  | sed -E 's#^(DATABASE_URL=postgres(ql)?://[^:]+:)[^@]*@#\1***@#; s#^([A-Z_]*(TOKEN|SECRET|KEY)[A-Z_]*)=.*#\1=<hidden>#'
 ```
 
 Back up before the first deploy. Take the user and database name from that `DATABASE_URL`:

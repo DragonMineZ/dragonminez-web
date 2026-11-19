@@ -31,33 +31,30 @@ Discord and Clerk: the Discord login is the "Discord" connection in the Clerk da
 
 ## Database
 
-The forum uses the website's own database: the Postgres service that Dokploy runs next to the website app. The forum tables are created by the migration `prisma/migrations/20261118000000_forum`. It only adds the `forum_*` tables and the five categories and never touches the hair tables. The website's container runs `prisma migrate deploy` when it starts, so deploying is enough.
+The forum uses the website's own database, `dragonminez_web`, in the Postgres installed on the VPS host (the Discord bot's `dragonminez_ai` is in the same instance). The container reaches it over the Unix socket; the connection string and the role are described in [deploy.md](deploy.md). The forum tables are created by the migration `prisma/migrations/20261118000000_forum`. It only adds the `forum_*` tables and the five categories and never touches the hair tables. The website's container runs `prisma migrate deploy` when it starts, so deploying is enough.
 
-See which database the website points at, without showing the password. Run on the VPS; it finds the container by its image, so there is no name to type:
-
-```bash
-docker inspect $(docker ps -q -f ancestor=bennndev/dragonminez-web:latest) --format '{{range .Config.Env}}{{println .}}{{end}}' \
-  | sed -E 's#^(DATABASE_URL=postgres(ql)?://[^:]+:)[^@]*@#\1***@#; s#^([A-Z_]*(TOKEN|SECRET|KEY)[A-Z_]*)=.*#\1=<hidden>#'
-```
-
-Back up before the first deploy. Take the user and database name from that `DATABASE_URL`:
+See which database the website points at, without showing the password. Run on the VPS:
 
 ```bash
-docker exec $(docker ps -q -f ancestor=postgres:18) pg_dump -U USER -Fc DBNAME > dragonminez_web_$(date +%F).dump
+grep '^DATABASE_URL=' /opt/dragonminez-web/.env | sed -E 's#(://[^:]+:)[^@]+@#\1***@#'
 ```
 
-Dokploy can also schedule backups of that database from its own dashboard.
+Back up before a risky migration (the nightly dump is described in [deploy.md](deploy.md)):
+
+```bash
+sudo -u postgres pg_dump -Fc dragonminez_web > dragonminez_web_$(date +%F).dump
+```
 
 ## Deploy
 
 How the site is built and deployed (GitHub Actions, the image on GHCR, the SSH deploy to the VPS, the variables, rollback) is in [deploy.md](deploy.md). For the forum:
 
-1. Merge the pull request and let the site deploy. The forum migration runs when the container starts.
+1. Push to `main` and let the site deploy. The forum migration runs when the container starts.
 2. Check, logged in as an admin: `/forum` opens, `/forum/c/announcements/new` works, `/forum/mod` shows the queue. Logged out, `/forum` shows "The forum isn't open yet".
 
 ## Opening the forum
 
-When the forum is ready for everyone: set `FORUM_PUBLIC=1` in the container's environment and restart. To lock it again, remove the variable and restart.
+When the forum is ready for everyone: set `FORUM_PUBLIC=1` in `/opt/dragonminez-web/.env` on the VPS and run `cd /opt/dragonminez-web && sudo -u dmzweb docker compose up -d --force-recreate`. To lock it again, remove the line and run the same command.
 
 ## Local development
 

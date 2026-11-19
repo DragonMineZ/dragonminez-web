@@ -6,6 +6,13 @@ set -eu
 
 cd /opt/dragonminez-web
 
+# One deploy at a time: a hand-run deploy and the CI deploy can overlap, and two container swaps at once leave a stale container behind.
+exec 9> .deploy.lock
+flock 9
+
+# Remove containers left under a temporary name by an interrupted swap (they block the next one with a name conflict).
+docker ps -aq --filter "label=com.docker.compose.project=dragonminez-web" --filter "name=_dragonminez-web-web" | xargs -r docker rm -f > /dev/null
+
 # The query string defeats the CDN cache, so a deploy right after a merge sees the new file.
 curl -fsSL "https://raw.githubusercontent.com/DragonMineZ/dragonminez-web/main/docker-compose.yml?t=$(date +%s)" -o docker-compose.yml.new
 # Refuse a broken file (or a missing required variable in .env) before it replaces the working one.

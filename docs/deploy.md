@@ -29,7 +29,7 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
 
 | Variable | Required | Notes |
 |---|---|---|
-| `DATABASE_URL` | yes | The website's Postgres (the Dokploy Postgres service, host `dragonminez-7x11e5`). |
+| `DATABASE_URL` | yes | `postgresql://dmz_web:<password>@localhost/dragonminez_web?host=/var/run/postgresql`: the Postgres installed on the host (the bot's `dragonminez_ai` lives there too), reached through its Unix socket, which `docker-compose.yml` mounts into the container. The `dmz_web` role is only allowed on that database, by one line in `pg_hba.conf`. |
 | `PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SIGNING_SECRET`, `PUBLIC_APP_URL` | yes | Same values the site already uses. |
 | `DISCORD_TOKEN` | for staff | Bot token. Without it nobody counts as staff and the locked forum stays closed except to `ADMIN_DISCORD_IDS`. |
 | `DISCORD_GUILD_ID` | no | Defaults to the DragonMineZ server. |
@@ -135,8 +135,8 @@ If the site answers `404 page not found` after step 2, Traefik has no route for 
 
 ## Backups
 
-The database is the Postgres service Dokploy runs, so Dokploy's own backups need a Dokploy login. Without one, dump it yourself and copy the dump off the server:
+Both databases (`dragonminez_web` and the bot's `dragonminez_ai`) live in the host's Postgres. A nightly cron job (`/etc/cron.d/dmz-db-backup`, running `/usr/local/sbin/dmz-db-backup`) dumps them into `/var/backups/dmz/` and keeps 14 days. Copy that folder off the server now and then. By hand:
 
 ```bash
-docker exec $(docker ps -q -f ancestor=postgres:18) pg_dump -U dragon_admin -Fc dragonminez_prod > /root/backups/dragonminez_prod_$(date +%F).dump
+sudo -u postgres pg_dump -Fc dragonminez_web > /root/dragonminez_web_$(date +%F).dump
 ```

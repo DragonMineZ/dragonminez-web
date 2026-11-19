@@ -37,7 +37,7 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
 | `ADMIN_DISCORD_IDS` | no | Break-glass admins by Discord user id. |
 | `FORUM_PUBLIC` | no | Leave unset to keep the forum staff-only; `1` opens it. |
 | `WEB_IMAGE` | no | Pin an exact build, for example `ghcr.io/dragonminez/dragonminez-web:<commit sha>`. Unset follows `main`. |
-| `WEB_HOST` | no | Only for a first start that must not take traffic (see below). Defaults to `dragonminez.com`. |
+| `WEB_TRAEFIK` | no | Set to `false` for a first start that must not take traffic (see below). Unset means Traefik routes the container. |
 
 ## One-time setup on the VPS (as root)
 
@@ -51,10 +51,10 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
    ```bash
    docker inspect $(docker ps -q -f ancestor=bennndev/dragonminez-web:latest) --format '{{range .Config.Env}}{{println .}}{{end}}' | grep -E '^(DATABASE_URL|PUBLIC_CLERK_PUBLISHABLE_KEY|CLERK_SECRET_KEY|CLERK_WEBHOOK_SIGNING_SECRET|PUBLIC_APP_URL|DISCORD_TOKEN|DISCORD_GUILD_ID)=' > /opt/dragonminez-web/.env
    echo 'ADMIN_DISCORD_IDS=YOUR_DISCORD_USER_ID' >> /opt/dragonminez-web/.env
-   echo 'WEB_HOST=localhost.invalid' >> /opt/dragonminez-web/.env
+   echo 'WEB_TRAEFIK=false' >> /opt/dragonminez-web/.env
    chown root:dmzweb /opt/dragonminez-web/.env && chmod 640 /opt/dragonminez-web/.env
    ```
-   Add `DISCORD_MODERATOR_ROLES=...` if your staff role is not called `Moderator`. `WEB_HOST=localhost.invalid` keeps the first start away from real traffic; the cutover removes it.
+   Add `DISCORD_MODERATOR_ROLES=...` if your staff role is not called `Moderator`. `WEB_TRAEFIK=false` keeps the first start away from real traffic; the cutover removes it.
 3. The deploy script:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/DragonMineZ/dragonminez-web/main/deploy/vps-deploy.sh -o /usr/local/sbin/dmz-web-deploy
@@ -87,23 +87,31 @@ cd /opt/dragonminez-web && sudo -u dmzweb docker compose logs web | tail -30
 sudo -u dmzweb docker compose exec web wget -qO- http://127.0.0.1:4321/ | head -c 300
 ```
 
-You want `All migrations have been successfully applied` in the logs and HTML from the last command. The migration only adds the `forum_*` tables, so the live site is unaffected. The old site keeps serving because this container answers only to `localhost.invalid`.
+You want `All migrations have been successfully applied` in the logs and HTML from the last command. The first migration only adds the `forum_*` tables, so the live site is unaffected. The old site keeps serving because Traefik is told to ignore this container (`WEB_TRAEFIK=false`).
 
-## Cutover (a minute or two without the site)
+## Cutover
 
-```bash
-# 1. stop the old Dokploy app and take its route out of Traefik
-docker service scale dragonminezweb-v7b1ac=0
-mkdir -p /etc/dokploy/traefik/disabled
-mv /etc/dokploy/traefik/dynamic/dragonminezweb-v7b1ac.yml /etc/dokploy/traefik/disabled/
-# 2. let the new container answer to the real host
-sed -i '/^WEB_HOST=/d' /opt/dragonminez-web/.env
-cd /opt/dragonminez-web && sudo -u dmzweb docker compose up -d
-```
+Two steps, so a mistake never takes the site down. First the new container joins the domain next to the old app (both serve the same site from the same database, so visitors see no difference). Only after you have checked it does the old app leave.
+
+1. Let Traefik route the new container, and check what it will route:
+   ```bash
+   sed -i '/^WEB_TRAEFIK=/d' /opt/dragonminez-web/.env
+   cd /opt/dragonminez-web && sudo -u dmzweb docker compose up -d --force-recreate
+   docker inspect dragonminez-web-web-1 --format '{{index .Config.Labels "traefik.http.routers.dmzweb.rule"}}'
+   ```
+   The last command must print ``Host(`dragonminez.com`)``. Wait for `healthy` in `sudo -u dmzweb docker compose ps`, then open the site.
+2. Take the old app out:
+   ```bash
+   docker service scale dragonminezweb-v7b1ac=0
+   mkdir -p /etc/dokploy/traefik/disabled
+   mv /etc/dokploy/traefik/dynamic/dragonminezweb-v7b1ac.yml /etc/dokploy/traefik/disabled/
+   ```
 
 Then check the site, the HairSalon, login and the vote page, and `/forum` as an admin. Logged out, `/forum` must show "The forum isn't open yet". Traefik already holds the certificate for `dragonminez.com`, so HTTPS keeps working.
 
 Do not deploy the old app from Dokploy again; that would write its route back.
+
+If the site answers `404 page not found` after step 2, Traefik has no route for the domain: use the whole-move rollback below, then compare `docker logs dokploy-traefik --tail 40` with step 1.
 
 ## Rolling back
 

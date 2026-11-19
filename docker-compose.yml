@@ -30,16 +30,16 @@ services:
       retries: 3
       start_period: 60s
     # Traefik (the one Dokploy installed) finds this container through these labels: same host, entry points and
-    # certificate resolver as the old Dokploy route. WEB_HOST lets a first start run without taking real traffic.
+    # certificate resolver as the old Dokploy route. WEB_TRAEFIK=false lets a first start run without taking real traffic.
     labels:
-      traefik.enable: "true"
+      traefik.enable: "${WEB_TRAEFIK:-true}"
       traefik.docker.network: dokploy-network
-      traefik.http.routers.dmzweb-http.rule: Host(`${WEB_HOST:-dragonminez.com}`)
+      traefik.http.routers.dmzweb-http.rule: Host(`dragonminez.com`)
       traefik.http.routers.dmzweb-http.entrypoints: web
       traefik.http.routers.dmzweb-http.middlewares: dmzweb-https
       traefik.http.middlewares.dmzweb-https.redirectscheme.scheme: https
       traefik.http.middlewares.dmzweb-https.redirectscheme.permanent: "true"
-      traefik.http.routers.dmzweb.rule: Host(`${WEB_HOST:-dragonminez.com}`)
+      traefik.http.routers.dmzweb.rule: Host(`dragonminez.com`)
       traefik.http.routers.dmzweb.entrypoints: websecure
       traefik.http.routers.dmzweb.tls.certresolver: letsencrypt
       traefik.http.routers.dmzweb.service: dmzweb

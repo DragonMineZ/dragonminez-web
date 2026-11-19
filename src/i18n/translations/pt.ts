@@ -19,6 +19,7 @@ const pt: Translations = {
     download: "Baixar",
     discord: "Discord",
     hairsalon: "Salão de Cabelo",
+    forum: "Fórum",
     wiki: "Wiki",
     login: "Entrar",
     logout: "Sair",

@@ -19,6 +19,7 @@ export interface Translations {
     download: string;
     discord: string;
     hairsalon: string;
+    forum: string;
     wiki: string;
     login: string;
     logout: string;

@@ -7,7 +7,7 @@ export const POST: APIRoute = async ({ request }) => {
     let evt: Awaited<ReturnType<typeof verifyWebhook>>;
     try {
         evt = await verifyWebhook(request, {
-            signingSecret: import.meta.env.CLERK_WEBHOOK_SIGNING_SECRET,
+            signingSecret: process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? import.meta.env.CLERK_WEBHOOK_SIGNING_SECRET,
         });
     } catch {
         return badRequest("Webhook signature verification failed");

@@ -37,7 +37,7 @@ Keep this file and `docs/` true: when infrastructure, the layout or a rule below
 
 - Astro inlines `import.meta.env` private variables at build time, so secrets must not depend on them. `withRuntimeEnv` in the middleware copies `process.env` into `locals.runtime.env` so Clerk reads its keys at runtime. Only `PUBLIC_CLERK_PUBLISHABLE_KEY` and `PUBLIC_APP_URL` are baked into the image (build args from GitHub secrets).
 - Runtime variables (in `/opt/dragonminez-web/.env`, listed in `docs/deploy.md`): `DATABASE_URL`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SIGNING_SECRET`, `DISCORD_TOKEN`, `DISCORD_GUILD_ID`, `DISCORD_MODERATOR_ROLES`, `ADMIN_DISCORD_IDS`, `FORUM_PUBLIC`, `WEB_IMAGE`, `WEB_TRAEFIK`. `docker-compose.yml` refuses to start without the required ones.
-- Staff: server owner and anyone with an Administrator role are forum admins; roles in `DISCORD_MODERATOR_ROLES` are moderators; `ADMIN_DISCORD_IDS` are always admins. The forum profile is synced from Clerk with a 5-minute TTL.
+- Staff: server owner and anyone with an Administrator role are forum admins; roles in `DISCORD_MODERATOR_ROLES` (default: the staff role ids `1341596685339725885,1286814599215317034`) are moderators; `ADMIN_DISCORD_IDS` are always admins. The forum profile is synced from Clerk with a 5-minute TTL.
 
 ## Database
 
@@ -48,7 +48,7 @@ Keep this file and `docs/` true: when infrastructure, the layout or a rule below
 
 ## Deploy
 
-Push to `main` -> GitHub Actions (`.github/workflows/deploy.yml`) builds `ghcr.io/dragonminez/dragonminez-web` -> the deploy job SSHes to the VPS as `dmzweb` (forced command `/usr/local/sbin/dmz-web-deploy`, a root-owned copy of `deploy/vps-deploy.sh`; copy it again as root when it changes) -> the script fetches `docker-compose.yml` from `main`, pulls the image and recreates the container. Traefik (installed by Dokploy) routes `dragonminez.com` to it through the compose labels. Nobody needs a Dokploy login, and the old Dokploy app (`dragonminezweb-v7b1ac`) is scaled to 0: never deploy it from Dokploy again, it would write its route back. Rollback and troubleshooting: `docs/deploy.md`.
+Push to `main` -> GitHub Actions (`.github/workflows/deploy.yml`) builds `ghcr.io/dragonminez/dragonminez-web` -> the deploy job SSHes to the VPS as `dmzweb` (forced command `/usr/local/sbin/dmz-web-deploy`, a root-owned copy of `deploy/vps-deploy.sh`; copy it again as root when it changes) -> the script fetches `docker-compose.yml` from `main`, pulls the image and recreates the container. Traefik (installed by Dokploy) routes `dragonminez.com` to it through the compose labels. The wiki (repo `dragonminez-wiki`, MediaWiki) is a separate container on the same Traefik: its own compose labels route `dragonminez.com/wiki` to it, so never add a `/wiki` page here. Nobody needs a Dokploy login, and the old Dokploy app (`dragonminezweb-v7b1ac`) is scaled to 0: never deploy it from Dokploy again, it would write its route back. Rollback and troubleshooting: `docs/deploy.md`.
 
 ## Retired
 

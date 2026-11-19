@@ -19,7 +19,7 @@ function settings() {
     return {
         token: process.env.DISCORD_TOKEN ?? "",
         guildId: process.env.DISCORD_GUILD_ID || DRAGONMINEZ_GUILD_ID,
-        roles: (process.env.DISCORD_MODERATOR_ROLES ?? "Moderator")
+        roles: (process.env.DISCORD_MODERATOR_ROLES || "1341596685339725885,1286814599215317034")
             .split(",")
             .map((role) => role.trim().toLowerCase())
             .filter(Boolean),

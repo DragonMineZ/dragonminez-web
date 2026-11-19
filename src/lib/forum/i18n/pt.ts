@@ -166,7 +166,7 @@ export default {
   "roles.msg.removed": "Cargo removido.",
   "locked.eyebrow": "Beta privado",
   "locked.title": "O fórum está em beta privado",
-  "locked.text": "Estamos construindo o fórum do DragonMineZ com a equipe antes de abri-lo para todos. Veja o que vem por aí.",
+  "locked.text": "Estamos construindo o fórum do DragonMineZ com a equipe antes de abri-lo para todos. Por enquanto, só a staff tem acesso. Veja o que vem por aí.",
   "locked.f1": "Anúncios oficiais",
   "locked.f2": "Sugestões para votar",
   "locked.f3": "Relatórios de bugs com status",

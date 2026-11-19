@@ -22,13 +22,9 @@ const badge = "rounded-full bg-[#f97316] px-1.5 text-xs font-bold text-white";
 
 <div class="fixed top-20 z-40 w-full border-b border-white/10 bg-background/80 backdrop-blur-md">
   <div class="container-base flex h-12 max-w-7xl items-center gap-4">
-    <a href="/forum" class="shrink-0 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/85 transition-colors hover:bg-white/10">
-      {t(lang, "nav.forum")}
-    </a>
-    <span class="-ml-2 shrink-0 rounded-full bg-[#f97316] px-2 py-0.5 text-[9px] font-bold uppercase leading-none tracking-widest text-white">Beta</span>
-    {crumbs.map((c) => (
+    {crumbs.map((c, i) => (
       <>
-        <span class="hidden shrink-0 text-white/30 sm:inline">/</span>
+        {i > 0 && <span class="hidden shrink-0 text-white/30 sm:inline">/</span>}
         <a href={c.href} class="hidden truncate text-[11px] font-bold uppercase tracking-widest text-white/60 transition-colors hover:text-white sm:inline">{c.label}</a>
       </>
     ))}

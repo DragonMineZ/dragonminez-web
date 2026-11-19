@@ -21,7 +21,7 @@ const { title, description = t(lang, "site.description"), noindex = false, blog 
 const siteName = t(lang, "site.name");
 ---
 
-<Layout title={title ? `${title} | ${siteName}` : siteName} description={description} noindex={noindex}>
+<Layout title={title ? `${title} | ${siteName}` : siteName} description={description} noindex={noindex} headerBadge={{ label: t(lang, "nav.forum"), href: "/forum", beta: true }}>
   <ForumNav crumbs={crumbs} minimal={minimal} />
   <main class:list={["min-h-screen pb-12", !blog && "pt-36"]}>
     <slot />

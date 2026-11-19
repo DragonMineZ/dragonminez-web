@@ -12,6 +12,8 @@ export interface Props {
   description?: string;
   noindex?: boolean;
   ogImage?: string;
+  /** Section chip next to the header logo. */
+  headerBadge?: { label: string; href: string; beta?: boolean };
 }
 
 const { 
@@ -19,7 +21,8 @@ const {
   i18nTitle,
   description = "Únete a DragonMineZ, el mod de Dragon Ball Z líder para Minecraft. Personaliza tu pelo 3D, combate con ki, descubre transformaciones y enfréntate a las mejores raids.",
   noindex = false,
-  ogImage = "/images/og-default.png"
+  ogImage = "/images/og-default.png",
+  headerBadge,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -92,7 +95,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
   </head>
   <body class="bg-background text-foreground selection:bg-foreground/10">
-    <Header />
+    <Header badge={headerBadge} />
     <slot />
     <Footer />
     <FloatingMenu client:idle />

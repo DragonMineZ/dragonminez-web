@@ -166,7 +166,7 @@ export default {
   "roles.msg.removed": "Role removed.",
   "locked.eyebrow": "Private beta",
   "locked.title": "The forum is in private beta",
-  "locked.text": "We are building the DragonMineZ forum with the team before opening it to everyone. Here is what is coming.",
+  "locked.text": "We are building the DragonMineZ forum with the team before opening it to everyone. For now only staff have access. Here is what is coming.",
   "locked.f1": "Official announcements",
   "locked.f2": "Suggestions you can vote on",
   "locked.f3": "Bug reports with status",

@@ -33,7 +33,7 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
 | `PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SIGNING_SECRET`, `PUBLIC_APP_URL` | yes | Same values the site already uses. |
 | `DISCORD_TOKEN` | for staff | Bot token. Without it nobody counts as staff and the locked forum stays closed except to `ADMIN_DISCORD_IDS`. |
 | `DISCORD_GUILD_ID` | no | Defaults to the DragonMineZ server. |
-| `DISCORD_MODERATOR_ROLES` | no | Defaults to `Moderator`. Comma list of role names or ids. |
+| `DISCORD_MODERATOR_ROLES` | no | Defaults to the two staff role ids `1341596685339725885,1286814599215317034`. Comma list of role names or ids. |
 | `ADMIN_DISCORD_IDS` | no | Break-glass admins by Discord user id. |
 | `FORUM_PUBLIC` | no | Leave unset to keep the forum staff-only; `1` opens it. |
 | `WEB_IMAGE` | no | Pin an exact build, for example `ghcr.io/dragonminez/dragonminez-web:<commit sha>`. Unset follows `main`. |
@@ -54,7 +54,7 @@ Everything that decides how the site runs is in this repository: `Dockerfile`, `
    echo 'WEB_TRAEFIK=false' >> /opt/dragonminez-web/.env
    chown root:dmzweb /opt/dragonminez-web/.env && chmod 640 /opt/dragonminez-web/.env
    ```
-   Add `DISCORD_MODERATOR_ROLES=...` if your staff role is not called `Moderator`. `WEB_TRAEFIK=false` keeps the first start away from real traffic; the cutover removes it.
+   Leave `DISCORD_MODERATOR_ROLES` unset to use the staff role ids above. `WEB_TRAEFIK=false` keeps the first start away from real traffic; the cutover removes it.
 3. The deploy script:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/DragonMineZ/dragonminez-web/main/deploy/vps-deploy.sh -o /usr/local/sbin/dmz-web-deploy

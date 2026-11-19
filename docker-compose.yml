@@ -19,7 +19,7 @@ services:
       # Discord: staff of the forum and moderation of the HairSalon.
       DISCORD_TOKEN: ${DISCORD_TOKEN:-}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-1216429657273012415}
-      DISCORD_MODERATOR_ROLES: ${DISCORD_MODERATOR_ROLES:-Moderator}
+      DISCORD_MODERATOR_ROLES: ${DISCORD_MODERATOR_ROLES:-1341596685339725885,1286814599215317034}
       ADMIN_DISCORD_IDS: ${ADMIN_DISCORD_IDS:-}
       # The forum is staff-only until this is exactly 1.
       FORUM_PUBLIC: ${FORUM_PUBLIC:-}

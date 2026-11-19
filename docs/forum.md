@@ -18,7 +18,7 @@ The forum needs no new Discord app and no new login keys: it uses the ones the w
 | `PUBLIC_APP_URL` | login | Already set (`https://dragonminez.com`). |
 | `DISCORD_TOKEN` | staff check | Bot token of the bot that is in the DragonMineZ server. Already used by the HairSalon moderation. Runtime variable. |
 | `DISCORD_GUILD_ID` | staff check | Optional: defaults to the DragonMineZ server. |
-| `DISCORD_MODERATOR_ROLES` | staff check | Comma list of Discord role names or ids that count as forum moderators, for example `Helper,Moderator`. This is the same list the HairSalon uses for moderation. |
+| `DISCORD_MODERATOR_ROLES` | staff check | Comma list of Discord role names or ids that count as forum moderators, default `1341596685339725885,1286814599215317034` (the staff roles). This is the same list the HairSalon uses for moderation. |
 | `ADMIN_DISCORD_IDS` | break-glass | Comma list of Discord user ids that are always forum admins, even if Discord cannot be reached or `DISCORD_TOKEN` is missing. Set it to your own id for the first deploy. |
 | `FORUM_PUBLIC` | opening the forum | New. Leave it unset (or anything but `1`) while the forum is staff-only. Set it to `1` to open the forum to everyone. |
 | `FORUM_DEV_LOGIN` | local development | Never set it on the server. It only works under `astro dev` and is ignored in production builds. |

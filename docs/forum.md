@@ -39,7 +39,7 @@ See which database the website points at, without showing the password. Run on t
 grep '^DATABASE_URL=' /opt/dragonminez-web/.env | sed -E 's#(://[^:]+:)[^@]+@#\1***@#'
 ```
 
-Back up before a risky migration (the nightly dump is described in [deploy.md](deploy.md)):
+Back up before a risky migration:
 
 ```bash
 sudo -u postgres pg_dump -Fc dragonminez_web > dragonminez_web_$(date +%F).dump

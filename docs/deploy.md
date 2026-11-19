@@ -135,7 +135,7 @@ If the site answers `404 page not found` after step 2, Traefik has no route for 
 
 ## Backups
 
-Both databases (`dragonminez_web` and the bot's `dragonminez_ai`) live in the host's Postgres. A nightly cron job (`/etc/cron.d/dmz-db-backup`, running `/usr/local/sbin/dmz-db-backup`) dumps them into `/var/backups/dmz/` and keeps 14 days. Copy that folder off the server now and then. By hand:
+The hosting provider backs up the whole server (both databases included), so no backup job runs on it. Before a risky or destructive migration, take your own dump:
 
 ```bash
 sudo -u postgres pg_dump -Fc dragonminez_web > /root/dragonminez_web_$(date +%F).dump

@@ -44,7 +44,7 @@ Keep this file and `docs/` true: when infrastructure, the layout or a rule below
 - The Postgres installed on the VPS host (16.x), shared with the Discord bot. This site: database `dragonminez_web`, role `dmz_web`. The bot's `dragonminez_ai` is in the same instance and is not ours to touch.
 - The container reaches it over the Unix socket `/var/run/postgresql` (mounted by `docker-compose.yml`): `DATABASE_URL=postgresql://dmz_web:<password>@localhost/dragonminez_web?host=/var/run/postgresql`. `pg_hba.conf` allows `dmz_web` on that database only. Password: `/root/dmz_web_pw` on the VPS (root only).
 - The old Dokploy Postgres 18 container (`dragonminez-7x11e5`, database `dragonminez_prod`) is the pre-migration copy, kept only as a fallback until it is deleted.
-- Backups: nightly dump into `/var/backups/dmz/` (see `docs/deploy.md`).
+- Backups: the hosting provider backs up the whole server, so no dump job runs here. Take a manual `pg_dump` before a destructive migration (`docs/deploy.md`, Backups).
 
 ## Deploy
 

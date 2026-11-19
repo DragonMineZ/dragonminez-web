@@ -162,6 +162,16 @@ const withRateLimit: MiddlewareHandler = async (context, next) => {
     return next();
 };
 
+// ── Runtime environment for Clerk
+// Clerk reads its keys with import.meta.env, which Astro fixes when the site is built. Clerk checks `locals.runtime.env`
+// first (the Cloudflare convention), so giving it the server's environment makes the secret key come from the running
+// container instead of being baked into the Docker image. Build-time values stay as defaults.
+const withRuntimeEnv: MiddlewareHandler = (context, next) => {
+    const locals = context.locals as unknown as { runtime?: { env?: Record<string, unknown> } };
+    locals.runtime = { ...locals.runtime, env: { ...import.meta.env, ...process.env } };
+    return next();
+};
+
 // ── Clerk Auth
 const clerk = clerkMiddleware((auth, context) => {
     const { userId, redirectToSignIn } = auth();
@@ -197,4 +207,4 @@ const withForum: MiddlewareHandler = async (context, next) => {
     return response;
 };
 
-export const onRequest = sequence(withSecurityHeaders, withRateLimit, withClerkAuth, withForum);
+export const onRequest = sequence(withSecurityHeaders, withRateLimit, withRuntimeEnv, withClerkAuth, withForum);

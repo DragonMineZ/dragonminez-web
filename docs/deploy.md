@@ -122,6 +122,7 @@ Do not deploy the old app from Dokploy again; that would write its route back.
 - It fails with `Host key verification failed`: `DMZ_VPS_KNOWN_HOSTS` does not contain this host and port.
 - `config -q` fails in the log: a required variable is missing from `.env`, and the message names which one. The running container is left alone.
 - The domain answers 404 or 502: check `docker compose ps` (the container must be healthy) and that the old route file is out of `/etc/dokploy/traefik/dynamic/`.
+- `Conflict. The container name ... is already in use`: an interrupted swap left a container named like `<id>_dragonminez-web-web-1`. The script removes those on every run now; by hand: `docker rm -f <that id>` and deploy again.
 - Updating the deploy script itself: copy `deploy/vps-deploy.sh` to `/usr/local/sbin/dmz-web-deploy` again as root.
 
 ## Backups

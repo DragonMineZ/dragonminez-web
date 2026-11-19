@@ -13,23 +13,37 @@ Astro.response.status = 403;
 ---
 
 <Layout title={t(lang, "locked.title")} noindex minimal>
-  <div class="container-base max-w-xl py-24 text-center space-y-6">
-    <span class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#f97316] text-white shadow-lg shadow-[#f97316]/30">
-      <span class="material-symbols-rounded text-4xl">lock</span>
-    </span>
-    <h1 class="text-4xl font-bold">{t(lang, "locked.title")}</h1>
-    <p class="text-muted">{t(lang, "locked.text")}</p>
-    {user ? (
-      <>
-        <p class="rounded-2xl border border-white/10 bg-surface p-4 text-sm text-muted">{t(lang, "locked.notStaff", { name: user.username })}</p>
-        <SignOutButton class="cursor-pointer rounded-xl border border-white/10 px-5 py-2.5 font-semibold transition-colors hover:bg-white/10">
-          {t(lang, "nav.logout")}
-        </SignOutButton>
-      </>
-    ) : (
-      <SignInButton mode="modal" forceRedirectUrl="/forum" class="cursor-pointer rounded-xl bg-[#f97316] px-6 py-3 font-semibold text-white transition hover:brightness-110">
-        {t(lang, "locked.login")}
-      </SignInButton>
-    )}
+  <div class="container-base max-w-2xl py-16 sm:py-24">
+    <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-surface px-6 py-12 text-center sm:px-12">
+      <div class="pointer-events-none absolute -top-32 left-1/2 size-80 -translate-x-1/2 rounded-full bg-[#f97316]/20 blur-3xl" aria-hidden="true"></div>
+      <div class="relative space-y-6">
+        <span class="inline-flex items-center gap-2 rounded-full border border-[#f97316]/40 bg-[#f97316]/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#f97316]">
+          <span class="material-symbols-rounded text-base" aria-hidden="true">science</span>
+          {t(lang, "locked.eyebrow")}
+        </span>
+        <h1 class="text-3xl font-bold sm:text-4xl">{t(lang, "locked.title")}</h1>
+        <p class="mx-auto max-w-md text-muted">{t(lang, "locked.text")}</p>
+        <ul class="mx-auto grid max-w-md grid-cols-1 gap-3 text-left text-sm sm:grid-cols-2">
+          {[["campaign", "locked.f1"], ["lightbulb", "locked.f2"], ["bug_report", "locked.f3"], ["dns", "locked.f4"]].map(([icon, key]) => (
+            <li class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <span class="material-symbols-rounded text-xl text-[#f97316]" aria-hidden="true">{icon}</span>
+              {t(lang, key)}
+            </li>
+          ))}
+        </ul>
+        {user ? (
+          <div class="space-y-4">
+            <p class="text-sm text-muted">{t(lang, "locked.notStaff", { name: user.username })}</p>
+            <SignOutButton class="cursor-pointer rounded-xl border border-white/10 px-5 py-2.5 font-semibold transition-colors hover:bg-white/10">
+              {t(lang, "nav.logout")}
+            </SignOutButton>
+          </div>
+        ) : (
+          <SignInButton mode="modal" forceRedirectUrl="/forum" class="cursor-pointer rounded-xl bg-[#f97316] px-6 py-3 font-semibold text-white transition hover:brightness-110">
+            {t(lang, "locked.login")}
+          </SignInButton>
+        )}
+      </div>
+    </div>
   </div>
 </Layout>

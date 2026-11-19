@@ -19,6 +19,7 @@ const es: Translations = {
     download: "Descargar",
     discord: "Discord",
     hairsalon: "Peluquería",
+    forum: "Foro",
     wiki: "Wiki",
     login: "Iniciar Sesión",
     logout: "Cerrar Sesión",

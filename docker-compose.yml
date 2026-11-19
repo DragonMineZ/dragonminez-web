@@ -23,6 +23,10 @@ services:
       ADMIN_DISCORD_IDS: ${ADMIN_DISCORD_IDS:-}
       # The forum is staff-only until this is exactly 1.
       FORUM_PUBLIC: ${FORUM_PUBLIC:-}
+    # The Postgres installed on the host (the bot's) is reached through its Unix socket: no open port, no firewall rule.
+    # DATABASE_URL then looks like postgresql://user:pass@localhost/db?host=/var/run/postgresql
+    volumes:
+      - /var/run/postgresql:/var/run/postgresql
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:4321/"]
       interval: 30s
